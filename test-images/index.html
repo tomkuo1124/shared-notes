@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>重症肌無力 — 眼肌型輔助復原策略與實證整理</title>
+
+<!-- Open Graph -->
+<meta property="og:title" content="重症肌無力 — 眼肌型輔助復原策略與實證整理" />
+<meta property="og:description" content="" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomkuo1124.github.io/shared-notes/test-images/" />
+<meta property="og:locale" content="zh_TW" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="重症肌無力 — 眼肌型輔助復原策略與實證整理" />
+<meta name="twitter:description" content="" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0;
+  background: #faf8f4;
+  color: #2c2a26;
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ───────────────────────────────────────── */
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+.content { padding-bottom: 80px; }
+
+/* ── Typography ───────────────────────────────────── */
+h1, h2, h3, h4 { font-weight: 700; color: #2c2a26; letter-spacing: -0.01em; }
+h1 { font-size: 2.4em; line-height: 1.2; margin: 0 0 16px; }
+h2 {
+  font-size: 1.7em; line-height: 1.3;
+  margin: 72px 0 20px;
+  padding-top: 40px;
+  border-top: 1px solid #e0dbd1;
+  position: relative;
+}
+h2:first-of-type { border-top: none; padding-top: 0; margin-top: 40px; }
+h2 .chapter-num {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #7a4f3a;
+  margin-bottom: 4px;
+}
+h2 .chapter-num::before { content: "§ "; }
+h3 { font-size: 1.25em; line-height: 1.4; margin: 40px 0 12px; color: #5c3828; }
+h4 { font-size: 1.05em; line-height: 1.45; margin: 28px 0 8px; }
+p { margin: 0 0 18px; }
+strong { color: #2c2a26; }
+em { color: #5c3828; }
+a { color: #7a4f3a; text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: #5c3828; }
+hr { border: none; border-top: 1px solid #e0dbd1; margin: 48px 0; }
+
+ul, ol { padding-left: 24px; margin: 0 0 18px; }
+li { margin-bottom: 6px; }
+li > ul, li > ol { margin-top: 6px; margin-bottom: 0; }
+
+code {
+  background: #f3efe8;
+  padding: 2px 6px; border-radius: 3px;
+  font-size: 0.88em;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+}
+pre {
+  background: #f3efe8;
+  border: 1px solid #e0dbd1;
+  border-radius: 6px;
+  padding: 20px; overflow-x: auto;
+  font-size: 14px; line-height: 1.5;
+  margin: 24px 0;
+}
+pre code { background: none; padding: 0; }
+
+/* ── Hero ─────────────────────────────────────────── */
+.hero {
+  padding: 64px 0 48px;
+  border-bottom: 2px solid #7a4f3a;
+  position: relative;
+}
+.hero::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, #5c3828, #7a4f3a, #8a857d);
+}
+.hero-title { font-size: 2.6em; line-height: 1.15; }
+.hero-abstract {
+  font-size: 1.15em; line-height: 1.65;
+  color: #5a5650;
+  margin: 20px 0 0;
+  max-width: 700px;
+}
+.hero-meta {
+  margin-top: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; color: #8a857d;
+  letter-spacing: 0.03em;
+}
+.tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 16px;
+}
+.tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 12px;
+  background: #f0e4da;
+  color: #7a4f3a;
+}
+
+/* ── Visual Element 2: Callouts (unified box, color-coded) ──── */
+.callout {
+  border-left: 4px solid #7a4f3a;
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin: 28px 0;
+  position: relative;
+}
+.callout-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.callout-body p:last-child { margin-bottom: 0; }
+.callout-body ul:last-child, .callout-body ol:last-child { margin-bottom: 0; }
+
+/* Callout color variants */
+.callout-tip, .callout-example { background: #e8f2e8; border-color: #3a7d44; }
+.callout-tip .callout-title, .callout-example .callout-title { color: #3a7d44; }
+.callout-warning, .callout-caution, .callout-danger, .callout-important {
+  background: #f6e8e0; border-color: #c25a2e;
+}
+.callout-warning .callout-title, .callout-caution .callout-title,
+.callout-danger .callout-title, .callout-important .callout-title { color: #c25a2e; }
+.callout-abstract, .callout-summary { background: #f0e4da; border-color: #7a4f3a; }
+.callout-abstract .callout-title, .callout-summary .callout-title { color: #7a4f3a; }
+.callout-info, .callout-note { background: #e8e0f0; border-color: #6b3a8c; }
+.callout-info .callout-title, .callout-note .callout-title { color: #6b3a8c; }
+
+/* ── Visual Element 3: Tables ─────────────────────── */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 16px;
+}
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0dbd1;
+  vertical-align: top;
+}
+th {
+  background: #5c3828;
+  color: #faf8f4;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+tr:nth-child(even) td { background: #f3efe8; }
+tr:last-child td { border-bottom: none; }
+td:first-child { font-weight: 600; color: #5c3828; }
+
+/* Table enhancement: Sugar cube blocks */
+.cube-num { font-weight: 700; font-size: 1.1em; margin-bottom: 6px; }
+.cube-row { display: flex; gap: 3px; flex-wrap: wrap; }
+.cube {
+  width: 20px; height: 20px;
+  background: linear-gradient(135deg, #fff7e0 0%, #c8901433 100%);
+  border: 1.5px solid #c89014;
+  border-radius: 3px;
+  box-shadow: 1px 1px 0 #c890144d;
+}
+.cube-half {
+  background: linear-gradient(90deg, #fff7e0 50%, transparent 50%);
+}
+
+/* Table enhancement: Percentage color badges */
+.pct-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6em; font-weight: 800;
+  display: block; line-height: 1.2;
+}
+.pct-high { color: #2d6a34; }
+.pct-mid  { color: #b8861d; }
+.pct-low  { color: #b83a1d; }
+
+/* ── Visual Element 4: Blockquotes ────────────────── */
+blockquote {
+  margin: 36px 0;
+  padding: 20px 32px;
+  border-left: 3px solid #7a4f3a;
+  font-size: 1.15em;
+  line-height: 1.55;
+  font-style: italic;
+  color: #5c3828;
+  background: linear-gradient(90deg, #f0e4da 0%, transparent 100%);
+}
+blockquote p { margin-bottom: 8px; }
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ── Visual Element 5: Mermaid Diagrams ───────────── */
+.mermaid-wrap {
+  margin: 32px -80px;
+  padding: 24px;
+  background: #faf8f4;
+  border: 1px solid #e0dbd1;
+  border-radius: 8px;
+  overflow-x: auto;
+  cursor: zoom-in;
+}
+pre.mermaid {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  text-align: center;
+  min-width: 900px;
+  overflow: visible;
+}
+.mermaid-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; cursor: zoom-out;
+  overflow: auto;
+}
+.mermaid-overlay svg { max-width: 95vw; max-height: 90vh; }
+
+/* ── Embedded Images ─────────────────────────────── */
+.img-embed { margin: 28px 0; text-align: center; }
+.img-embed img {
+  max-width: 100%; height: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+/* ── Floating TOC ─────────────────────────────────── */
+.toc {
+  position: fixed; right: 20px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  font-family: 'Inter', sans-serif;
+  background: #faf8f4;
+  border: 1px solid #e0dbd1;
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 240px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.toc-header {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: #8a857d;
+  margin-bottom: 12px;
+}
+.toc ol { list-style: none; padding: 0; margin: 0; }
+.toc li { margin-bottom: 6px; }
+.toc a {
+  color: #5a5650;
+  text-decoration: none;
+  font-size: 12px; line-height: 1.4;
+  display: flex; align-items: baseline; gap: 8px;
+  transition: color 0.15s;
+}
+.toc a:hover { color: #7a4f3a; }
+.toc a.active { color: #7a4f3a; font-weight: 600; }
+.toc .toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #e0dbd1;
+  min-width: 18px;
+}
+.toc a.active .toc-num { color: #7a4f3a; }
+
+/* ── Footer ───────────────────────────────────────── */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #8a857d;
+  border-top: 1px solid #e0dbd1;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 1320px) { .toc { display: none; } }
+@media (max-width: 960px) {
+  .mermaid-wrap { margin: 24px -24px; }
+}
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+  .hero { padding: 40px 0 32px; }
+  .hero-title { font-size: 1.8em; }
+  .hero-abstract { font-size: 1em; }
+  h2 { font-size: 1.4em; margin: 56px 0 16px; }
+  h3 { font-size: 1.15em; }
+  blockquote { padding: 16px 20px; font-size: 1.05em; }
+  table { font-size: 14px; }
+  th, td { padding: 8px 12px; }
+  .callout { padding: 16px 18px; }
+  .mermaid-wrap { margin: 16px -16px; padding: 16px; }
+}
+@media print {
+  .toc { display: none; }
+  .hero::before { display: none; }
+  body { font-size: 12pt; background: white; }
+  h2 { page-break-after: avoid; }
+  .callout, blockquote, table { page-break-inside: avoid; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Floating TOC -->
+<nav class="toc" aria-label="Table of Contents">
+  <div class="toc-header">Contents</div>
+  <ol>
+    <li><a href="#section-1"><span class="toc-num">01</span>知識架構總覽</a></li>
+    <li><a href="#section-2"><span class="toc-num">02</span>一、疾病背景與預後</a></li>
+    <li><a href="#section-3"><span class="toc-num">03</span>二、替代藥物選項（供與醫師討論）</a></li>
+    <li><a href="#section-4"><span class="toc-num">04</span>三、營養與飲食</a></li>
+    <li><a href="#section-5"><span class="toc-num">05</span>四、禁忌與謹慎使用的補充品</a></li>
+    <li><a href="#section-6"><span class="toc-num">06</span>五、腸道菌群與免疫</a></li>
+    <li><a href="#section-7"><span class="toc-num">07</span>六、運動與呼吸訓練</a></li>
+    <li><a href="#section-8"><span class="toc-num">08</span>七、針灸</a></li>
+    <li><a href="#section-9"><span class="toc-num">09</span>八、生活方式管理</a></li>
+    <li><a href="#section-10"><span class="toc-num">10</span>九、優先行動清單</a></li>
+  </ol>
+</nav>
+
+<!-- Main Content -->
+<article class="article">
+  <header class="hero">
+    <div class="container">
+      <div class="tags"><span class="tag">health</span><span class="tag">autoimmune</span><span class="tag">nutrition</span><span class="tag">neurology</span></div>
+      <h1 class="hero-title">重症肌無力 — 眼肌型輔助復原策略與實證整理</h1>
+      
+      <div class="hero-meta"><span>2026-05-20</span></div>
+    </div>
+  </header>
+
+  <div class="container content">
+    <h1>重症肌無力 — 眼肌型輔助復原策略與實證整理</h1>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_0.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_0.png" loading="lazy"></figure>
+
+<blockquote>
+<p>眼肌型重症肌無力（Ocular Myasthenia Gravis, OMG）除藥物治療外的輔助復原方式整理。涵蓋營養、腸道菌群、運動、針灸、生活方式管理等面向，基於 2024-2025 年 PubMed 文獻與系統性回顧。與 不生病的健康之道 — 細胞營養與健康三力 的「免疫力」概念相呼應 — 自體免疫疾病本質上是免疫系統攻擊自身組織。</p>
+</blockquote>
+<h2 id="section-1"><span class="chapter-num">01</span>知識架構總覽</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_1.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_1.png" loading="lazy"></figure>
+
+
+<div class="mermaid-wrap"><pre class="mermaid">
+mindmap
+  root((重症肌無力 · 輔助復原))
+    營養與飲食
+      地中海飲食
+      Omega-3 脂肪酸
+      維生素 D（適量）
+      維生素 B12
+      CoQ10 · L-肉鹼
+      薑黃素 · 多酚類
+      充足蛋白質
+    腸道菌群
+      益生菌（雙歧桿菌）
+      益生元（膳食纖維）
+      發酵食品
+    運動與呼吸
+      每週 150 分鐘適度運動
+      橫膈膜呼吸訓練
+      噘嘴呼吸法
+    針灸
+      2024 Meta 分析 OR=4.28
+      輔助療法定位
+    生活方式
+      壓力管理
+      充足睡眠
+      避免觸發因子
+      能量管理
+    禁忌補充品
+      鎂 · 高危
+      紫錐花 · 高危
+      高劑量鋅
+      褪黑激素
+      高劑量維生素 D
+</pre></div>
+
+
+<hr>
+<h2 id="section-2"><span class="chapter-num">02</span>一、疾病背景與預後</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_2.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_2.png" loading="lazy"></figure>
+
+<p>重症肌無力（Myasthenia Gravis, MG）是一種自體免疫疾病，抗體攻擊神經肌肉接合處的乙醯膽鹼受體（AChR），導致肌肉無力。眼肌型（OMG）主要影響眼部肌肉，表現為眼瞼下垂、複視。</p>
+<h3>眼肌型的自然病程</h3>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>數據</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>自發緩解率</td>
+<td>11%–30%（數月至數年不等）</td>
+</tr>
+<tr>
+<td>進展為全身型的比例</td>
+<td>50%–80%（多在確診後 2 年內）</td>
+</tr>
+<tr>
+<td>胸腺切除後完全緩解率（5年）</td>
+<td>~42%（胸腺正常者預後較佳）</td>
+</tr>
+<tr>
+<td>有利預後因子</td>
+<td>年齡 ≤40、女性、胸腺正常、早期治療</td>
+</tr>
+</tbody></table>
+<div class="callout callout-warning"><div class="callout-title">重要提醒</div><div class="callout-body">
+
+<p>眼肌型若無藥物控制，有較高的全身化風險。即使無法使用 Mestinon，仍應與神經科醫師討論替代藥物方案。</p>
+</div></div>
+
+
+<hr>
+<h2 id="section-3"><span class="chapter-num">03</span>二、替代藥物選項（供與醫師討論）</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_3.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_3.png" loading="lazy"></figure>
+
+<p>當 Mestinon（Pyridostigmine）因嚴重副作用無法使用時，可討論的替代方案：</p>
+<table>
+<thead>
+<tr>
+<th>藥物</th>
+<th>類型</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>3,4-二氨基吡啶（Amifampridine）</strong></td>
+<td>突觸前增強劑</td>
+<td>機制不同於 Mestinon，促進乙醯膽鹼釋放，對 Mestinon 不耐受者是有價值的替代選擇</td>
+</tr>
+<tr>
+<td><strong>低劑量類固醇</strong></td>
+<td>免疫抑制</td>
+<td>Prednisolone 等，需監測骨質與代謝</td>
+</tr>
+<tr>
+<td><strong>Mycophenolate / Azathioprine</strong></td>
+<td>免疫抑制劑</td>
+<td>類固醇減量用，起效較慢（數月）</td>
+</tr>
+<tr>
+<td><strong>Rituximab</strong></td>
+<td>生物製劑（抗 CD20）</td>
+<td>B 細胞清除療法，用於難治型</td>
+</tr>
+<tr>
+<td><strong>FcRn 抑制劑</strong></td>
+<td>新型生物製劑</td>
+<td>2024-2025 新進展，降低致病抗體濃度</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="section-4"><span class="chapter-num">04</span>三、營養與飲食</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_4.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_4.png" loading="lazy"></figure>
+
+<blockquote>
+<p>參考：<a href="https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1600508/full">Frontiers in Nutrition 2025 綜述</a></p>
+</blockquote>
+<h3>推薦的飲食模式</h3>
+<table>
+<thead>
+<tr>
+<th>飲食模式</th>
+<th>證據等級</th>
+<th>機制與效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>地中海飲食</strong></td>
+<td>中等</td>
+<td>豐富抗氧化物與 Omega-3，減少慢性發炎</td>
+</tr>
+<tr>
+<td><strong>全食物植物性飲食</strong></td>
+<td>初步（個案）</td>
+<td>5 個月後神經肌肉症狀減輕、體重下降</td>
+</tr>
+<tr>
+<td><strong>生酮飲食</strong></td>
+<td>初步（進行中）</td>
+<td>有報告顯示肌力改善、臨床症狀減輕</td>
+</tr>
+</tbody></table>
+<h3>應積極攝取的營養素</h3>
+<table>
+<thead>
+<tr>
+<th>營養素</th>
+<th>食物來源</th>
+<th>機制</th>
+<th>注意事項</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Omega-3 脂肪酸</strong></td>
+<td>鮭魚、鯖魚、核桃、亞麻籽</td>
+<td>調節發炎、支持免疫平衡、保護神經</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>維生素 D</strong></td>
+<td>日曬、魚類、蛋黃、強化乳品</td>
+<td>調節 T 細胞、抑制發炎性細胞因子</td>
+<td>每日不超過 4,000 IU，建議先驗血</td>
+</tr>
+<tr>
+<td><strong>維生素 B12</strong></td>
+<td>肉類、蛋、乳製品</td>
+<td>支持神經健康、減少疲勞</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>充足蛋白質</strong></td>
+<td>魚、蛋、豆腐、雞胸肉</td>
+<td>低血清白蛋白與疾病嚴重度相關</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>CoQ10（輔酶 Q10）</strong></td>
+<td>補充劑</td>
+<td>支持肌肉細胞能量產生</td>
+<td>有限證據</td>
+</tr>
+<tr>
+<td><strong>L-肉鹼</strong></td>
+<td>紅肉、補充劑</td>
+<td>可能改善肌肉無力與疲勞</td>
+<td>僅個案證據</td>
+</tr>
+<tr>
+<td><strong>薑黃素（Curcumin）</strong></td>
+<td>薑黃</td>
+<td>強效抗發炎、平衡免疫反應</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>多酚類 / 植化素</strong></td>
+<td>多色蔬果</td>
+<td>抗氧化、抗發炎</td>
+<td>「吃彩虹」多樣化攝取</td>
+</tr>
+</tbody></table>
+<div class="callout callout-tip"><div class="callout-title">維生素 D 個案研究</div><div class="callout-body">
+
+<p>一項 2024 個案報告顯示，患者維生素 D 從 6.64 升至 39.3 ng/mL（3 個月），MG 症狀顯著改善。維生素 D 通過作用於肌纖維上的受體來支持肌肉功能。</p>
+</div></div>
+
+
+<h3>應避免的食物</h3>
+<p><strong>高飽和脂肪食物</strong>（促進發炎性細胞因子）</p>
+<ul>
+<li>油炸食品：炸雞、薯條、鹹酥雞、天婦羅</li>
+<li>高脂肉類：五花肉、培根、香腸、熱狗</li>
+<li>全脂乳製品：奶油、起司蛋糕、冰淇淋</li>
+<li>烘焙甜點：酥皮、可頌、蛋塔（含大量奶油/酥油）</li>
+</ul>
+<p><strong>高鈉加工食品</strong>（過量鈉導致水分滯留、影響神經肌肉功能）</p>
+<ul>
+<li>醃漬食品：醬菜、泡菜罐頭、鹹魚、臘肉</li>
+<li>加工肉品：火腿、煙燻肉、肉鬆、肉乾</li>
+<li>即食食品：泡麵、冷凍微波餐、罐頭湯</li>
+<li>零食類：洋芋片、餅乾、鹹味堅果、爆米花（加鹽）</li>
+</ul>
+<p><strong>精緻糖與高糖食品</strong>（加劇發炎反應）</p>
+<ul>
+<li>含糖飲料：手搖杯、汽水、果汁飲料、能量飲料</li>
+<li>甜食：蛋糕、糖果、巧克力棒、甜甜圈</li>
+</ul>
+<p><strong>特別注意的飲品</strong></p>
+<ul>
+<li><strong>通寧水（Tonic Water）</strong>：含奎寧（Quinine），會加劇 MG 症狀，<strong>必須避免</strong></li>
+<li><strong>酒精</strong>：可加重 MG 症狀、干擾藥物效果，建議避免或極少量</li>
+<li><strong>咖啡因</strong>（咖啡、濃茶、能量飲料）：可能導致脫水，建議適量並觀察個人反應</li>
+</ul>
+<p><strong>質地不易處理的食物</strong>（若有咀嚼或吞嚥困難）</p>
+<ul>
+<li>乾硬食物：堅硬的堅果、餅乾、爆米花</li>
+<li>需大量咀嚼的食物：牛排、生菜沙拉、生紅蘿蔔</li>
+<li>稀薄液體：純牛奶、清湯（比濃稠液體更易嗆到）</li>
+</ul>
+<hr>
+<h2 id="section-5"><span class="chapter-num">05</span>四、禁忌與謹慎使用的補充品</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_5.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_5.png" loading="lazy"></figure>
+
+<blockquote>
+<p>參考：<a href="https://www.mgteam.com/resources/can-vitamins-help-or-hurt-myasthenia-gravis-supplements-to-avoid">MGteam — Supplements to Avoid</a></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>補充品</th>
+<th>危險程度</th>
+<th>原因</th>
+<th>常見含有此成分的產品</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>鎂 (Magnesium)</strong></td>
+<td>⚠️ 高危</td>
+<td>阻斷乙醯膽鹼釋放，加重肌肉無力，可能觸發肌無力危象</td>
+<td>鎂錠、氧化鎂、檸檬酸鎂、瀉鹽（Epsom Salt）泡澡鹽、部分制酸劑（如氫氧化鎂/Milk of Magnesia）、肌肉放鬆補充品</td>
+</tr>
+<tr>
+<td><strong>紫錐花 (Echinacea)</strong></td>
+<td>⚠️ 高</td>
+<td>刺激免疫系統，加劇自體免疫反應</td>
+<td>感冒預防保健品、免疫力提升配方、部分花草茶</td>
+</tr>
+<tr>
+<td><strong>高劑量鋅 (&gt;40mg/天)</strong></td>
+<td>中高</td>
+<td>增強免疫活性，可能惡化症狀</td>
+<td>鋅錠、感冒喉錠（含鋅）、部分免疫補充配方</td>
+</tr>
+<tr>
+<td><strong>褪黑激素 (Melatonin)</strong></td>
+<td>中</td>
+<td>影響免疫功能，與免疫抑制劑交互作用</td>
+<td>助眠補充品、睡眠軟糖</td>
+</tr>
+<tr>
+<td><strong>肌酸 (Creatine)</strong></td>
+<td>中</td>
+<td>可能干擾肌肉代謝</td>
+<td>健身增肌補充品、運動前補充粉</td>
+</tr>
+<tr>
+<td><strong>高劑量維生素 D (&gt;4,000 IU)</strong></td>
+<td>中</td>
+<td>高鈣血症加重肌肉無力</td>
+<td>高單位維生素 D 膠囊（5,000-10,000 IU 產品）</td>
+</tr>
+</tbody></table>
+<div class="callout callout-danger"><div class="callout-title">鎂的風險</div><div class="callout-body">
+
+<p>MG 患者最需要避免的補充品。鎂會阻斷乙醯膽鹼釋放 — 而 MG 的核心問題就是神經肌肉傳導不足。
+<strong>可接受</strong>：食物中的天然鎂、綜合維他命中的微量鎂（通常 &lt;100mg）
+<strong>必須避免</strong>：高劑量鎂補充品（200mg 以上）、含鎂制酸劑（Milk of Magnesia）、含鎂瀉劑、鎂鹽泡澡（Epsom Salt）、標榜「肌肉放鬆」的含鎂配方
+購買任何保健品前，務必檢查成分表中是否含有 Magnesium。</p>
+</div></div>
+
+
+
+<div class="callout callout-warning"><div class="callout-title">需額外注意的藥物與成分</div><div class="callout-body">
+
+<p>以下非補充品但也應避免或與醫師確認：</p>
+<ul>
+<li><strong>奎寧（Quinine）</strong>：存在於通寧水中，會惡化 MG</li>
+<li><strong>肉毒桿菌素（Botox）</strong>：無論醫療或美容用途，都會加重神經肌肉無力</li>
+<li><strong>特定抗生素</strong>：Fluoroquinolones（如 Ciprofloxacin、Levofloxacin）、Macrolides（如 Azithromycin）、Aminoglycosides（如 Gentamicin）— 就醫時務必告知醫師 MG 病史</li>
+<li><strong>Beta-blockers</strong>：部分降血壓藥可能加重無力</li>
+<li><strong>Statins</strong>：部分降膽固醇藥有肌肉相關副作用</li>
+<li><strong>含鎮靜成分的感冒藥和過敏藥</strong>：可能加重肌肉無力</li>
+</ul>
+</div></div>
+
+
+<hr>
+<h2 id="section-6"><span class="chapter-num">06</span>五、腸道菌群與免疫</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_6.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_6.png" loading="lazy"></figure>
+
+<blockquote>
+<p>參考：<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6755540/">Perturbed Microbial Ecology in MG (PMC)</a></p>
+</blockquote>
+<p>MG 患者的腸道菌群呈現失衡（dysbiosis）：</p>
+<table>
+<thead>
+<tr>
+<th>變化</th>
+<th>詳情</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>減少的菌群</td>
+<td>雙歧桿菌（Bifidobacterium）、放線菌門、疣微菌門</td>
+</tr>
+<tr>
+<td>增加的菌群</td>
+<td>類桿菌門（Bacteroides）、脫硫弧菌（Desulfovibrio）</td>
+</tr>
+<tr>
+<td>代謝物變化</td>
+<td>短鏈脂肪酸（SCFAs）含量顯著低於健康人</td>
+</tr>
+<tr>
+<td>與疾病關聯</td>
+<td>菌群失衡與血清中發炎生物標記密切相關</td>
+</tr>
+</tbody></table>
+<h3>改善腸道菌群的策略</h3>
+<ul>
+<li><strong>益生菌</strong>：特別是含**雙歧桿菌（Bifidobacterium）**的產品 — 動物實驗顯示可減少發炎、抑制自體免疫反應</li>
+<li><strong>益生元</strong>：膳食纖維（如菊糖、果寡糖）促進有益菌生長</li>
+<li><strong>發酵食品</strong>：優格、味噌、泡菜（適量）</li>
+</ul>
+<hr>
+<h2 id="section-7"><span class="chapter-num">07</span>六、運動與呼吸訓練</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_7.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_7.png" loading="lazy"></figure>
+
+<h3>適度運動</h3>
+<blockquote>
+<p>參考：<a href="https://doi.org/10.3390/healthcare14081100">Physical Exercise in MG: Systematic Review (Healthcare, 2024)</a></p>
+</blockquote>
+<p>過去曾認為 MG 患者應避免運動，但新證據推翻了這個觀念：</p>
+<ul>
+<li><strong>建議量</strong>：每週至少 <strong>150 分鐘</strong>中等強度運動（適用於輕至中度患者）</li>
+<li><strong>效果</strong>：改善肌力、日常功能、生活品質</li>
+<li><strong>原則</strong>：循序漸進，避免過度疲勞</li>
+<li><strong>適合的運動</strong>：散步、游泳、低強度瑜伽、太極拳</li>
+</ul>
+<h3>呼吸肌訓練</h3>
+<blockquote>
+<p>參考：<a href="https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2025.1667400/full">Respiratory Muscle Training in MG (Frontiers in Neurology, 2025)</a></p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>項目</th>
+<th>內容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>方式</td>
+<td>橫膈膜呼吸、噘嘴呼吸法</td>
+</tr>
+<tr>
+<td>頻率</td>
+<td>每次 10-30 分鐘，每週 3-10 次</td>
+</tr>
+<tr>
+<td>強度</td>
+<td>最大呼吸壓力的 15%-75%</td>
+</tr>
+<tr>
+<td>效果</td>
+<td>MG 症狀改善 49%、呼吸症狀改善 58%、體能改善 64%（自覺量表）</td>
+</tr>
+<tr>
+<td>證據</td>
+<td>Level III（有效性指標），2025 系統性回顧確認安全且有益</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="section-8"><span class="chapter-num">08</span>七、針灸</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_8.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_8.png" loading="lazy"></figure>
+
+<blockquote>
+<p>參考：<a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291685">Acupuncture for MG: Systematic Review (PLOS ONE, 2024)</a></p>
+</blockquote>
+<ul>
+<li><strong>14 項隨機對照試驗</strong> Meta 分析結果：針灸組有效率顯著優於單純西藥<ul>
+<li>OR = 4.28, 95% CI (2.95, 6.22), P&lt;0.005</li>
+</ul>
+</li>
+<li>可改善肌無力評分（QMG）和生活品質</li>
+<li><strong>定位</strong>：輔助療法，非替代藥物</li>
+<li><strong>限制</strong>：研究品質普遍偏低，需更嚴謹的 RCT 驗證</li>
+</ul>
+<hr>
+<h2 id="section-9"><span class="chapter-num">09</span>八、生活方式管理</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_9.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_9.png" loading="lazy"></figure>
+
+<h3>壓力管理</h3>
+<p>壓力是 MG 症狀惡化的已知觸發因子。建議：</p>
+<ul>
+<li>冥想、正念呼吸（參考 睡眠正念學 — 三種消耗、微休息與正念呼吸恢復法）</li>
+<li>溫和瑜伽</li>
+<li>充足且規律的睡眠</li>
+</ul>
+<h3>應避免的觸發因子</h3>
+<ul>
+<li><strong>高溫環境</strong>：熱天、泡熱水澡</li>
+<li><strong>感染</strong>：加強日常防護</li>
+<li><strong>過度疲勞</strong></li>
+<li><strong>特定藥物</strong>：Fluoroquinolones、Aminoglycosides 等抗生素；肉毒桿菌素（Botox）</li>
+</ul>
+<h3>能量管理</h3>
+<ul>
+<li>在精力最好的時段安排重要活動（MG 症狀通常早輕晚重）</li>
+<li>頻繁休息、分散活動</li>
+<li>用餐前避免運動</li>
+</ul>
+<h3>眼瞼下垂的日常技巧</h3>
+<ul>
+<li><strong>眼瞼支撐器（Ptosis Crutch）</strong>：可安裝在眼鏡框上，物理性撐起下垂的眼瞼</li>
+<li>白天定時閉眼休息</li>
+<li>減少長時間閱讀或盯螢幕</li>
+<li>睡前適度冷敷</li>
+</ul>
+<hr>
+<h2 id="section-10"><span class="chapter-num">10</span>九、優先行動清單</h2>
+<figure class="img-embed"><img src="images/%E9%87%8D%E7%97%87%E8%82%8C%E7%84%A1%E5%8A%9B%20%E2%80%94%20%E7%9C%BC%E8%82%8C%E5%9E%8B%E8%BC%94%E5%8A%A9%E5%BE%A9%E5%8E%9F%E7%AD%96%E7%95%A5%E8%88%87%E5%AF%A6%E8%AD%89%E6%95%B4%E7%90%86_10.png" alt="重症肌無力 — 眼肌型輔助復原策略與實證整理_10.png" loading="lazy"></figure>
+
+<p>針對目前狀況（眼肌型 MG、未服藥、症狀超過 6 個月、胸腺正常），建議優先順序：</p>
+<table>
+<thead>
+<tr>
+<th>優先度</th>
+<th>行動</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>⭐⭐⭐</td>
+<td><strong>回診神經科</strong></td>
+<td>討論 Mestinon 以外的替代藥物（3,4-DAP、免疫抑制劑、生物製劑）</td>
+</tr>
+<tr>
+<td>⭐⭐⭐</td>
+<td><strong>驗血檢查維生素 D</strong></td>
+<td>如缺乏則補充（每日 1,000-2,000 IU），目標值 30-50 ng/mL</td>
+</tr>
+<tr>
+<td>⭐⭐</td>
+<td><strong>調整飲食</strong></td>
+<td>採地中海飲食模式，增加 Omega-3、多色蔬果</td>
+</tr>
+<tr>
+<td>⭐⭐</td>
+<td><strong>開始適度運動</strong></td>
+<td>從散步開始，逐步增加到每週 150 分鐘</td>
+</tr>
+<tr>
+<td>⭐⭐</td>
+<td><strong>嘗試益生菌</strong></td>
+<td>選含雙歧桿菌的產品</td>
+</tr>
+<tr>
+<td>⭐</td>
+<td><strong>考慮針灸</strong></td>
+<td>作為輔助療法，尋找有 MG 經驗的中醫師</td>
+</tr>
+<tr>
+<td>⭐</td>
+<td><strong>建立呼吸訓練習慣</strong></td>
+<td>橫膈膜呼吸，每日 10-15 分鐘</td>
+</tr>
+<tr>
+<td>⭐</td>
+<td><strong>配眼瞼支撐器</strong></td>
+<td>改善日常視覺功能</td>
+</tr>
+</tbody></table>
+<hr>
+<h1>文獻來源</h1>
+<ul>
+<li><a href="https://www.frontiersin.org/journals/nutrition/articles/10.3389/fnut.2025.1600508/full">Myasthenia Gravis and Nutrition — Frontiers in Nutrition, 2025</a></li>
+<li><a href="https://myasthenia.org/blog/2026/04/02/myasthenia-gravis-nutrition-strategies/">MGFA Nutrition Strategies, 2026</a></li>
+<li><a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0291685">Acupuncture for MG: Systematic Review — PLOS ONE, 2024</a></li>
+<li><a href="https://doi.org/10.3390/healthcare14081100">Physical Exercise in MG: Systematic Review — Healthcare, 2024</a></li>
+<li><a href="https://www.frontiersin.org/journals/neurology/articles/10.3389/fneur.2025.1667400/full">Respiratory Muscle Training in MG — Frontiers in Neurology, 2025</a></li>
+<li><a href="https://www.mgteam.com/resources/can-vitamins-help-or-hurt-myasthenia-gravis-supplements-to-avoid">Supplements to Avoid — MGteam</a></li>
+<li><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6755540/">Perturbed Microbial Ecology in MG — PMC</a></li>
+<li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9424766/">3,4-DAP for MG — PMC</a></li>
+<li><a href="https://www.healthline.com/health/myasthenia-gravis/natural-therapies">Natural Therapies for MG — Healthline</a></li>
+<li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8857387/">Risk Factors for OMG Generalization — PMC</a></li>
+<li><a href="https://myasthenia.org/living-with-mg/mg-emergency-preparedness/cautionary-drugs/">MGFA Cautionary Drugs</a></li>
+</ul>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <p>Generated from Obsidian notes</p>
+  </div>
+</footer>
+
+<!-- Mermaid.js (UMD build to avoid CORS issues with file:// URLs) -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+mermaid.initialize({
+  startOnLoad: true,
+  securityLevel: 'loose',
+  theme: 'neutral',
+  fontFamily: '"Noto Serif TC", serif',
+  fontSize: 16,
+  flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+  mindmap: { useMaxWidth: false, padding: 20 },
+  themeVariables: {
+    fontSize: '16px',
+    fontFamily: '"Noto Serif TC", serif',
+  }
+});
+</script>
+
+<!-- TOC scroll highlight -->
+<script>
+(function() {
+  const sections = document.querySelectorAll('h2[id]');
+  const links = document.querySelectorAll('.toc a');
+  if (!sections.length || !links.length) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
+
+<!-- Click-to-zoom for mermaid diagrams -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.mermaid-wrap').forEach(wrap => {
+      wrap.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.className = 'mermaid-overlay';
+        const clone = wrap.querySelector('svg')?.cloneNode(true);
+        if (clone) {
+          clone.style.maxWidth = '95vw';
+          clone.style.maxHeight = '90vh';
+          clone.style.width = 'auto';
+          clone.style.height = 'auto';
+          overlay.appendChild(clone);
+        }
+        overlay.addEventListener('click', () => overlay.remove());
+        document.body.appendChild(overlay);
+      });
+    });
+  }, 2000);
+});
+</script>
+
+</body>
+</html>
