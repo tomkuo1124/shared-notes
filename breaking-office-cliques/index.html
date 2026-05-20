@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>遠見雜誌 — 破解職場小圈圈內耗主管應該這麼做</title>
+
+<!-- Open Graph -->
+<meta property="og:title" content="遠見雜誌 — 破解職場小圈圈內耗主管應該這麼做" />
+<meta property="og:description" content="當團隊出現小圈圈導致內耗，主管既不能袖手旁觀也不能選邊站。謝文憲提出四大策略：建立共同目標、打造多元合作機會、營造公開安全溝通文化、保持中立但有界限的角色定位。核心觀點是主管應透過讓自己更強、不可或缺來凝聚團隊，而非試圖消滅小圈圈。" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://tomkuo1124.github.io/shared-notes/breaking-office-cliques/" />
+<meta property="og:locale" content="zh_TW" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="遠見雜誌 — 破解職場小圈圈內耗主管應該這麼做" />
+<meta name="twitter:description" content="當團隊出現小圈圈導致內耗，主管既不能袖手旁觀也不能選邊站。謝文憲提出四大策略：建立共同目標、打造多元合作機會、營造公開安全溝通文化、保持中立但有界限的角色定位。核心觀點是主管應透過讓自己更強、不可或缺來凝聚團隊，而非試圖消滅小圈圈。" />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* ── Reset & Base ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; padding: 0;
+  background: #faf8f4;
+  color: #2c2a26;
+  font-family: 'Noto Serif TC', Georgia, serif;
+  font-size: 18px;
+  line-height: 1.75;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Layout ───────────────────────────────────────── */
+.container { max-width: 780px; margin: 0 auto; padding: 0 24px; }
+.content { padding-bottom: 80px; }
+
+/* ── Typography ───────────────────────────────────── */
+h1, h2, h3, h4 { font-weight: 700; color: #2c2a26; letter-spacing: -0.01em; }
+h1 { font-size: 2.4em; line-height: 1.2; margin: 0 0 16px; }
+h2 {
+  font-size: 1.7em; line-height: 1.3;
+  margin: 72px 0 20px;
+  padding-top: 40px;
+  border-top: 1px solid #e0dbd1;
+  position: relative;
+}
+h2:first-of-type { border-top: none; padding-top: 0; margin-top: 40px; }
+h2 .chapter-num {
+  display: block;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.15em;
+  color: #7a4f3a;
+  margin-bottom: 4px;
+}
+h2 .chapter-num::before { content: "§ "; }
+h3 { font-size: 1.25em; line-height: 1.4; margin: 40px 0 12px; color: #5c3828; }
+h4 { font-size: 1.05em; line-height: 1.45; margin: 28px 0 8px; }
+p { margin: 0 0 18px; }
+strong { color: #2c2a26; }
+em { color: #5c3828; }
+a { color: #7a4f3a; text-decoration: underline; text-underline-offset: 3px; }
+a:hover { color: #5c3828; }
+hr { border: none; border-top: 1px solid #e0dbd1; margin: 48px 0; }
+
+ul, ol { padding-left: 24px; margin: 0 0 18px; }
+li { margin-bottom: 6px; }
+li > ul, li > ol { margin-top: 6px; margin-bottom: 0; }
+
+code {
+  background: #f3efe8;
+  padding: 2px 6px; border-radius: 3px;
+  font-size: 0.88em;
+  font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', Consolas, monospace;
+}
+pre {
+  background: #f3efe8;
+  border: 1px solid #e0dbd1;
+  border-radius: 6px;
+  padding: 20px; overflow-x: auto;
+  font-size: 14px; line-height: 1.5;
+  margin: 24px 0;
+}
+pre code { background: none; padding: 0; }
+
+/* ── Hero ─────────────────────────────────────────── */
+.hero {
+  padding: 64px 0 48px;
+  border-bottom: 2px solid #7a4f3a;
+  position: relative;
+}
+.hero::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, #5c3828, #7a4f3a, #8a857d);
+}
+.hero-title { font-size: 2.6em; line-height: 1.15; }
+.hero-abstract {
+  font-size: 1.15em; line-height: 1.65;
+  color: #5a5650;
+  margin: 20px 0 0;
+  max-width: 700px;
+}
+.hero-meta {
+  margin-top: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; color: #8a857d;
+  letter-spacing: 0.03em;
+}
+.tags {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin-bottom: 16px;
+}
+.tag {
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 3px 10px; border-radius: 12px;
+  background: #f0e4da;
+  color: #7a4f3a;
+}
+
+/* ── Visual Element 2: Callouts (unified box, color-coded) ──── */
+.callout {
+  border-left: 4px solid #7a4f3a;
+  border-radius: 4px;
+  padding: 20px 24px;
+  margin: 28px 0;
+  position: relative;
+}
+.callout-title {
+  font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 600;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.callout-body p:last-child { margin-bottom: 0; }
+.callout-body ul:last-child, .callout-body ol:last-child { margin-bottom: 0; }
+
+/* Callout color variants */
+.callout-tip, .callout-example { background: #e8f2e8; border-color: #3a7d44; }
+.callout-tip .callout-title, .callout-example .callout-title { color: #3a7d44; }
+.callout-warning, .callout-caution, .callout-danger, .callout-important {
+  background: #f6e8e0; border-color: #c25a2e;
+}
+.callout-warning .callout-title, .callout-caution .callout-title,
+.callout-danger .callout-title, .callout-important .callout-title { color: #c25a2e; }
+.callout-abstract, .callout-summary { background: #f0e4da; border-color: #7a4f3a; }
+.callout-abstract .callout-title, .callout-summary .callout-title { color: #7a4f3a; }
+.callout-info, .callout-note { background: #e8e0f0; border-color: #6b3a8c; }
+.callout-info .callout-title, .callout-note .callout-title { color: #6b3a8c; }
+
+/* ── Visual Element 3: Tables ─────────────────────── */
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 24px 0;
+  font-size: 16px;
+}
+th, td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0dbd1;
+  vertical-align: top;
+}
+th {
+  background: #5c3828;
+  color: #faf8f4;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+tr:nth-child(even) td { background: #f3efe8; }
+tr:last-child td { border-bottom: none; }
+td:first-child { font-weight: 600; color: #5c3828; }
+
+/* Table enhancement: Sugar cube blocks */
+.cube-num { font-weight: 700; font-size: 1.1em; margin-bottom: 6px; }
+.cube-row { display: flex; gap: 3px; flex-wrap: wrap; }
+.cube {
+  width: 20px; height: 20px;
+  background: linear-gradient(135deg, #fff7e0 0%, #f5e3b8 100%);
+  border: 1.5px solid #c89014;
+  border-radius: 3px;
+  box-shadow: 1px 1px 0 rgba(200,144,20,0.3);
+}
+.cube-half {
+  background: linear-gradient(90deg, #fff7e0 50%, transparent 50%);
+}
+
+/* Table enhancement: Percentage color badges */
+.pct-badge {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.6em; font-weight: 800;
+  display: block; line-height: 1.2;
+}
+.pct-high { color: #2d6a34; }
+.pct-mid  { color: #b8861d; }
+.pct-low  { color: #b83a1d; }
+
+/* ── Visual Element 4: Blockquotes ────────────────── */
+blockquote {
+  margin: 36px 0;
+  padding: 20px 32px;
+  border-left: 3px solid #7a4f3a;
+  font-size: 1.15em;
+  line-height: 1.55;
+  font-style: italic;
+  color: #5c3828;
+  background: linear-gradient(90deg, #f0e4da 0%, transparent 100%);
+}
+blockquote p { margin-bottom: 8px; }
+blockquote p:last-child { margin-bottom: 0; }
+
+/* ── Visual Element 5: Mermaid Diagrams ───────────── */
+.mermaid-wrap {
+  margin: 32px -80px;
+  padding: 24px;
+  background: #faf8f4;
+  border: 1px solid #e0dbd1;
+  border-radius: 8px;
+  overflow-x: auto;
+  cursor: zoom-in;
+}
+pre.mermaid {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  text-align: center;
+  min-width: 900px;
+  overflow: visible;
+}
+.mermaid-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(0,0,0,0.85);
+  display: flex; align-items: center; justify-content: center;
+  padding: 40px; cursor: zoom-out;
+  overflow: auto;
+}
+.mermaid-overlay svg { max-width: 95vw; max-height: 90vh; }
+
+/* ── Floating TOC ─────────────────────────────────── */
+.toc {
+  position: fixed; right: 20px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  font-family: 'Inter', sans-serif;
+  background: #faf8f4;
+  border: 1px solid #e0dbd1;
+  border-radius: 8px;
+  padding: 16px 20px;
+  max-width: 240px;
+  max-height: 70vh;
+  overflow-y: auto;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.toc-header {
+  font-size: 11px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.15em;
+  color: #8a857d;
+  margin-bottom: 12px;
+}
+.toc ol { list-style: none; padding: 0; margin: 0; }
+.toc li { margin-bottom: 6px; }
+.toc a {
+  color: #5a5650;
+  text-decoration: none;
+  font-size: 12px; line-height: 1.4;
+  display: flex; align-items: baseline; gap: 8px;
+  transition: color 0.15s;
+}
+.toc a:hover { color: #7a4f3a; }
+.toc a.active { color: #7a4f3a; font-weight: 600; }
+.toc .toc-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #e0dbd1;
+  min-width: 18px;
+}
+.toc a.active .toc-num { color: #7a4f3a; }
+
+/* ── Footer ───────────────────────────────────────── */
+footer {
+  padding: 40px 0;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #8a857d;
+  border-top: 1px solid #e0dbd1;
+}
+
+/* ── Responsive ───────────────────────────────────── */
+@media (max-width: 1320px) { .toc { display: none; } }
+@media (max-width: 960px) {
+  .mermaid-wrap { margin: 24px -24px; }
+}
+@media (max-width: 768px) {
+  body { font-size: 16px; }
+  .hero { padding: 40px 0 32px; }
+  .hero-title { font-size: 1.8em; }
+  .hero-abstract { font-size: 1em; }
+  h2 { font-size: 1.4em; margin: 56px 0 16px; }
+  h3 { font-size: 1.15em; }
+  blockquote { padding: 16px 20px; font-size: 1.05em; }
+  table { font-size: 14px; }
+  th, td { padding: 8px 12px; }
+  .callout { padding: 16px 18px; }
+  .mermaid-wrap { margin: 16px -16px; padding: 16px; }
+}
+@media print {
+  .toc { display: none; }
+  .hero::before { display: none; }
+  body { font-size: 12pt; background: white; }
+  h2 { page-break-after: avoid; }
+  .callout, blockquote, table { page-break-inside: avoid; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- Floating TOC -->
+<nav class="toc" aria-label="Table of Contents">
+  <div class="toc-header">Contents</div>
+  <ol>
+    <li><a href="#section-1"><span class="toc-num">01</span>網頁資訊</a></li>
+    <li><a href="#section-2"><span class="toc-num">02</span>核心論點</a></li>
+    <li><a href="#section-3"><span class="toc-num">03</span>敘事脈絡</a></li>
+    <li><a href="#section-4"><span class="toc-num">04</span>論點展開</a></li>
+    <li><a href="#section-5"><span class="toc-num">05</span>關鍵洞察 &amp; 反思</a></li>
+    <li><a href="#section-6"><span class="toc-num">06</span>重要引述</a></li>
+    <li><a href="#section-7"><span class="toc-num">07</span>術語表</a></li>
+    <li><a href="#section-8"><span class="toc-num">08</span>相關筆記</a></li>
+  </ol>
+</nav>
+
+<!-- Main Content -->
+<article class="article">
+  <header class="hero">
+    <div class="container">
+      <div class="tags"><span class="tag">web-clip</span><span class="tag">article</span><span class="tag">leadership</span><span class="tag">team-management</span></div>
+      <h1 class="hero-title">遠見雜誌 — 破解職場小圈圈內耗主管應該這麼做</h1>
+      <p class="hero-abstract">當團隊出現小圈圈導致內耗，主管既不能袖手旁觀也不能選邊站。謝文憲提出四大策略：建立共同目標、打造多元合作機會、營造公開安全溝通文化、保持中立但有界限的角色定位。核心觀點是主管應透過讓自己更強、不可或缺來凝聚團隊，而非試圖消滅小圈圈。</p>
+      <div class="hero-meta"><span>2026-05-17</span></div>
+    </div>
+  </header>
+
+  <div class="container content">
+    <div class="callout callout-abstract"><div class="callout-title">摘要</div><div class="callout-body">
+
+<p>當團隊出現小圈圈導致內耗，主管既不能袖手旁觀也不能選邊站。謝文憲提出四大策略：建立共同目標、打造多元合作機會、營造公開安全溝通文化、保持中立但有界限的角色定位。核心觀點是主管應透過讓自己更強、不可或缺來凝聚團隊，而非試圖消滅小圈圈。</p>
+</div></div>
+
+
+<h2 id="section-1"><span class="chapter-num">01</span>網頁資訊</h2>
+<table>
+<thead>
+<tr>
+<th>欄位</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>來源</td>
+<td><a href="https://www.gvm.com.tw/article/125447">遠見雜誌</a></td>
+</tr>
+<tr>
+<td>作者</td>
+<td>謝文憲</td>
+</tr>
+<tr>
+<td>發佈日期</td>
+<td>2025-10-31</td>
+</tr>
+<tr>
+<td>擷取日期</td>
+<td>2026-05-17</td>
+</tr>
+<tr>
+<td>內容類型</td>
+<td>文章</td>
+</tr>
+<tr>
+<td>語言</td>
+<td>zh</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="section-2"><span class="chapter-num">02</span>核心論點</h2>
+<div class="mermaid-wrap"><pre class="mermaid">
+mindmap
+  root(("破解小圈圈內耗"))
+    共同目標優先
+      部門群體性 > 個人競爭
+      設計全員參與專案
+    多元合作機會
+      刻意輪換搭檔
+      降低固定圈子凝聚力
+    公開安全溝通
+      定期檢討時段
+      針對行為不針對人
+    中立有界限
+      不涉入小圈圈
+      團隊價值高於私交
+    主管自我強化
+      讓自己不可或缺
+      團隊自然凝聚
+</pre></div>
+
+<p>文章針對「團隊小圈圈導致組織內耗」這一常見管理痛點，提出系統性解法。核心邏輯是：主管不應試圖消滅小圈圈（這是人性），而是透過制度設計削弱圈子的排他性，同時強化自身在團隊中的不可替代性，讓凝聚力自然回歸到工作目標上。</p>
+<hr>
+<h2 id="section-3"><span class="chapter-num">03</span>敘事脈絡</h2>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph LR
+    A["問題定義<br/>小圈圈導致內耗<br/>私人情誼 > 集體任務"] --> B["困境分析<br/>不能袖手旁觀<br/>也不能選邊站"]
+    B --> C["策略一：共同目標<br/>強調群體性<br/>設計全員專案"]
+    C --> D["策略二：多元合作<br/>輪換搭檔<br/>打破固定組合"]
+    D --> E["策略三：溝通文化<br/>定期檢討<br/>對事不對人"]
+    E --> F["策略四：中立界限<br/>不涉入圈子<br/>明確表態底線"]
+    F --> G["結論<br/>強化自身不可或缺<br/>小圈圈反而可利用"]
+</pre></div>
+
+<p>文章從問題出發，先定義主管的兩難處境，接著提出四個層次遞進的策略——從制度面（目標、分工）到文化面（溝通）再到角色定位（中立界限），最後以反直覺的結論收尾：小圈圈的存在反而能讓主管更好辦事。</p>
+<hr>
+<h2 id="section-4"><span class="chapter-num">04</span>論點展開</h2>
+<h3>策略一：建立共同目標的優先感</h3>
+<p>核心思路是將團隊注意力從「個人競爭」轉向「部門群體性」。具體做法是設計必須全員參與才能完成的專案，讓成員自然意識到合作的必要性。</p>
+<div class="callout callout-tip"><div class="callout-title">關鍵操作</div><div class="callout-body">
+
+<p>目標設計的重點不是「大家一起做」，而是「少了任何人都做不成」——讓每個人的貢獻都可見且不可替代。</p>
+</div></div>
+
+
+<h3>策略二：打造多元合作機會</h3>
+<p>透過刻意輪換搭檔來打破固定小圈圈的凝聚力：</p>
+<table>
+<thead>
+<tr>
+<th>專案</th>
+<th>組合</th>
+<th>效果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>專案 A</td>
+<td>甲＋乙＋丙</td>
+<td>建立跨圈默契</td>
+</tr>
+<tr>
+<td>專案 B</td>
+<td>乙＋丁＋戊</td>
+<td>打破固定依賴</td>
+</tr>
+<tr>
+<td>專案 C</td>
+<td>甲＋丁＋己</td>
+<td>擴大協作網絡</td>
+</tr>
+</tbody></table>
+<p>這個策略的精髓在於「不正面衝突」——不是禁止小圈圈，而是透過分工安排讓固定組合自然瓦解。</p>
+<h3>策略三：建立公開而安全的溝通文化</h3>
+<p>設立定期檢討時段，核心規則：<strong>點出問題要針對行為，不針對人身</strong>。</p>
+<div class="mermaid-wrap"><pre class="mermaid">
+graph TD
+    A["定期檢討機制"] --> B["安全感"]
+    A --> C["透明度"]
+    B --> D["成員敢於表達"]
+    C --> D
+    D --> E["問題早期浮現<br/>不累積成派系衝突"]
+</pre></div>
+
+<p>這解決了小圈圈的一個根本成因——當正式溝通管道不暢通時，人們就會轉向私下小圈圈尋求支持和發洩。</p>
+<h3>策略四：主管角色保持中立卻有界限</h3>
+<p>主管的態度宣示：「團隊價值高於私交，若小圈圈影響任務，這就是工作表現問題。」</p>
+<div class="callout callout-warning"><div class="callout-title">界限劃定</div><div class="callout-body">
+
+<p>中立 ≠ 放任。主管不涉入小圈圈的社交動態，但一旦圈子行為影響到工作產出，就必須以「績效管理」的框架介入，而非「人際關係調解」。</p>
+</div></div>
+
+
+<hr>
+<h2 id="section-5"><span class="chapter-num">05</span>關鍵洞察 &amp; 反思</h2>
+<ul>
+<li><strong>不選邊站，強化自身</strong> — 主管的權威來自能力與公正，而非派系支持。讓自己不可或缺，團隊自然以你為中心凝聚</li>
+<li><strong>同事不必是朋友</strong> — 職場關係的基礎是專業協作，不需要勉強建立私交。降低對「團隊和諧」的不切實際期待</li>
+<li><strong>小圈圈可以被利用</strong> — 反直覺地，圈子的存在讓主管有了自然的資訊管道和非正式影響力節點，關鍵是不讓它排他化</li>
+<li><strong>制度設計優先於說教</strong> — 與其苦口婆心勸大家合作，不如透過分工輪換和目標設計，讓合作成為必然</li>
+</ul>
+<div class="callout callout-tip"><div class="callout-title">核心啟示</div><div class="callout-body">
+
+<p>管理小圈圈的最高境界不是消滅它，而是讓它為團隊目標服務。主管的定位是「超越派系的凝聚核心」，而非「介入派系的調停者」。</p>
+</div></div>
+
+
+<hr>
+<h2 id="section-6"><span class="chapter-num">06</span>重要引述</h2>
+<blockquote>
+<p>「團隊價值高於私交，若小圈圈影響任務，這就是工作表現問題。」</p>
+</blockquote>
+<blockquote>
+<p>「主管不選邊站，讓自己更強不可或缺，團隊自然凝聚。」</p>
+</blockquote>
+<blockquote>
+<p>「同事無需刻意成為朋友，朋友也不必勉強成同事。」</p>
+</blockquote>
+<blockquote>
+<p>「小圈子存在反而讓主管更好辦事。」</p>
+</blockquote>
+<hr>
+<h2 id="section-7"><span class="chapter-num">07</span>術語表</h2>
+<table>
+<thead>
+<tr>
+<th>中文</th>
+<th>English</th>
+<th>定義</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>小圈圈</td>
+<td>Clique</td>
+<td>組織內基於私人關係形成的非正式小團體</td>
+</tr>
+<tr>
+<td>內耗</td>
+<td>Internal Friction</td>
+<td>團隊內部因派系、衝突導致的效率損失</td>
+</tr>
+<tr>
+<td>選邊站</td>
+<td>Taking Sides</td>
+<td>主管在派系間偏向某一方的行為</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="section-8"><span class="chapter-num">08</span>相關筆記</h2>
+<ul>
+<li>AI 時代核心心法總結 — 管理思維在 AI 時代的延伸</li>
+</ul>
+
+  </div>
+</article>
+
+<footer>
+  <div class="container">
+    <p>Generated from Obsidian notes</p>
+  </div>
+</footer>
+
+<!-- Mermaid.js -->
+<script type="module">
+import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+mermaid.initialize({
+  startOnLoad: true,
+  theme: 'neutral',
+  fontFamily: '"Noto Serif TC", serif',
+  fontSize: 16,
+  flowchart: { useMaxWidth: false, htmlLabels: true, curve: 'basis' },
+  mindmap: { useMaxWidth: false, padding: 20 },
+  themeVariables: {
+    fontSize: '16px',
+    fontFamily: '"Noto Serif TC", serif',
+  }
+});
+</script>
+
+<!-- TOC scroll highlight -->
+<script>
+(function() {
+  const sections = document.querySelectorAll('h2[id]');
+  const links = document.querySelectorAll('.toc a');
+  if (!sections.length || !links.length) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const link = document.querySelector('.toc a[href="#' + e.target.id + '"]');
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -75% 0px' });
+
+  sections.forEach(s => obs.observe(s));
+})();
+</script>
+
+<!-- Click-to-zoom for mermaid diagrams -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    document.querySelectorAll('.mermaid-wrap').forEach(wrap => {
+      wrap.addEventListener('click', () => {
+        const overlay = document.createElement('div');
+        overlay.className = 'mermaid-overlay';
+        const clone = wrap.querySelector('svg')?.cloneNode(true);
+        if (clone) {
+          clone.style.maxWidth = '95vw';
+          clone.style.maxHeight = '90vh';
+          clone.style.width = 'auto';
+          clone.style.height = 'auto';
+          overlay.appendChild(clone);
+        }
+        overlay.addEventListener('click', () => overlay.remove());
+        document.body.appendChild(overlay);
+      });
+    });
+  }, 2000);
+});
+</script>
+
+</body>
+</html>
