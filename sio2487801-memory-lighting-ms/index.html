@@ -1,0 +1,1165 @@
+<title>SIO2487801 - Log 分析報告</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+  --bg: #F0F2F5;
+  --surface: #FFFFFF;
+  --card: #F7F8FA;
+  --text-1: #1B2332;
+  --text-2: #566275;
+  --text-3: #8894A5;
+  --border: #D4DAE3;
+  --border-light: #E6EAF0;
+  --accent: #2563EB;
+  --accent-subtle: #EEF3FC;
+  --error: #C93545;
+  --error-subtle: #FDF1F3;
+  --error-tint: rgba(201,53,69,0.06);
+  --warning: #B8860B;
+  --warning-subtle: #FDF6E8;
+  --success: #1A7742;
+  --success-subtle: #EDF6F1;
+  --info: #4A6FA5;
+  --info-subtle: #EDF1F7;
+  --code-bg: #161B24;
+  --code-text: #C9D1DC;
+  --code-line: #3A4455;
+  --eliminated: #A3ADBA;
+  --phase-pre: #4A6FA5;
+  --phase-trigger: #B8860B;
+  --phase-fail: #C93545;
+  --phase-post: #8894A5;
+  --phase-recovery: #1A7742;
+  --badge-confirmed-bg: #E7F5ED;
+  --badge-confirmed-fg: #1A7742;
+  --badge-likely-bg: #FDF6E8;
+  --badge-likely-fg: #8B6914;
+  --badge-investigate-bg: #FDF1F3;
+  --badge-investigate-fg: #C93545;
+  --callout-red-bg: #FDF1F3;
+  --callout-red-border: #C93545;
+  --callout-amber-bg: #FDF6E8;
+  --callout-amber-border: #B8860B;
+  --star-shadow: 0 0 0 1px rgba(201,53,69,0.2), 0 0 12px rgba(201,53,69,0.08);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0E1117;
+    --surface: #161B24;
+    --card: #1C222E;
+    --text-1: #D8DEE8;
+    --text-2: #8C96A8;
+    --text-3: #5C6678;
+    --border: #2A3242;
+    --border-light: #222A38;
+    --accent: #5B9CF5;
+    --accent-subtle: rgba(91,156,245,0.1);
+    --error: #F06070;
+    --error-subtle: rgba(240,96,112,0.1);
+    --error-tint: rgba(240,96,112,0.08);
+    --warning: #E0A820;
+    --warning-subtle: rgba(224,168,32,0.1);
+    --success: #40B86A;
+    --success-subtle: rgba(64,184,106,0.1);
+    --info: #7DA5D0;
+    --info-subtle: rgba(125,165,208,0.1);
+    --code-bg: #0C0F14;
+    --code-text: #B8C2D0;
+    --code-line: #2A3242;
+    --eliminated: #5C6678;
+    --phase-pre: #7DA5D0;
+    --phase-trigger: #E0A820;
+    --phase-fail: #F06070;
+    --phase-post: #5C6678;
+    --phase-recovery: #40B86A;
+    --badge-confirmed-bg: rgba(64,184,106,0.15);
+    --badge-confirmed-fg: #40B86A;
+    --badge-likely-bg: rgba(224,168,32,0.15);
+    --badge-likely-fg: #E0A820;
+    --badge-investigate-bg: rgba(240,96,112,0.15);
+    --badge-investigate-fg: #F06070;
+    --callout-red-bg: rgba(240,96,112,0.08);
+    --callout-red-border: #F06070;
+    --callout-amber-bg: rgba(224,168,32,0.08);
+    --callout-amber-border: #E0A820;
+    --star-shadow: 0 0 0 1px rgba(240,96,112,0.3), 0 0 16px rgba(240,96,112,0.12);
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0E1117;
+  --surface: #161B24;
+  --card: #1C222E;
+  --text-1: #D8DEE8;
+  --text-2: #8C96A8;
+  --text-3: #5C6678;
+  --border: #2A3242;
+  --border-light: #222A38;
+  --accent: #5B9CF5;
+  --accent-subtle: rgba(91,156,245,0.1);
+  --error: #F06070;
+  --error-subtle: rgba(240,96,112,0.1);
+  --error-tint: rgba(240,96,112,0.08);
+  --warning: #E0A820;
+  --warning-subtle: rgba(224,168,32,0.1);
+  --success: #40B86A;
+  --success-subtle: rgba(64,184,106,0.1);
+  --info: #7DA5D0;
+  --info-subtle: rgba(125,165,208,0.1);
+  --code-bg: #0C0F14;
+  --code-text: #B8C2D0;
+  --code-line: #2A3242;
+  --eliminated: #5C6678;
+  --phase-pre: #7DA5D0;
+  --phase-trigger: #E0A820;
+  --phase-fail: #F06070;
+  --phase-post: #5C6678;
+  --phase-recovery: #40B86A;
+  --badge-confirmed-bg: rgba(64,184,106,0.15);
+  --badge-confirmed-fg: #40B86A;
+  --badge-likely-bg: rgba(224,168,32,0.15);
+  --badge-likely-fg: #E0A820;
+  --badge-investigate-bg: rgba(240,96,112,0.15);
+  --badge-investigate-fg: #F06070;
+  --callout-red-bg: rgba(240,96,112,0.08);
+  --callout-red-border: #F06070;
+  --callout-amber-bg: rgba(224,168,32,0.08);
+  --callout-amber-border: #E0A820;
+  --star-shadow: 0 0 0 1px rgba(240,96,112,0.3), 0 0 16px rgba(240,96,112,0.12);
+}
+:root[data-theme="light"] {
+  --bg: #F0F2F5;
+  --surface: #FFFFFF;
+  --card: #F7F8FA;
+  --text-1: #1B2332;
+  --text-2: #566275;
+  --text-3: #8894A5;
+  --border: #D4DAE3;
+  --border-light: #E6EAF0;
+  --accent: #2563EB;
+  --accent-subtle: #EEF3FC;
+  --error: #C93545;
+  --error-subtle: #FDF1F3;
+  --error-tint: rgba(201,53,69,0.06);
+  --warning: #B8860B;
+  --warning-subtle: #FDF6E8;
+  --success: #1A7742;
+  --success-subtle: #EDF6F1;
+  --info: #4A6FA5;
+  --info-subtle: #EDF1F7;
+  --code-bg: #161B24;
+  --code-text: #C9D1DC;
+  --code-line: #3A4455;
+  --eliminated: #A3ADBA;
+  --phase-pre: #4A6FA5;
+  --phase-trigger: #B8860B;
+  --phase-fail: #C93545;
+  --phase-post: #8894A5;
+  --phase-recovery: #1A7742;
+  --badge-confirmed-bg: #E7F5ED;
+  --badge-confirmed-fg: #1A7742;
+  --badge-likely-bg: #FDF6E8;
+  --badge-likely-fg: #8B6914;
+  --badge-investigate-bg: #FDF1F3;
+  --badge-investigate-fg: #C93545;
+  --callout-red-bg: #FDF1F3;
+  --callout-red-border: #C93545;
+  --callout-amber-bg: #FDF6E8;
+  --callout-amber-border: #B8860B;
+  --star-shadow: 0 0 0 1px rgba(201,53,69,0.2), 0 0 12px rgba(201,53,69,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  font-family: "Microsoft JhengHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text-1);
+  line-height: 1.7;
+  margin: 0;
+  padding: 0;
+}
+
+.report {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+h1, h2, h3, h4 {
+  font-family: "Segoe UI Variable Display", "Segoe UI", system-ui, sans-serif;
+  line-height: 1.3;
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  letter-spacing: -0.01em;
+}
+
+.report-header {
+  margin-bottom: 2.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.issue-id {
+  display: inline-block;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-subtle);
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  margin-bottom: 0.6rem;
+  letter-spacing: 0.03em;
+}
+
+.report-meta {
+  color: var(--text-3);
+  font-size: 0.82rem;
+  margin-top: 0.4rem;
+}
+
+h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+h2 .section-num {
+  color: var(--text-3);
+  font-weight: 400;
+  font-size: 0.85rem;
+  margin-right: 0.4rem;
+}
+
+h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.6rem;
+  color: var(--text-2);
+}
+
+p { margin: 0 0 0.8rem; }
+
+.callout {
+  border-radius: 6px;
+  padding: 1.2rem 1.4rem;
+  margin: 1rem 0 1.5rem;
+  border-left: 4px solid;
+}
+
+.callout-red {
+  background: var(--callout-red-bg);
+  border-color: var(--callout-red-border);
+}
+
+.callout-amber {
+  background: var(--callout-amber-bg);
+  border-color: var(--callout-amber-border);
+}
+
+.callout p:last-child { margin-bottom: 0; }
+
+.badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15em 0.55em;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.badge-likely {
+  background: var(--badge-likely-bg);
+  color: var(--badge-likely-fg);
+}
+
+.badge-confirmed {
+  background: var(--badge-confirmed-bg);
+  color: var(--badge-confirmed-fg);
+}
+
+.badge-investigate {
+  background: var(--badge-investigate-bg);
+  color: var(--badge-investigate-fg);
+}
+
+.env-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.env-item {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border-light);
+  display: flex;
+  gap: 0.5rem;
+}
+
+.env-item:nth-last-child(-n+2) { border-bottom: none; }
+
+.env-label {
+  color: var(--text-3);
+  font-size: 0.8rem;
+  min-width: 7rem;
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.env-value {
+  font-size: 0.85rem;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+  word-break: break-all;
+}
+
+.env-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.call-chain {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1.5rem;
+  border-radius: 6px;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.8;
+  white-space: pre;
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+.call-chain .hl-ok { color: #6BCB77; }
+.call-chain .hl-warn { color: #F0C040; }
+.call-chain .hl-err { color: #F06070; }
+.call-chain .hl-dim { color: #5C6678; }
+.call-chain .hl-accent { color: #5B9CF5; }
+
+.scenario-table-wrap {
+  overflow-x: auto;
+  margin: 1rem 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.84rem;
+  font-variant-numeric: tabular-nums;
+}
+
+th {
+  text-align: left;
+  font-weight: 600;
+  padding: 0.6rem 0.7rem;
+  background: var(--card);
+  border-bottom: 2px solid var(--border);
+  color: var(--text-2);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.55rem 0.7rem;
+  border-bottom: 1px solid var(--border-light);
+  vertical-align: top;
+}
+
+tr:last-child td { border-bottom: none; }
+
+.result-fail {
+  color: var(--error);
+  font-weight: 600;
+}
+
+.result-ok {
+  color: var(--success);
+}
+
+.phase-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 0.4rem;
+  vertical-align: middle;
+}
+
+.phase-pre .phase-dot { background: var(--phase-pre); }
+.phase-trigger .phase-dot { background: var(--phase-trigger); }
+.phase-fail .phase-dot { background: var(--phase-fail); }
+.phase-post .phase-dot { background: var(--phase-post); }
+.phase-recovery .phase-dot { background: var(--phase-recovery); }
+
+.phase-pre td:first-child { color: var(--phase-pre); }
+.phase-trigger td:first-child { color: var(--phase-trigger); }
+.phase-fail td:first-child { color: var(--phase-fail); font-weight: 600; }
+.phase-post td:first-child { color: var(--phase-post); }
+.phase-recovery td:first-child { color: var(--phase-recovery); }
+
+.evidence-block {
+  margin: 1.2rem 0;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-left: 4px solid;
+}
+
+.evidence-block.status-ok { border-left-color: var(--success); }
+.evidence-block.status-warn { border-left-color: var(--warning); }
+.evidence-block.status-error { border-left-color: var(--error); }
+.evidence-block.status-star {
+  border-left-color: var(--error);
+  box-shadow: var(--star-shadow);
+  border-color: var(--error);
+}
+
+.evidence-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1rem;
+  background: var(--card);
+  border-bottom: 1px solid var(--border-light);
+  font-size: 0.84rem;
+}
+
+.evidence-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+
+.evidence-badge-ok { background: var(--success-subtle); color: var(--success); }
+.evidence-badge-warn { background: var(--warning-subtle); color: var(--warning); }
+.evidence-badge-error { background: var(--error-subtle); color: var(--error); }
+.evidence-badge-star {
+  background: var(--error-subtle);
+  color: var(--error);
+  font-weight: 800;
+}
+
+.evidence-title {
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.evidence-file {
+  margin-left: auto;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.72rem;
+  color: var(--text-3);
+}
+
+.evidence-code {
+  background: var(--code-bg);
+  color: var(--code-text);
+  padding: 1rem;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.76rem;
+  line-height: 1.7;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  margin: 0;
+}
+
+.evidence-code .ln {
+  color: var(--code-line);
+  user-select: none;
+  display: inline-block;
+  width: 4.5em;
+  text-align: right;
+  margin-right: 1em;
+}
+
+.evidence-code .hl { color: #F0C040; }
+.evidence-code .hl-err { color: #F06070; }
+.evidence-code .hl-ok { color: #6BCB77; }
+
+.evidence-annotation {
+  padding: 0.7rem 1rem;
+  background: var(--card);
+  font-size: 0.82rem;
+  color: var(--text-2);
+  border-top: 1px solid var(--border-light);
+}
+
+.evidence-annotation::before {
+  content: "▲ ";
+  color: var(--text-3);
+  font-weight: 700;
+}
+
+.hypothesis-eliminated {
+  color: var(--eliminated);
+  text-decoration: line-through;
+  font-weight: 400;
+  margin: 0.4rem 0;
+}
+
+.hypothesis-eliminated .reason {
+  text-decoration: none;
+  display: inline;
+  font-style: normal;
+  color: var(--text-3);
+  font-size: 0.88em;
+}
+
+.obs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+
+.obs-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1rem 1.2rem;
+}
+
+.obs-card-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.4rem;
+}
+
+.obs-card p {
+  font-size: 0.84rem;
+  color: var(--text-2);
+  margin: 0;
+}
+
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.checklist li {
+  padding: 0.5rem 0 0.5rem 1.8rem;
+  position: relative;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.checklist li:last-child { border-bottom: none; }
+
+.checklist li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.65rem;
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-radius: 3px;
+}
+
+.checklist .ref {
+  color: var(--text-3);
+  font-size: 0.78rem;
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+}
+
+.owner-badge {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.3em 0.8em;
+  border-radius: 5px;
+  background: var(--accent-subtle);
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+}
+
+.conclusions ul {
+  padding-left: 1.2rem;
+  margin: 0.6rem 0;
+}
+
+.conclusions li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.evidence-ref {
+  font-family: "Cascadia Code", "Cascadia Mono", Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.attribution-basis {
+  margin-top: 0.6rem;
+  font-size: 0.88rem;
+}
+
+.attribution-basis strong { color: var(--text-1); }
+
+.condition-change {
+  margin-top: 0.6rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--info-subtle);
+  border-radius: 4px;
+  font-size: 0.84rem;
+  color: var(--info);
+}
+
+.scenario-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  letter-spacing: 0.02em;
+}
+
+.scenario-label-a {
+  background: var(--info-subtle);
+  color: var(--info);
+}
+
+.scenario-label-b {
+  background: var(--warning-subtle);
+  color: var(--warning);
+}
+
+.timeline-scenario-header td {
+  background: var(--card);
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding-top: 0.7rem;
+  padding-bottom: 0.7rem;
+}
+
+.spec-gap {
+  background: var(--warning-subtle);
+  border: 1px solid var(--warning);
+  border-radius: 4px;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.84rem;
+  margin: 0.6rem 0;
+  color: var(--warning);
+}
+
+@media (max-width: 640px) {
+  .report { padding: 1.5rem 1rem 3rem; }
+  h1 { font-size: 1.3rem; }
+  .env-grid { grid-template-columns: 1fr; }
+  .env-item:nth-last-child(2) { border-bottom: 1px solid var(--border-light); }
+  .obs-grid { grid-template-columns: 1fr; }
+  .evidence-file { display: none; }
+  .call-chain { font-size: 0.72rem; padding: 1rem; }
+}
+</style>
+
+<div class="report" lang="zh-TW">
+
+  <header class="report-header">
+    <div class="issue-id">SIO2487801</div>
+    <h1>[26C2][TekkenOC][NVL-S] Memory Lighting 於 Modern Standby 期間持續亮著</h1>
+    <div class="report-meta">分析日期：2026-08-13 &middot; 分析基準：HPOMENBG log + System EVTX + Sleep Study Report</div>
+  </header>
+
+  <!-- Section 1: 問題摘要 -->
+  <h2><span class="section-num">1</span>問題摘要</h2>
+  <div class="callout callout-red">
+    <p>Kingston Fury DDR5 記憶體的 RGB LED 在系統進入 Modern Standby (MS) 後持續亮著。測試涵蓋 4 個場景（IPF SMBUS Device Enabled/Disabled &times; 手動進入/Idle Timeout 進入），<strong>全部失敗</strong>。</p>
+    <p>Log 分析顯示：OGH 應用程式在 4 個場景中的 3 個，於 MS 進入前成功發送了 <code>SetLightingOffAsync</code> WMI 命令，軟體層回報「All done」完成。第 4 個場景（SMBUS Disabled + 手動進入）因系統剛重開、OGH 尚未啟動而未發送命令。然而，<strong>即使軟體層回報成功，記憶體 LED 在 MS 期間仍持續亮著</strong>。</p>
+    <p>BIOS 回報 <code>supportLightingValue = 0</code>，表示不支援 Memory LED lighting bypass control。BIOS 規格書中<strong>未定義</strong> MS 期間記憶體 LED 的行為。故障層邊界位於 OGH 應用程式與 BIOS/EC 之間：WMI 命令被接受但未轉換為實際硬體操作。</p>
+  </div>
+
+  <!-- Section 2: 問題歸屬判定 -->
+  <h2><span class="section-num">2</span>問題歸屬判定</h2>
+  <div class="callout callout-amber">
+    <p><strong>Issue Owner：BIOS/EC Team</strong> &nbsp; <span class="badge badge-likely">Highly Likely</span></p>
+    <div class="attribution-basis">
+      <p><strong>依據：</strong>證據 ①②⑤ 顯示 OGH 正確發送 <code>SetLightingOffAsync</code> 並回報完成，但 LED 未實際關閉。證據 ③ 顯示 BIOS 不支援 Memory LED bypass control（<code>supportLightingValue = 0</code>）。BIOS 規格書（HP_OMEN_Spec_v0e.md）未定義 MS 期間記憶體 LED 行為。IPF SMBUS Device Enabled/Disabled 均無效（證據 ①② vs ⑤）。</p>
+    </div>
+    <div class="condition-change">
+      變更歸屬的條件：若 BIOS 團隊能證明 WMI 命令確實透過 SMBUS 傳送到 Kingston Fury DIMM 的 LED 控制器，且控制器回傳 ACK 但仍不關燈，則歸屬應改為 Kingston（記憶體模組韌體）。
+    </div>
+  </div>
+
+  <!-- Section 3: 測試環境 -->
+  <h2><span class="section-num">3</span>測試環境</h2>
+  <div class="env-grid">
+    <div class="env-item">
+      <span class="env-label">應用程式</span>
+      <span class="env-value">OMEN Command Center (HPOMENBG) v1101.2608.100.0</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">Process / PID</span>
+      <span class="env-value">PID 5528 (BootId 26), PID 11956 (BootId 27)</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">作業系統</span>
+      <span class="env-value">Windows 11 Build 26200.8973</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">BIOS</span>
+      <span class="env-value">AMI B.07 (2026-08-05)</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">平台</span>
+      <span class="env-value">HyperX OMEN MAX DESKTOP (Frostbyte / SSID 8F6A)</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">記憶體</span>
+      <span class="env-value">Kingston Fury DDR5 &times; 2 DIMMs (Ch.A-D1, Ch.B-D1)</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">LED 控制</span>
+      <span class="env-value">FuryLightingControlWMI_DDR5 (HID VID_0416 PID_5020)</span>
+    </div>
+    <div class="env-item">
+      <span class="env-label">時區</span>
+      <span class="env-value">UTC-7 (PDT)</span>
+    </div>
+    <div class="env-item full-width">
+      <span class="env-label">Log 檔案</span>
+      <span class="env-value">HPOMENBG_20260813.log (26,878 行, 16:57~18:33) + System.evtx + sleepstudy-report.html</span>
+    </div>
+    <div class="env-item full-width">
+      <span class="env-label">重現步驟</span>
+      <span class="env-value">
+        1. 設定 IPF SMBUS Device = Enabled/Disabled (需重開機)<br>
+        2. 手動進入 MS (Win+L → 螢幕關閉 → 進入 MS) 或等待 Idle Timeout<br>
+        3. 觀察記憶體 LED 是否在 MS 期間持續亮著
+      </span>
+    </div>
+  </div>
+
+  <!-- Section 4: 根因分析 -->
+  <h2><span class="section-num">4</span>根因分析：關鍵發現</h2>
+
+  <h3>故障層邊界定位</h3>
+  <div class="call-chain"><span class="hl-accent">OGH App (HPOMENBG)</span>
+  │
+  ├─ <span class="hl-ok">FuryLightingControlWMI_DDR5::SetLightingOffAsync</span>
+  │   └─ <span class="hl-ok">軟體層回報 "All done" (3/4 場景成功發送)</span>
+  │
+  ▼ <span class="hl-warn">WMI Interface</span>
+  │
+  ├─ <span class="hl-err">BIOS (supportLightingValue = 0)</span>
+  │   └─ <span class="hl-err">不支援 Memory LED lighting bypass control</span>
+  │   └─ <span class="hl-err">規格書未定義 MS 期間 LED 行為</span>
+  │
+  ▼ <span class="hl-dim">SMBUS (IPF SMBUS Device Enabled/Disabled 均無效)</span>
+  │
+  └─ <span class="hl-dim">Kingston Fury DDR5 DIMM LED Controller (持續亮燈)</span>
+
+  <span class="hl-err">✗ 故障點：WMI 命令被 BIOS 接受但未轉換為 SMBUS 硬體操作</span></div>
+
+  <h3>四個測試場景比對</h3>
+  <div class="scenario-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>場景</th>
+          <th>IPF SMBUS</th>
+          <th>進入方式</th>
+          <th>MS 時間 (PDT)</th>
+          <th>SetLightingOff</th>
+          <th>實體 LED</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="scenario-label scenario-label-a">a-1</span></td>
+          <td>Enabled</td>
+          <td>Idle Timeout</td>
+          <td>17:27:57 → 17:41:04</td>
+          <td class="result-ok">已發送 (17:27:47, 行 14947)</td>
+          <td class="result-fail">持續亮著</td>
+        </tr>
+        <tr>
+          <td><span class="scenario-label scenario-label-a">a-2</span></td>
+          <td>Enabled</td>
+          <td>手動</td>
+          <td>17:41:27 → 17:55:10</td>
+          <td class="result-ok">已發送 (17:41:26, 行 16333)</td>
+          <td class="result-fail">持續亮著</td>
+        </tr>
+        <tr>
+          <td><span class="scenario-label scenario-label-b">b-1</span></td>
+          <td>Disabled</td>
+          <td>手動</td>
+          <td>17:58:19 → 18:11:51</td>
+          <td class="result-fail">未發送（系統剛重開）</td>
+          <td class="result-fail">持續亮著</td>
+        </tr>
+        <tr>
+          <td><span class="scenario-label scenario-label-b">b-2</span></td>
+          <td>Disabled</td>
+          <td>Idle Timeout</td>
+          <td>18:13:27 → 18:26:46</td>
+          <td class="result-ok">已發送 (18:13:12, 行 20828)</td>
+          <td class="result-fail">持續亮著</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>白話說明：OGH 在進入睡眠前呼叫了「關燈」指令，BIOS 也回覆「收到了」，但記憶體上的 LED 根本沒有反應。就像你按了遙控器的關燈鍵，電視顯示「已關燈」，但燈泡實際上還亮著。問題出在遙控器（OGH）和燈泡（DIMM LED）之間的接收器（BIOS/EC）。</p>
+
+  <h3>已排除的假說</h3>
+  <p class="hypothesis-eliminated">假說：OGH 沒有發送 SetLightingOff 命令 <span class="reason">— 排除原因：Log 確認 3/4 場景已成功發送（證據 ①②⑤，行號 14947、16333、20828）</span></p>
+  <p class="hypothesis-eliminated">假說：IPF SMBUS Device 設定導致問題 <span class="reason">— 排除原因：Enabled 和 Disabled 均失敗，設定無差異性</span></p>
+  <p class="hypothesis-eliminated">假說：OGH Process 異常崩潰 <span class="reason">— 排除原因：僅場景 b-1 無 OGH 運行，原因是系統重開以切換 BIOS 設定（EVTX BootId 26→27），非 process crash</span></p>
+
+  <h3>反證檢驗摘要</h3>
+  <div class="scenario-table-wrap">
+    <table>
+      <thead>
+        <tr><th>驗證項目</th><th>預期</th><th>實際結果</th><th>結論</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>若 BIOS 正確處理 SetLightingOff</td>
+          <td>LED 應關閉</td>
+          <td class="result-fail">LED 未關閉</td>
+          <td>BIOS 未正確執行</td>
+        </tr>
+        <tr>
+          <td>若問題在 OGH 未發送命令</td>
+          <td>至少 1 個有命令的場景應成功</td>
+          <td class="result-fail">3 個有命令的場景全部失敗</td>
+          <td>OGH 不是根因</td>
+        </tr>
+        <tr>
+          <td>BIOS 是否宣告支援此功能</td>
+          <td>supportLightingValue = 1</td>
+          <td class="result-fail">supportLightingValue = 0</td>
+          <td>BIOS 未宣告支援</td>
+        </tr>
+        <tr>
+          <td>SMBUS 設定是否為區分變數</td>
+          <td>Enabled/Disabled 結果不同</td>
+          <td class="result-fail">結果完全相同</td>
+          <td>SMBUS 設定非關鍵因素</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- BIOS Spec Gap -->
+  <h3>BIOS 規格書缺口</h3>
+  <div class="spec-gap">
+    HP_OMEN_Spec_v0e.md 中未定義以下內容：(1) Modern Standby 期間記憶體 LED 行為 (2) IPF SMBUS Device 設定 (3) 26C2 / TekkenOC / NVL-S 平台。「Memory LED lighting bypass control」旗標（Command 20009h 01h Bit 4）存在但行為語義未定義。
+  </div>
+
+  <!-- Section 5: 時間軸 -->
+  <h2><span class="section-num">5</span>完整事件時間軸</h2>
+  <div class="scenario-table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:11rem">時間 (PDT)</th>
+          <th style="width:5rem">行號</th>
+          <th style="width:5rem">階段</th>
+          <th>事件描述</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="timeline-scenario-header">
+          <td colspan="4"><span class="scenario-label scenario-label-a">a-1</span> IPF SMBUS Enabled + Idle Timeout (BootId=26)</td>
+        </tr>
+        <tr class="phase-pre">
+          <td><span class="phase-dot"></span>17:26:40</td>
+          <td>12548</td>
+          <td>前置</td>
+          <td>PID 5528 HPOMENBG 啟動（重開機後新 process）</td>
+        </tr>
+        <tr class="phase-pre">
+          <td><span class="phase-dot"></span>17:26:46</td>
+          <td>14221</td>
+          <td>前置</td>
+          <td>FuryLightingControlWMI_DDR5::SetLightingOnAsync — 亮度 100%</td>
+        </tr>
+        <tr class="phase-trigger">
+          <td><span class="phase-dot"></span>17:27:47</td>
+          <td>14947</td>
+          <td>觸發</td>
+          <td>Monitor OFF → SetLightingOffAsync 發送（60.2ms，回報 All done）</td>
+        </tr>
+        <tr class="phase-fail">
+          <td><span class="phase-dot"></span>17:27:57</td>
+          <td>15241</td>
+          <td>錯誤</td>
+          <td>State=4 進入 MS — <strong>LED 仍亮著</strong>（軟體成功但硬體未反應）</td>
+        </tr>
+        <tr class="phase-recovery">
+          <td><span class="phase-dot"></span>17:41:04</td>
+          <td>15504</td>
+          <td>恢復</td>
+          <td>State=18 (Resume) → SetLightingOnAsync 亮度 100%</td>
+        </tr>
+
+        <tr class="timeline-scenario-header">
+          <td colspan="4"><span class="scenario-label scenario-label-a">a-2</span> IPF SMBUS Enabled + Manual (BootId=26)</td>
+        </tr>
+        <tr class="phase-trigger">
+          <td><span class="phase-dot"></span>17:41:26</td>
+          <td>16333</td>
+          <td>觸發</td>
+          <td>Monitor OFF → SetLightingOffAsync 發送（155.97ms，回報 All done）</td>
+        </tr>
+        <tr class="phase-fail">
+          <td><span class="phase-dot"></span>17:41:27</td>
+          <td>16594</td>
+          <td>錯誤</td>
+          <td>State=4 進入 MS — <strong>LED 仍亮著</strong></td>
+        </tr>
+        <tr class="phase-recovery">
+          <td><span class="phase-dot"></span>17:55:10</td>
+          <td>16878</td>
+          <td>恢復</td>
+          <td>Resume → SetLightingOnAsync 亮度 100%</td>
+        </tr>
+
+        <tr class="timeline-scenario-header">
+          <td colspan="4"><span class="scenario-label scenario-label-b">b-1</span> IPF SMBUS Disabled + Manual (BootId=27) &mdash; 系統重開後</td>
+        </tr>
+        <tr class="phase-pre">
+          <td><span class="phase-dot"></span>17:57:09</td>
+          <td>18952</td>
+          <td>前置</td>
+          <td>PID 5528 最後一行（DynamicFanCurve），系統即將重開</td>
+        </tr>
+        <tr class="phase-trigger">
+          <td><span class="phase-dot"></span>17:57:37</td>
+          <td>EVTX</td>
+          <td>觸發</td>
+          <td>Kernel-Power ID=109 — 系統 Shutdown/Reboot（切換 IPF SMBUS 設定）</td>
+        </tr>
+        <tr class="phase-fail">
+          <td><span class="phase-dot"></span>17:58:19</td>
+          <td>EVTX</td>
+          <td>錯誤</td>
+          <td>系統開機後立即進入 MS — <strong>OGH 尚未啟動，無關燈命令</strong></td>
+        </tr>
+        <tr class="phase-post">
+          <td><span class="phase-dot"></span>18:11:51</td>
+          <td>EVTX</td>
+          <td>後續</td>
+          <td>MS Resume（鍵盤喚醒）</td>
+        </tr>
+        <tr class="phase-recovery">
+          <td><span class="phase-dot"></span>18:12:36</td>
+          <td>18952</td>
+          <td>恢復</td>
+          <td>PID 11956 HPOMENBG 啟動（新 process，完整初始化）</td>
+        </tr>
+
+        <tr class="timeline-scenario-header">
+          <td colspan="4"><span class="scenario-label scenario-label-b">b-2</span> IPF SMBUS Disabled + Idle Timeout (BootId=27)</td>
+        </tr>
+        <tr class="phase-pre">
+          <td><span class="phase-dot"></span>18:12:56</td>
+          <td>20393</td>
+          <td>前置</td>
+          <td>SetLightingOnAsync — 亮度 100%（初始化完成）</td>
+        </tr>
+        <tr class="phase-trigger">
+          <td><span class="phase-dot"></span>18:13:12</td>
+          <td>20828</td>
+          <td>觸發</td>
+          <td>Monitor OFF → SetLightingOffAsync 發送（63.2ms，回報 All done）</td>
+        </tr>
+        <tr class="phase-fail">
+          <td><span class="phase-dot"></span>18:13:27</td>
+          <td>EVTX</td>
+          <td>錯誤</td>
+          <td>State=4 進入 MS — <strong>LED 仍亮著</strong></td>
+        </tr>
+        <tr class="phase-recovery">
+          <td><span class="phase-dot"></span>18:26:46</td>
+          <td>21040</td>
+          <td>恢復</td>
+          <td>Resume → SetLightingOnAsync 亮度 100%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 6: Log 證據 -->
+  <h2><span class="section-num">6</span>Log 證據</h2>
+
+  <!-- Evidence ① -->
+  <div class="evidence-block status-warn">
+    <div class="evidence-header">
+      <span class="evidence-badge evidence-badge-warn">⚠ 注意</span>
+      <span class="evidence-title">① SetLightingOff 軟體層成功 — 場景 a-1 (SMBUS Enabled + Idle)</span>
+      <span class="evidence-file">HPOMENBG_20260813.log</span>
+    </div>
+    <pre class="evidence-code"><span class="ln">14947</span>Entry::PowerEvent - MemoryLightingBg (Monitor): State=OFF <span class="hl">SetLightingOffAsync Get in off</span>
+<span class="ln">14948</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - Start command 5:27:47 PM
+<span class="ln">14949</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - Set command 5:27:47 PM
+<span class="ln">14950</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - <span class="hl-ok">Set Done</span> command 5:27:47 PM
+<span class="ln">14953</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - <span class="hl-ok">All done</span> command 5:27:47 PM
+<span class="ln">14954</span>Entry::PowerEvent - MemoryLightingBg (Monitor): State=OFF SetLightingOffAsync OFFF <span class="hl">60.1994</span></pre>
+    <div class="evidence-annotation">軟體層回報 SetLightingOff 在 60.2ms 內完成，但實際記憶體 LED 並未關閉。「All done」僅代表 WMI 呼叫回傳，不代表 SMBUS 命令已到達 DIMM LED 控制器。</div>
+  </div>
+
+  <!-- Evidence ② -->
+  <div class="evidence-block status-warn">
+    <div class="evidence-header">
+      <span class="evidence-badge evidence-badge-warn">⚠ 注意</span>
+      <span class="evidence-title">② SetLightingOff 軟體層成功 — 場景 a-2 (SMBUS Enabled + Manual)</span>
+      <span class="evidence-file">HPOMENBG_20260813.log</span>
+    </div>
+    <pre class="evidence-code"><span class="ln">16333</span>Entry::PowerEvent - MemoryLightingBg (Monitor): State=OFF <span class="hl">SetLightingOffAsync Get in off</span>
+<span class="ln">16339</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - Start command 5:41:26 PM
+<span class="ln">16340</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - Set command 5:41:26 PM
+<span class="ln">16341</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - <span class="hl-ok">Set Done</span> command 5:41:26 PM
+<span class="ln">16569</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - <span class="hl-ok">All done</span> command 5:41:26 PM
+<span class="ln">16570</span>Entry::PowerEvent - MemoryLightingBg (Monitor): State=OFF SetLightingOffAsync OFFF <span class="hl">155.9734</span></pre>
+    <div class="evidence-annotation">相同模式：軟體回報成功（155.97ms），但 LED 實際未關閉。此場景與 ① 唯一差異為進入 MS 的方式（手動 vs Idle），結果完全相同。</div>
+  </div>
+
+  <!-- Evidence ③ -->
+  <div class="evidence-block status-star">
+    <div class="evidence-header">
+      <span class="evidence-badge evidence-badge-star">★ 問題發生點</span>
+      <span class="evidence-title">③ BIOS 回報不支援 Memory LED Bypass Control</span>
+      <span class="evidence-file">HPOMENBG_20260813.log</span>
+    </div>
+    <pre class="evidence-code"><span class="ln">234</span>[PID: 14564] IsKingstonFuryLightingSupport: <span class="hl-err">supportLightingValue = 0</span>,
+    IsHpMemoryLightingSupport = True, isKingston = True
+
+<span class="ln">12773</span>[PID: 5528] IsKingstonFuryLightingSupport: <span class="hl-err">supportLightingValue = 0</span>,
+    IsHpMemoryLightingSupport = True, isKingston = True
+
+<span class="ln">19177</span>[PID: 11956] IsKingstonFuryLightingSupport: <span class="hl-err">supportLightingValue = 0</span>,
+    IsHpMemoryLightingSupport = True, isKingston = True</pre>
+    <div class="evidence-annotation"><code>supportLightingValue = 0</code> 對應 BIOS WMI Command 20009h 01h Byte 0 Bit 4 — BIOS 明確回報不支援 Memory LED lighting bypass control。但 OGH 基於自身偵測邏輯（<code>IsHpMemoryLightingSupport</code> + <code>isKingston</code>）仍嘗試透過 WMI 控制 LED，導致命令被發送到一個宣稱不支援此功能的 BIOS。這是根因所在：BIOS 對這些 WMI 命令缺乏正確的 SMBUS 轉發實作。</div>
+  </div>
+
+  <!-- Evidence ④ -->
+  <div class="evidence-block status-error">
+    <div class="evidence-header">
+      <span class="evidence-badge evidence-badge-error">✗ 異常</span>
+      <span class="evidence-title">④ 場景 b-1：系統重開導致 OGH 空窗期</span>
+      <span class="evidence-file">HPOMENBG_20260813.log</span>
+    </div>
+    <pre class="evidence-code"><span class="ln">18952</span>2026-08-13 <span class="hl">17:57:09</span>.275 [PID: <span class="hl-err">5528</span>] [TID: 50]
+    <span class="hl-err">2026-08-13 18:12:36.833 [PID: 11956] [TID: 1] App::InitializeOmenLog - HPOMENBG log Start</span>
+
+<span class="hl-dim">    ▲ 同一行內新舊 PID 的 log 交疊 — process 被系統重開強制終止</span>
+<span class="hl-dim">    ▲ 17:57:09 (PID 5528 最後活動) → 18:12:36 (PID 11956 啟動) = 15 分 27 秒空窗</span>
+<span class="hl-dim">    ▲ MS 在 17:58:19 進入，此時無 OGH process 運行</span></pre>
+    <div class="evidence-annotation">PID 5528 被系統重開終止（EVTX Kernel-Power ID=109 at 17:57:37），log 行被新 PID 覆寫。系統在 40 秒內完成重開並進入 MS (17:58:19)，但 OGH 直到 18:12:36 才啟動。這 15 分鐘的空窗期內無任何實體可發送關燈命令。此為架構性問題：BIOS/EC 缺乏不依賴 OGH 的獨立關燈機制。</div>
+  </div>
+
+  <!-- Evidence ⑤ -->
+  <div class="evidence-block status-warn">
+    <div class="evidence-header">
+      <span class="evidence-badge evidence-badge-warn">⚠ 注意</span>
+      <span class="evidence-title">⑤ SetLightingOff 軟體層成功 — 場景 b-2 (SMBUS Disabled + Idle)</span>
+      <span class="evidence-file">HPOMENBG_20260813.log</span>
+    </div>
+    <pre class="evidence-code"><span class="ln">20828</span>Entry::PowerEvent - MemoryLightingBg (Monitor): State=OFF <span class="hl">SetLightingOffAsync Get in off</span>
+<span class="ln">20829</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - Start command 6:13:12 PM
+<span class="ln">20830</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - Set command 6:13:12 PM
+<span class="ln">20831</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - <span class="hl-ok">Set Done</span> command 6:13:12 PM
+<span class="ln">20840</span>FuryLightingControlWMI_DDR5::SetLightingOffAsync - <span class="hl-ok">All done</span> command 6:13:12 PM
+<span class="ln">20841</span>Entry::PowerEvent - MemoryLightingBg (Monitor): State=OFF SetLightingOffAsync OFFF <span class="hl">63.2372</span></pre>
+    <div class="evidence-annotation">IPF SMBUS Device = Disabled 時，SetLightingOff 仍然回報成功（63.2ms）。但 LED 依然亮著。這證明 IPF SMBUS Device 設定對此問題無影響 — Enabled 和 Disabled 的結果完全一致。</div>
+  </div>
+
+  <!-- Evidence ⑥ -->
+  <div class="evidence-block status-error">
+    <div class="evidence-header">
+      <span class="evidence-badge evidence-badge-error">✗ 異常</span>
+      <span class="evidence-title">⑥ SMBUS Disabled 後的溫度感測器異常</span>
+      <span class="evidence-file">HPOMENBG_20260813.log</span>
+    </div>
+    <pre class="evidence-code"><span class="hl-dim">-- SMBUS Enabled 時 (BootId 26, PID 5528):</span>
+<span class="ln">18900</span>DynamicFanCurve Round 26 EWMA_CPU_Temp = <span class="hl-ok">37.82C</span>, Mode: Auto
+
+<span class="hl-dim">-- SMBUS Disabled 時 (BootId 27, PID 11956), MS Resume 後:</span>
+<span class="ln">20990</span>DynamicFanCurve Round 1 EWMA_CPU_Temp = <span class="hl-err">-0.957C</span>, Mode: Auto
+<span class="ln">21050</span>DynamicFanCurve Round 2 EWMA_CPU_Temp = <span class="hl-err">-0.985C</span>, Mode: Auto
+<span class="ln">21100</span>DynamicFanCurve Round 3 EWMA_CPU_Temp = <span class="hl-err">-0.992C</span>, Mode: Auto
+<span class="hl-dim">    ▲ 負溫度持續 16+ 輪 (30+ 秒)，僅在 SMBUS Disabled 場景出現</span></pre>
+    <div class="evidence-annotation">IPF SMBUS Device = Disabled 時，MS Resume 後溫度感測器回傳不可能的負值（-0.96&deg;C），持續超過 30 秒。此現象在 SMBUS Enabled 時不會發生（正常值 35~42&deg;C）。這表明 IPF SMBUS Device 設定確實影響 SMBUS 通訊，但<strong>即使 SMBUS 通訊正常（Enabled），LED 關燈命令仍然無效</strong> — 進一步排除 SMBUS 通道本身為根因。</div>
+  </div>
+
+  <!-- Section 7: 其他觀察 -->
+  <h2><span class="section-num">7</span>其他觀察項目</h2>
+  <div class="obs-grid">
+    <div class="obs-card">
+      <div class="obs-card-title">DirectedDripsTransitionCount = 0</div>
+      <p>所有 5 個 MS session 的 Directed DRIPS 轉換次數均為 0，表示 SoC 從未進入最深層 S0ix 狀態。主要 offender 為 NCSI（網路狀態檢查）和 PCIe Root Ports。SW DRIPS 89~96%。</p>
+    </div>
+    <div class="obs-card">
+      <div class="obs-card-title">OGH Process 重啟模式</div>
+      <p>HPOMENBG 在每次 MS 喚醒後被殺掉並重新啟動新 PID（14564→18000→5528→11956）。重啟期間存在 10~15 秒的空窗期，此時無實體可控制 LED。</p>
+    </div>
+    <div class="obs-card">
+      <div class="obs-card-title">IsUserLock 行為差異</div>
+      <p><code>IsUserLock=True</code> 時（手動鎖定後），Resume 路徑跳過 <code>PBT_APMRESUMEAUTOMATIC</code> 的 lighting reset，改由 Monitor ON 事件觸發。不影響根因但增加時序複雜度。</p>
+    </div>
+  </div>
+
+  <!-- Section 8: Owner 處理指南 -->
+  <h2><span class="section-num">8</span>Issue Owner 處理指南</h2>
+  <div class="owner-badge">BIOS/EC Team</div>
+
+  <ul class="checklist">
+    <li>
+      檢查 BIOS WMI Command 20009h 01h Bit 4（Memory LED lighting bypass control）為何回報 0 — 確認此平台（26C2/TekkenOC/NVL-S）是否應支援此功能
+      <br><span class="ref">參考：HPOMENBG log 行 234, 12773, 19177</span>
+    </li>
+    <li>
+      驗證 Command 20009h 09h（Set LED Animation for HyperX Memory）在 MS 進入時是否真正透過 SMBUS 將命令傳送到 Kingston Fury DDR5 DIMM 的 SPD5 Hub LED 控制器
+      <br><span class="ref">參考：HP_OMEN_Spec_v0e.md Command 20009h 09h/0Ah</span>
+    </li>
+    <li>
+      評估是否需要在 BIOS/EC 層級實作獨立的 MS 進入時記憶體 LED 關閉機制，不依賴 OGH userspace 應用程式（OGH 可能因重開機、crash 或時序問題而缺席）
+      <br><span class="ref">參考：證據 ④，PID 5528 空窗期 15 分 27 秒</span>
+    </li>
+    <li>
+      確認 IPF SMBUS Device 設定對記憶體 LED 控制路徑的預期行為 — 目前 Enabled/Disabled 結果完全相同，顯示此設定未影響 LED 控制鏈
+      <br><span class="ref">參考：場景 a vs b 比較</span>
+    </li>
+    <li>
+      更新 HP_OMEN_Spec 加入 26C2/TekkenOC/NVL-S 平台的 MS 期間記憶體 LED 行為定義，包含 <code>supportLightingValue</code> 旗標的預期值和行為語義
+      <br><span class="ref">參考：BIOS 規格書缺口分析</span>
+    </li>
+    <li>
+      調查 SMBUS Disabled 時溫度感測器回傳負值的問題（可能為獨立 bug）
+      <br><span class="ref">參考：證據 ⑥，行 20990~21100</span>
+    </li>
+  </ul>
+
+  <!-- Section 9: 結論與建議 -->
+  <h2><span class="section-num">9</span>結論與建議</h2>
+  <div class="conclusions">
+    <ul>
+      <li><strong>根因方向：</strong>BIOS 接收了 OGH 的 SetLightingOff WMI 命令但未將其轉換為 SMBUS 硬體操作。BIOS 明確回報不支援 Memory LED bypass control（<code>supportLightingValue = 0</code>），且規格書中缺乏 MS 期間 LED 行為的定義。</li>
+      <li><strong>修復建議：</strong>BIOS 應實作 Command 20009h 的 SMBUS 轉發邏輯，確保 SetLightingOff WMI 命令能實際到達 Kingston Fury DIMM 的 LED 控制器。或在 EC 層級加入 MS 進入時的自動關燈機制。</li>
+      <li><strong>驗證方式：</strong>修復後，重新執行相同的 4 個測試場景（SMBUS Enabled/Disabled &times; Manual/Idle），確認 MS 期間 LED 確實關閉。可額外使用 SMBUS analyzer 確認 BIOS 是否真正發出 I2C 命令到 DIMM slave address。</li>
+      <li><strong>架構建議：</strong>長期應在 BIOS/EC 層加入不依賴 OGH 的記憶體 LED 關閉機制（類似 heartbeat timeout 後 EC 接管 thermal 的設計），以覆蓋 OGH 重啟空窗期和異常退出的場景。</li>
+    </ul>
+  </div>
+
+</div>
