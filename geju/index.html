@@ -1,0 +1,3798 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f5f3ee">
+<title>viral-toy</title>
+<meta name="description" content="把房間丟下去，蓋一間房子">
+<meta property="og:type" content="website">
+<meta property="og:title" content="格局">
+<meta property="og:description" content="把房間丟下去，蓋一間房子">
+<meta property="og:url" content="https://tomkuo1124.github.io/shared-notes/geju/">
+<meta property="og:image" content="https://tomkuo1124.github.io/shared-notes/geju/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="格局">
+<meta name="twitter:image" content="https://tomkuo1124.github.io/shared-notes/geju/og.png">
+<style>
+:root {
+  --paper: #f5f3ee; --ink: #1b1b1d; --red: #d23a2c; --muted: #6b6b70; --line: #d9d5cc; --card: #fff;
+  --font: system-ui, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; background: var(--paper); color: var(--ink); font-family: var(--font);
+  -webkit-tap-highlight-color: transparent; overscroll-behavior: none; }
+button { font: inherit; color: inherit; cursor: pointer; }
+[hidden] { display: none !important; }
+
+#app { position: fixed; inset: 0; display: flex; flex-direction: column; max-width: 640px; margin: 0 auto;
+  padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+#hud { display: flex; gap: 12px; align-items: flex-start; padding: 12px 16px 6px; }
+#ask { flex: 1; min-width: 0; }
+#bname { display: block; font-size: 17px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#req { margin: 2px 0 6px; font-size: 14px; color: var(--muted); }
+#pips { display: flex; gap: 4px; }
+#pips i { width: 14px; height: 6px; border-radius: 3px; background: var(--line); }
+#pips i.on { background: var(--red); }
+#next { text-align: right; font-size: 12px; color: var(--muted); border: 1.5px solid var(--ink); border-radius: 8px;
+  padding: 4px 10px; background: var(--card); }
+#next b { display: block; font-size: 16px; color: var(--ink); }
+
+#stage { position: relative; flex: 1; min-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; }
+#c { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.hint { position: absolute; left: 0; right: 0; bottom: 18px; margin: 0; text-align: center; font-weight: 700;
+  color: var(--red); animation: blink 1.2s infinite; pointer-events: none; }
+@keyframes blink { 50% { opacity: .35; } }
+.banner { position: absolute; left: 16px; right: 16px; top: 12px; margin: 0; padding: 10px; text-align: center;
+  background: var(--red); color: #fff; font-weight: 800; border-radius: 8px; pointer-events: none; }
+#cap { position: absolute; left: 16px; right: 16px; bottom: 16px; padding: 10px 14px; background: var(--card);
+  border: 2px solid var(--ink); border-radius: 10px; font-size: 15px; pointer-events: none; }
+#cap b { color: var(--red); margin-right: 8px; }
+#cap small { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+#skip { position: absolute; right: 16px; top: 12px; border: 1.5px solid var(--ink); background: var(--card);
+  border-radius: 999px; padding: 4px 14px; font-size: 13px; }
+
+.panel { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px;
+  background: color-mix(in srgb, var(--paper) 86%, transparent); overflow-y: auto; z-index: 5; }
+.box { width: 100%; max-width: 420px; text-align: center; display: flex; flex-direction: column; gap: 12px; }
+.box.wide { max-width: 640px; }
+h1 { font-size: 56px; margin: 0; letter-spacing: .08em; }
+.sub { margin: 0 0 12px; color: var(--muted); }
+.big { font-size: 18px; font-weight: 800; }
+.box button:not(.link) { border: 2px solid var(--ink); background: var(--card); border-radius: 12px; padding: 12px 16px; font-weight: 700; }
+.primary { background: var(--red) !important; color: #fff; border-color: var(--red) !important; }
+.row { display: flex; gap: 10px; }
+#r-mine, #r-theirs { display: flex; flex-direction: column; gap: 10px; }
+.row > button { flex: 1; }
+.link { border: 0 !important; background: none !important; color: var(--muted); text-decoration: underline; font-size: 14px; }
+#card-slot canvas { width: 100%; height: auto; display: block; border-radius: 6px; box-shadow: 0 2px 14px rgba(0,0,0,.12); }
+.new { margin: 0; color: var(--red); font-weight: 800; }
+.record { margin: 0; color: var(--muted); font-size: 14px; }
+#z-list { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 6px; }
+#z-list li { border: 1.5px dashed var(--line); border-radius: 8px; padding: 8px 4px; font-size: 13px; color: var(--muted); }
+#z-list li.got { border: 1.5px solid var(--ink); color: var(--ink); background: var(--card); font-weight: 700; }
+
+/* juice: chunky offset-shadow buttons that squish on press, stamped title, popping banner */
+.box button:not(.link) { box-shadow: 0 4px 0 var(--ink); transition: transform .08s, box-shadow .08s; }
+.box button:not(.link):active { transform: translateY(3px); box-shadow: 0 1px 0 var(--ink); }
+.primary { box-shadow: 0 4px 0 #7d1d14 !important; }
+h1 { display: inline-block; transform: rotate(-3deg); color: var(--red); text-shadow: 3px 3px 0 var(--ink);
+  animation: drop-in .7s cubic-bezier(.3,1.6,.5,1) both; }
+@keyframes drop-in { from { transform: translateY(-80px) rotate(-12deg); opacity: 0; } }
+.banner { animation: pop .45s cubic-bezier(.3,1.7,.5,1) both; box-shadow: 0 4px 0 var(--ink); }
+@keyframes pop { from { transform: scale(.4) rotate(-6deg); opacity: 0; } }
+.new { animation: pop .5s cubic-bezier(.3,1.7,.5,1) both; }
+#card-slot { animation: slap .5s cubic-bezier(.3,1.5,.5,1) both; }
+@keyframes slap { from { transform: scale(1.25) rotate(4deg); opacity: 0; } }
+#cap { box-shadow: 0 4px 0 var(--ink); }
+#cap-line { font-weight: 700; }
+
+#hud { padding-right: 112px; }
+#skip { right: 112px; top: 60px; }
+
+/* sound on/off: a labelled pill in the corner on every screen + switches on the title / result panels */
+.sound { display: inline-flex !important; align-items: center; justify-content: center; gap: 6px; }
+.sound .x { display: none; } .sound.off .x { display: inline; } .sound.off .wave { display: none; }
+.sound.pill { position: fixed; z-index: 8; top: calc(10px + env(safe-area-inset-top)); right: 10px; height: 38px; padding: 0 12px;
+  border: 2px solid var(--ink); border-radius: 999px; background: var(--card); color: var(--ink); font-size: 14px; font-weight: 800;
+  box-shadow: 0 3px 0 var(--ink); }
+.sound.pill:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
+.sound.off { color: var(--muted) !important; background: #ecebe6 !important; }
+.box .sound.switch { align-self: center; padding: 8px 18px !important; font-size: 15px; }
+
+/* the agent talking during the build */
+#agent { position: absolute; left: 12px; top: 8px; right: 12px; display: flex; align-items: flex-end; gap: 6px; pointer-events: none; z-index: 2; }
+#agent-face { width: 48px; height: 56px; flex: none; }
+#agent-line { margin: 0 0 18px; padding: 8px 12px; background: var(--card); border: 2px solid var(--ink); border-radius: 14px 14px 14px 2px;
+  font-weight: 800; font-size: 15px; box-shadow: 0 3px 0 var(--ink); max-width: 75%; }
+#agent.talk { animation: pop .35s cubic-bezier(.3,1.7,.5,1) both; }
+.banner { top: 76px; }
+
+/* forum replies under the card, readable at phone size (the card image only fits two) */
+.board { list-style: none; margin: 0; padding: 10px 14px; background: #141416; border: 2px solid var(--ink); border-radius: 10px;
+  box-shadow: 0 4px 0 var(--ink); text-align: left; font-size: 16px; line-height: 1.7; color: #f0f0f0; }
+.board li { display: flex; gap: 8px; align-items: baseline; min-width: 0; }
+.board b { flex: none; font-weight: 900; color: #f5f5f5; }
+.board b.boo { color: #ff5c5c; } .board b.arrow { color: #f2d35b; }
+.board code { flex: none; font: 700 14px ui-monospace, Consolas, monospace; color: #f2d35b; }
+.board span { min-width: 0; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+<button id="mute" type="button" class="sound pill" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="lbl"></span></button>
+<div id="app">
+  <header id="hud" hidden>
+    <div id="ask"><b id="bname"></b><p id="req"></p><div id="pips"></div></div>
+    <div id="next"><span data-t="next"></span><b id="next-name"></b></div>
+  </header>
+  <main id="stage">
+    <canvas id="c"></canvas>
+    <p id="hint" class="hint" hidden data-t="hint"></p>
+    <p id="banner" class="banner" hidden></p>
+    <div id="cap" hidden><b id="cap-time"></b><span id="cap-line"></span><small data-t="hold"></small></div>
+    <button id="skip" type="button" hidden data-t="skip"></button>
+    <div id="agent" hidden><canvas id="agent-face"></canvas><p id="agent-line"></p></div>
+  </main>
+</div>
+
+<section id="title" class="panel">
+  <div class="box">
+    <h1 data-t="title"></h1>
+    <p class="sub" data-t="sub"></p>
+    <button id="daily" type="button" class="primary big"></button>
+    <button id="go" type="button" class="big" data-t="go"></button>
+    <button id="t-sound" type="button" class="sound switch" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="lbl"></span></button>
+    <button id="t-zukan" type="button" class="link"><span data-t="zukan"></span> <span class="zk-count"></span></button>
+  </div>
+</section>
+
+<section id="zukan" class="panel" hidden>
+  <div class="box">
+    <p class="big"><span data-t="zukan"></span> <span class="zk-count"></span></p>
+    <ul id="z-list"></ul>
+    <button id="z-close" type="button" class="big" data-t="close"></button>
+  </div>
+</section>
+
+<section id="result" class="panel" hidden>
+  <div class="box wide">
+    <div id="card-slot"></div>
+    <ul id="r-board" class="board" hidden></ul>
+    <p id="new-find" class="new" hidden></p>
+    <p id="record" class="record" hidden></p>
+    <div id="r-mine">
+      <div class="row">
+        <button id="r-post" type="button" class="primary" data-t="post"></button>
+        <button id="r-img" type="button" data-t="save"></button>
+      </div>
+      <button id="again" type="button" class="big" data-t="again"></button>
+      <button id="r-video" type="button" data-t="video" hidden></button>
+    </div>
+    <div id="r-theirs" hidden>
+      <button id="nextdoor" type="button" class="primary big" data-t="nextdoor"></button>
+      <button id="mine" type="button" class="big" data-t="mine"></button>
+      <button id="watch" type="button" data-t="watch"></button>
+    </div>
+    <button id="r-sound" type="button" class="sound switch" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="lbl"></span></button>
+    <button id="r-zukan" type="button" class="link"><span data-t="zukan"></span> <span class="zk-count"></span></button>
+  </div>
+</section>
+
+
+<script type="module">
+// engine\core.js
+const __m0 = (() => {
+
+// core.js — deterministic helpers shared by every viral-toy game (no DOM).
+// Rule: every feature draws from its own rng(seed + ':' + feature) so adding a
+// feature never changes the outcome of an existing seed or share link.
+
+function hash(s) {
+  let h = 2166136261 >>> 0;
+  for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return h;
+}
+
+// mulberry32
+function rng(seed) {
+  let a = (typeof seed === 'number' ? seed : hash(seed)) >>> 0;
+  return () => {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const pick = (rand, arr) => arr[Math.floor(rand() * arr.length)];
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const lerp = (a, b, t) => a + (b - a) * t;
+const round1 = v => Math.round(v * 10) / 10;
+
+// entries: [[value, weight], ...]
+function weighted(rand, entries) {
+  const total = entries.reduce((s, e) => s + e[1], 0);
+  let r = rand() * total;
+  for (const [v, w] of entries) { r -= w; if (r < 0) return v; }
+  return entries[entries.length - 1][0];
+}
+
+function shuffle(rand, arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// X (Twitter) weighted length: CJK / full-width count 2.
+const xlen = s => [...s].reduce((n, c) => n + (c.codePointAt(0) > 0x10ff ? 2 : 1), 0);
+
+// A run's random event (game.events: [{ id, weight, … }], weights sum < 1) or null.
+function pickEvent(events, rand) {
+  if (!events || !events.length) return null;
+  let v = rand();
+  for (const ev of events) { v -= ev.weight; if (v < 0) return ev; }
+  return null;
+}
+
+// One run = brief + bag (+ event), each from an isolated stream of the run seed.
+// Events never reach the share code: a link replays drops, so the card must not depend on them.
+function newRun(game, seed) {
+  const event = pickEvent(game.events, rng(seed + ':event'));
+  let bag = game.makeBag(rng(seed + ':bag'));
+  if (event && event.bag && game.eventBag) bag = game.eventBag(event, bag, rng(seed + ':event-bag'));
+  return { seed, brief: game.brief(rng(seed + ':brief')), bag, event, drops: [], placed: [] };
+}
+
+return { hash, rng, pick, clamp, lerp, round1, weighted, shuffle, xlen, pickEvent, newRun };
+})();
+
+// engine\code.js
+const __m1 = (() => {
+
+// code.js — share code for drop-grid runs.
+// v1 layout: '1' + name(2 chars b36) + req(1 char b36) + per drop 2 chars b36 of (t*2+rot)*W + x.
+// Only the inputs are stored; decode replays placement, and every derived random
+// value is seeded from hash(code), so a link always rebuilds the identical result.
+// Piece indexes are append-only. When 2 chars stop being enough, add a v2 branch
+// here instead of renumbering.
+
+const B36 = /^[0-9a-z]+$/;
+
+// v1 field limits: name < 1296 (2 chars), req < 36 (1 char), (t*2+rot)*W + x < 1296.
+function encode(run, W) {
+  const { name, req } = run.brief;
+  if (name >= 1296 || req >= 36) throw new Error(`code v1: brief out of range (name ${name} < 1296, req ${req} < 36)`);
+  if (run.drops.length > 16) throw new Error(`code v1: ${run.drops.length} drops > 16 (decode would reject the link); add a v2 format`);
+  for (const d of run.drops) if ((d.t * 2 + d.rot) * W + d.x >= 1296) throw new Error(`code v1: piece ${d.t} too large for 2 chars (W=${W}); add a v2 format`);
+  return '1'
+    + run.brief.name.toString(36).padStart(2, '0')
+    + run.brief.req.toString(36)
+    + run.drops.map(d => ((d.t * 2 + d.rot) * W + d.x).toString(36).padStart(2, '0')).join('');
+}
+
+// Returns { brief, drops } or null. `limits` = { names, reqs, pieces, maxDrops }.
+function decode(code, W, limits) {
+  if (typeof code !== 'string' || !B36.test(code) || code[0] !== '1') return null;
+  const body = code.slice(4);
+  if (code.length < 6 || body.length % 2) return null;
+  const name = parseInt(code.slice(1, 3), 36);
+  const req = parseInt(code[3], 36);
+  if (name >= limits.names || req >= limits.reqs) return null;
+  const drops = [];
+  for (let i = 0; i < body.length; i += 2) {
+    const v = parseInt(body.slice(i, i + 2), 36);
+    const x = v % W, tr = Math.floor(v / W);
+    const d = { t: tr >> 1, rot: tr & 1, x };
+    if (d.t >= limits.pieces) return null;
+    drops.push(d);
+  }
+  if (drops.length > limits.maxDrops) return null;
+  return { brief: { name, req }, drops };
+}
+
+return { encode, decode };
+})();
+
+// engine\i18n.js
+const __m2 = (() => {
+
+// i18n.js — string table; a missing key throws so tests catch it before players do.
+
+let table = {};
+
+function setStrings(t) { table = { ...table, ...t }; }
+
+function tr(key, ...args) {
+  const v = table[key];
+  if (v === undefined) throw new Error('i18n: missing key ' + key);
+  return typeof v === 'function' ? v(...args) : v;
+}
+
+function applyDom(root) {
+  root.querySelectorAll('[data-t]').forEach(el => { el.textContent = tr(el.dataset.t); });
+}
+
+return { setStrings, tr, applyDom };
+})();
+
+// engine\zukan.js
+const __m3 = (() => {
+
+// zukan.js — per-browser collection of found rares. Storage can be missing or
+// throw (private mode, blocked site data); the game must work without it.
+
+function readIds(key) {
+  try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+}
+
+function zukan(gameId) {
+  const key = 'vt.' + gameId + '.zukan';
+  return {
+    list: () => readIds(key),
+    // Adds ids, returns the ones that were new.
+    add(ids) {
+      const have = new Set(readIds(key));
+      const fresh = [...new Set(ids)].filter(i => !have.has(i));
+      fresh.forEach(i => have.add(i));
+      try { localStorage.setItem(key, JSON.stringify([...have])); } catch {}
+      return fresh;
+    },
+  };
+}
+
+return { zukan };
+})();
+
+// engine\share.js
+const __m4 = (() => {
+const { xlen } = __m0;
+// share.js — card image + post. The PNG File is built synchronously: iOS refuses
+// to open the share sheet if anything is awaited before navigator.share.
+
+
+
+function cardFile(canvas, name) {
+  const bin = atob(canvas.toDataURL('image/png').split(',')[1]);
+  const u8 = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return new File([u8], name, { type: 'image/png' });
+}
+
+function saveFile(file) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = file.name;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+
+// lines: required first, optional last; optional lines are dropped (from the end)
+// until the post fits X's weighted limit with one link (t.co = 23) + newline.
+function shareText(lines, optional, limit = 280 - 24) {
+  const opt = optional.slice();
+  let text = [...lines, ...opt].join('\n');
+  while (xlen(text) > limit && opt.length) { opt.pop(); text = [...lines, ...opt].join('\n'); }
+  return text;
+}
+
+async function post({ canvas, text, url, filename }) {
+  const file = cardFile(canvas, filename);
+  const coarse = matchMedia('(pointer: coarse)').matches;
+  if (coarse && navigator.canShare && navigator.canShare({ files: [file] })) {
+    try { await navigator.share({ files: [file], text: text + '\n' + url }); return 'sheet'; }
+    catch (e) { if (e.name === 'AbortError') return 'cancel'; }
+  }
+  saveFile(file);
+  window.open('https://x.com/intent/post?text=' + encodeURIComponent(text) + '&url=' + encodeURIComponent(url), '_blank', 'noopener');
+  return 'x';
+}
+
+return { cardFile, saveFile, shareText, post };
+})();
+
+// engine\drop-grid.js
+const __m5 = (() => {
+const { clamp } = __m0;
+// drop-grid.js — mechanic: a crane swings a piece over a W-wide lot, a tap drops it.
+// Pure placement + structural analysis (runs in Node for sim), plus the crane controller.
+// Lot coordinates: x to the right, y away from the road (road is below y = 0).
+// Pieces fall toward the road and land on whatever is under them (height map).
+
+
+
+const DIRS = [[1, 0], [-1, 0], [0, 1], [0, -1]];
+
+function dims(p, rot) { return rot ? { w: p.h, h: p.w } : { w: p.w, h: p.h }; }
+
+function landing(placed, x, w) {
+  let y = 0;
+  for (const r of placed) if (r.x < x + w && x < r.x + r.w) y = Math.max(y, r.y + r.h);
+  return y;
+}
+
+function placeDrop(placed, pieces, d, W) {
+  const { w, h } = dims(pieces[d.t], d.rot);
+  const x = clamp(d.x, 0, W - w);
+  return { i: placed.length, t: d.t, rot: d.rot, x, y: landing(placed, x, w), w, h };
+}
+
+function replay(drops, pieces, W) {
+  const placed = [];
+  for (const d of drops) placed.push(placeDrop(placed, pieces, d, W));
+  return placed;
+}
+
+// Structural facts every grid game can build jokes on:
+//   own(x,y)   which room owns a cell (-1 = empty)
+//   open       empty cells connected to the outside; the rest are enclosed gaps
+//   doors      exactly one door per pair of rooms sharing a wall, on its middle unit
+//   faces      per room, how many wall units face road / side / yard / gap
+//   adj        per room, [{ o, door }]
+function analyzeGrid(placed, W, H) {
+  const top = Math.max(H, ...placed.map(r => r.y + r.h));
+  const key = (x, y) => x + ',' + y;
+  const owner = new Map();
+  for (const r of placed)
+    for (let x = r.x; x < r.x + r.w; x++)
+      for (let y = r.y; y < r.y + r.h; y++) owner.set(key(x, y), r.i);
+  const own = (x, y) => (owner.has(key(x, y)) ? owner.get(key(x, y)) : -1);
+  const inside = (x, y) => x >= 0 && x < W && y >= 0 && y < top;
+
+  const open = new Set();
+  const stack = [];
+  for (let x = 0; x < W; x++)
+    for (let y = 0; y < top; y++)
+      if (own(x, y) < 0 && (x === 0 || x === W - 1 || y === 0 || y === top - 1)) {
+        open.add(key(x, y)); stack.push([x, y]);
+      }
+  while (stack.length) {
+    const [x, y] = stack.pop();
+    for (const [dx, dy] of DIRS) {
+      const nx = x + dx, ny = y + dy, k = key(nx, ny);
+      if (inside(nx, ny) && own(nx, ny) < 0 && !open.has(k)) { open.add(k); stack.push([nx, ny]); }
+    }
+  }
+
+  const gaps = [];
+  const seen = new Set();
+  for (let x = 0; x < W; x++)
+    for (let y = 0; y < top; y++) {
+      const k0 = key(x, y);
+      if (own(x, y) >= 0 || open.has(k0) || seen.has(k0)) continue;
+      const cells = [];
+      const q = [[x, y]]; seen.add(k0);
+      while (q.length) {
+        const [cx, cy] = q.pop(); cells.push([cx, cy]);
+        for (const [dx, dy] of DIRS) {
+          const nx = cx + dx, ny = cy + dy, k = key(nx, ny);
+          if (inside(nx, ny) && own(nx, ny) < 0 && !open.has(k) && !seen.has(k)) { seen.add(k); q.push([nx, ny]); }
+        }
+      }
+      gaps.push({ cells });
+    }
+
+  const faces = placed.map(() => ({ road: 0, side: 0, yard: 0, gap: 0, out: 0, roadSeg: null, outSeg: null }));
+  const shared = new Map();
+  for (const r of placed)
+    for (let x = r.x; x < r.x + r.w; x++)
+      for (let y = r.y; y < r.y + r.h; y++)
+        for (const [dx, dy] of DIRS) {
+          const nx = x + dx, ny = y + dy, o = own(nx, ny);
+          if (o === r.i) continue;
+          const seg = { x, y, dx, dy };
+          const f = faces[r.i];
+          if (o >= 0) {
+            if (r.i < o) {
+              const pk = r.i + '-' + o;
+              if (!shared.has(pk)) shared.set(pk, []);
+              shared.get(pk).push(seg);
+            }
+            continue;
+          }
+          if (ny < 0) { f.road++; f.roadSeg = f.roadSeg || seg; }
+          else if (nx < 0 || nx >= W) f.side++;
+          else if (ny >= top || open.has(key(nx, ny))) f.yard++;
+          else { f.gap++; continue; }
+          f.out++; f.outSeg = f.outSeg || seg;
+        }
+
+  const doors = [];
+  const adj = placed.map(() => []);
+  for (const [pk, segs] of shared) {
+    const [a, b] = pk.split('-').map(Number);
+    segs.sort((s, t) => s.x - t.x || s.y - t.y);
+    const s = segs[Math.floor((segs.length - 1) / 2)];
+    const door = { a, b, ...s, mx: s.x + 0.5 + s.dx * 0.5, my: s.y + 0.5 + s.dy * 0.5 };
+    doors.push(door);
+    adj[a].push({ o: b, door });
+    adj[b].push({ o: a, door });
+  }
+
+  return { W, H, top, placed, own, open, gaps, faces, doors, adj };
+}
+
+// Town mode: houses (each a drops list) side by side, house k offset by k*W, analysed
+// as one lot so shared walls between houses get doors by the same one-door rule.
+// Adds: house[i] (which house a room is in), start[k] (first room index of house k).
+function streetGrid(houses, pieces, W, H) {
+  const placed = [], house = [], start = [];
+  houses.forEach((drops, k) => {
+    start.push(placed.length);
+    for (const r of replay(drops, pieces, W)) { placed.push({ ...r, i: placed.length, x: r.x + k * W }); house.push(k); }
+  });
+  const g = analyzeGrid(placed, W * houses.length, H);
+  return { ...g, house, start, houses: houses.length };
+}
+
+// Doors between house k and its neighbours, seen from house k (room indexes local to k).
+function crossDoors(sg, k) {
+  const out = [];
+  for (const d of sg.doors) {
+    const ha = sg.house[d.a], hb = sg.house[d.b];
+    if (ha === hb || (ha !== k && hb !== k)) continue;
+    const mine = ha === k ? d.a : d.b, theirs = ha === k ? d.b : d.a;
+    out.push({ mine: mine - sg.start[k], mineT: sg.placed[mine].t, theirsT: sg.placed[theirs].t });
+  }
+  return out;
+}
+
+function bfs(adj, start) {
+  const dist = adj.map(() => Infinity), prev = adj.map(() => -1);
+  if (start < 0) return { dist, prev };
+  dist[start] = 0;
+  const q = [start];
+  while (q.length) {
+    const a = q.shift();
+    for (const { o } of adj[a]) if (dist[o] === Infinity) { dist[o] = dist[a] + 1; prev[o] = a; q.push(o); }
+  }
+  return { dist, prev };
+}
+
+// Room path from BFS start to target, or null when unreachable.
+function pathTo(prev, dist, target) {
+  if (target < 0 || dist[target] === Infinity) return null;
+  const p = [target];
+  while (prev[p[0]] >= 0) p.unshift(prev[p[0]]);
+  return p;
+}
+
+const center = r => [r.x + r.w / 2, r.y + r.h / 2];
+
+// Walk waypoints through room centres and the door midpoints between them.
+function waypoints(g, rooms) {
+  const pts = [center(g.placed[rooms[0]])];
+  for (let k = 1; k < rooms.length; k++) {
+    const d = g.adj[rooms[k - 1]].find(e => e.o === rooms[k]).door;
+    pts.push([d.mx, d.my], center(g.placed[rooms[k]]));
+  }
+  return pts;
+}
+
+const railFor = (placed, H, h) => Math.max(H, ...placed.map(r => r.y + r.h)) + h + 0.8;
+
+// Crane controller. The stage calls tap()/update(); landed(drop) fires per piece.
+function crane({ W, H, pieces }) {
+  const c = {
+    run: null, cur: null, fall: null, shake: 0, onLand: null, speedOf: null, // speedOf(idx): live-only multiplier (events)
+    start(run, onLand) { c.run = run; c.onLand = onLand; c.next(); },
+    next() {
+      const idx = c.run.drops.length;
+      if (idx >= c.run.bag.length) { c.cur = null; return; }
+      const b = c.run.bag[idx];
+      const { w, h } = dims(pieces[b.t], b.rot);
+      const fromLeft = Math.random() < 0.5; // live-only randomness; never affects the code
+      c.cur = { ...b, w, h, x: fromLeft ? 0 : W - w, dir: fromLeft ? 1 : -1,
+        speed: (2.4 + idx * 0.32) * (c.speedOf ? c.speedOf(idx) : 1), rail: railFor(c.run.placed, H, h) };
+      c.fall = null;
+    },
+    col() { return clamp(Math.round(c.cur.x), 0, W - c.cur.w); },
+    tap() {
+      if (!c.cur || c.fall) return false;
+      const x = c.col();
+      c.fall = { x, y: c.cur.rail - c.cur.h, vy: 0, to: landing(c.run.placed, x, c.cur.w) };
+      return true;
+    },
+    update(dt) {
+      c.shake = Math.max(0, c.shake - dt);
+      if (!c.cur) return;
+      if (c.fall) {
+        c.fall.vy += 70 * dt;
+        c.fall.y -= c.fall.vy * dt;
+        if (c.fall.y <= c.fall.to) {
+          const d = { t: c.cur.t, rot: c.cur.rot, x: c.fall.x };
+          c.run.drops.push(d);
+          c.run.placed.push(placeDrop(c.run.placed, pieces, d, W));
+          c.shake = 0.12;
+          c.next();
+          c.onLand && c.onLand(d);
+        }
+        return;
+      }
+      const cur = c.cur;
+      cur.x += cur.dir * cur.speed * dt;
+      if (cur.x <= 0) { cur.x = 0; cur.dir = 1; }
+      if (cur.x >= W - cur.w) { cur.x = W - cur.w; cur.dir = -1; }
+    },
+    // What to draw for the moving piece: { t, rot, x, y, w, h, ghostY, rail }
+    hanging() {
+      if (!c.cur) return null;
+      const cur = c.cur;
+      if (c.fall) return { ...cur, x: c.fall.x, y: c.fall.y, ghostY: c.fall.to, falling: true };
+      const gx = c.col();
+      return { ...cur, y: cur.rail - cur.h, ghostX: gx, ghostY: landing(c.run.placed, gx, cur.w) };
+    },
+  };
+  return c;
+}
+
+return { DIRS, dims, landing, placeDrop, replay, analyzeGrid, streetGrid, crossDoors, bfs, pathTo, center, waypoints, railFor, crane };
+})();
+
+// engine\people.js
+const __m6 = (() => {
+
+// people.js — chibi residents in screen space: the walker (the tenant) and NPCs
+// (阿伯, 神明, 醉漢…). Pure drawing; animation comes in through `st`.
+//   person(ctx, x, y, r, look, st)   x, y = feet on screen; r = head radius in px
+//   st: { phase (walk cycle), time, face, alpha, shake }
+
+const INK = '#1b1b1d';
+const SKIN = '#f6d3b3';
+
+const LOOKS = {
+  tenant: { shirt: '#d23a2c', pants: '#2b3a55', hair: '#2a2a2a', hairStyle: 'short' },
+  abo: { shirt: '#f4f2ea', pants: '#6b5a45', hair: '#d9d9d9', hairStyle: 'bald', prop: 'fan' },
+  ama: { shirt: '#9a5fb0', pants: '#3e3550', hair: '#6a6a6a', hairStyle: 'perm', prop: 'bag' },
+  god: { shirt: '#e6b422', pants: '#c8342b', hair: '#1b1b1d', hairStyle: 'bun', prop: 'halo', float: true, beard: true },
+  drunk: { shirt: '#4a7bd0', pants: '#333a44', hair: '#2a2a2a', hairStyle: 'short', prop: 'mic', face: 'drunk', sway: true },
+  crowd: { shirt: '#81b29a', pants: '#3d405b', hair: '#2a2a2a', hairStyle: 'short' },
+  landlady: { shirt: '#f08bb0', pants: '#5a3a4a', hair: '#3a2a2a', hairStyle: 'curlers', prop: 'slipper' },
+  kid: { shirt: '#f5c518', pants: '#2d6fb5', hair: '#2a2a2a', hairStyle: 'cap', scale: 0.72 },
+  worker: { shirt: '#f28c28', pants: '#4a4a4a', hair: '#2a2a2a', hairStyle: 'helmet' },
+  agent: { shirt: '#2b3a55', pants: '#1b1b1d', hair: '#1b1b1d', hairStyle: 'short', prop: 'tie' },
+};
+
+const CROWD = ['#81b29a', '#e07a5f', '#3d405b', '#f2cc8f', '#7fb8f0'];
+
+function lookOf(kind, k = 0) {
+  const L = LOOKS[kind] || LOOKS.crowd;
+  return kind === 'crowd' ? { ...L, shirt: CROWD[k % CROWD.length] } : L;
+}
+
+function person(ctx, x, y, r0, look, st = {}) {
+  const r = r0 * (look.scale || 1);
+  const ph = st.phase || 0, time = st.time || 0;
+  const walking = !!st.walking;
+  const face = st.face || look.face || 'normal';
+  const sway = look.sway ? Math.sin(time * 2.2 + x * 0.01) * 0.18 : 0;
+  const lift = look.float ? r * (1.4 + Math.sin(time * 2) * 0.35) : walking ? Math.abs(Math.sin(ph)) * r * 0.25 : Math.sin(time * 3 + x) * r * 0.05;
+  const sh = st.shake ? Math.sin(st.shake * 60) * r * 0.25 : 0;
+  ctx.save();
+  ctx.globalAlpha = st.alpha ?? 1;
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  // shadow
+  ctx.fillStyle = 'rgba(0,0,0,.2)';
+  ctx.beginPath(); ctx.ellipse(x, y, r * 1.15, r * 0.45, 0, 0, Math.PI * 2); ctx.fill();
+
+  ctx.translate(x + sh, y - lift);
+  ctx.rotate(sway);
+  const lw = Math.max(1.2, r * 0.18);
+  ctx.strokeStyle = INK; ctx.lineWidth = lw;
+  // legs
+  const leg = walking ? Math.sin(ph) * r * 0.45 : 0;
+  ctx.strokeStyle = look.pants;
+  ctx.lineWidth = r * 0.42;
+  ctx.beginPath(); ctx.moveTo(-r * 0.32, -r * 1.1); ctx.lineTo(-r * 0.32 + leg, -r * 0.15); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(r * 0.32, -r * 1.1); ctx.lineTo(r * 0.32 - leg, -r * 0.15); ctx.stroke();
+  // body
+  ctx.fillStyle = look.shirt; ctx.strokeStyle = INK; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.roundRect(-r * 0.78, -r * 2.55, r * 1.56, r * 1.6, r * 0.55); ctx.fill(); ctx.stroke();
+  // arms
+  const arm = walking ? Math.sin(ph) * r * 0.5 : Math.sin(time * 2) * r * 0.08;
+  ctx.strokeStyle = SKIN; ctx.lineWidth = r * 0.32;
+  if (look.prop === 'slipper' || face === 'angry') {
+    ctx.beginPath(); ctx.moveTo(-r * 0.7, -r * 2.2); ctx.lineTo(-r * 1.05, -r * 1.7); ctx.lineTo(-r * 0.7, -r * 1.4); ctx.stroke();
+  } else {
+    ctx.beginPath(); ctx.moveTo(-r * 0.72, -r * 2.25); ctx.lineTo(-r * 0.95 - arm * 0.3, -r * 1.35 + arm); ctx.stroke();
+  }
+  const handY = look.prop === 'mic' ? -r * 2.8 : -r * 1.35 - arm;
+  ctx.beginPath(); ctx.moveTo(r * 0.72, -r * 2.25); ctx.lineTo(r * 1.0, handY); ctx.stroke();
+  prop(ctx, look.prop, r, handY, time);
+
+  // head
+  const hy = -r * 3.35;
+  ctx.fillStyle = face === 'drunk' ? '#f3a48f' : SKIN; ctx.strokeStyle = INK; ctx.lineWidth = lw;
+  ctx.beginPath(); ctx.arc(0, hy, r, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  hair(ctx, look, r, hy, lw);
+  if (look.beard) { ctx.fillStyle = '#1b1b1d'; ctx.beginPath(); ctx.moveTo(-r * 0.45, hy + r * 0.45); ctx.quadraticCurveTo(0, hy + r * 1.7, r * 0.45, hy + r * 0.45); ctx.fill(); }
+  faceOf(ctx, face, r, hy, time);
+  ctx.restore();
+}
+
+function hair(ctx, look, r, hy, lw) {
+  ctx.fillStyle = look.hair; ctx.strokeStyle = INK; ctx.lineWidth = lw;
+  const s = look.hairStyle;
+  if (s === 'short' || s === 'bun') {
+    ctx.beginPath(); ctx.arc(0, hy, r, Math.PI * 1.05, Math.PI * 1.95); ctx.quadraticCurveTo(0, hy - r * 0.35, -r * 0.98, hy - r * 0.25); ctx.fill();
+    if (s === 'bun') { ctx.beginPath(); ctx.arc(0, hy - r * 1.05, r * 0.38, 0, Math.PI * 2); ctx.fill(); ctx.stroke(); }
+  } else if (s === 'bald') {
+    ctx.beginPath(); ctx.arc(-r * 0.9, hy - r * 0.1, r * 0.25, 0, Math.PI * 2); ctx.arc(r * 0.9, hy - r * 0.1, r * 0.25, 0, Math.PI * 2); ctx.fill();
+  } else if (s === 'perm' || s === 'curlers') {
+    for (let k = 0; k < 6; k++) {
+      const a = Math.PI * (1.0 + k * 0.2);
+      ctx.beginPath(); ctx.arc(Math.cos(a) * r * 0.85, hy + Math.sin(a) * r * 0.85, r * 0.36, 0, Math.PI * 2); ctx.fill();
+      if (s === 'curlers' && k % 2) { ctx.fillStyle = '#7fb8f0'; ctx.fillRect(Math.cos(a) * r * 0.85 - r * 0.2, hy + Math.sin(a) * r * 0.85 - r * 0.12, r * 0.4, r * 0.24); ctx.fillStyle = look.hair; }
+    }
+  } else if (s === 'cap') {
+    ctx.fillStyle = '#d23a2c'; ctx.beginPath(); ctx.arc(0, hy, r * 1.02, Math.PI, 0); ctx.fill(); ctx.stroke();
+    ctx.fillRect(0, hy - r * 0.12, r * 1.5, r * 0.22);
+  } else if (s === 'helmet') {
+    ctx.fillStyle = '#f5c518'; ctx.beginPath(); ctx.arc(0, hy - r * 0.1, r * 1.05, Math.PI, 0); ctx.fill(); ctx.stroke();
+    ctx.fillRect(-r * 1.25, hy - r * 0.15, r * 2.5, r * 0.2);
+  }
+}
+
+function faceOf(ctx, face, r, hy, time) {
+  ctx.strokeStyle = INK; ctx.fillStyle = INK; ctx.lineWidth = Math.max(1, r * 0.14);
+  const ex = r * 0.38, ey = hy + r * 0.05;
+  const dot = (dx) => { ctx.beginPath(); ctx.arc(dx, ey, r * 0.12, 0, Math.PI * 2); ctx.fill(); };
+  if (face === 'happy') {
+    for (const dx of [-ex, ex]) { ctx.beginPath(); ctx.arc(dx, ey + r * 0.08, r * 0.15, Math.PI * 1.1, Math.PI * 1.9); ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(0, hy + r * 0.35, r * 0.28, 0, Math.PI); ctx.fill();
+  } else if (face === 'shock') {
+    for (const dx of [-ex, ex]) { ctx.beginPath(); ctx.arc(dx, ey, r * 0.2, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.beginPath(); ctx.ellipse(0, hy + r * 0.5, r * 0.16, r * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+  } else if (face === 'sleep') {
+    for (const dx of [-ex, ex]) { ctx.beginPath(); ctx.moveTo(dx - r * 0.15, ey); ctx.lineTo(dx + r * 0.15, ey); ctx.stroke(); }
+    const zz = (time * 0.8) % 1;
+    ctx.save();
+    ctx.globalAlpha *= 1 - zz;
+    ctx.font = `900 ${r * 0.9}px system-ui, sans-serif`; ctx.textAlign = 'center';
+    ctx.fillText('z', r * 1.1 + zz * r, hy - r * 1.1 - zz * r * 1.4);
+    ctx.restore();
+  } else if (face === 'drunk') {
+    for (const dx of [-ex, ex]) { ctx.beginPath(); ctx.moveTo(dx - r * 0.15, ey - r * 0.1); ctx.lineTo(dx + r * 0.15, ey + r * 0.05); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(-r * 0.3, hy + r * 0.45);
+    for (let k = 1; k <= 4; k++) ctx.lineTo(-r * 0.3 + k * r * 0.15, hy + r * (k % 2 ? 0.55 : 0.4)); ctx.stroke();
+  } else if (face === 'angry') {
+    for (const s of [-1, 1]) { ctx.beginPath(); ctx.moveTo(s * ex - s * r * 0.18, ey - r * 0.3); ctx.lineTo(s * ex + s * r * 0.12, ey - r * 0.12); ctx.stroke(); dot(s * ex); }
+    ctx.beginPath(); ctx.arc(0, hy + r * 0.6, r * 0.22, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
+  } else {
+    dot(-ex); dot(ex);
+    ctx.beginPath(); ctx.arc(0, hy + r * 0.3, r * 0.2, Math.PI * 0.15, Math.PI * 0.85); ctx.stroke();
+    if (face === 'sweat') {
+      ctx.fillStyle = '#7fc3f0'; ctx.beginPath();
+      ctx.moveTo(r * 1.05, hy - r * 0.5); ctx.quadraticCurveTo(r * 1.4, hy, r * 1.05, hy + r * 0.1); ctx.quadraticCurveTo(r * 0.75, hy, r * 1.05, hy - r * 0.5); ctx.fill();
+    }
+  }
+  // blush
+  ctx.fillStyle = 'rgba(232,90,90,.35)';
+  for (const dx of [-r * 0.62, r * 0.62]) { ctx.beginPath(); ctx.ellipse(dx, hy + r * 0.32, r * 0.18, r * 0.1, 0, 0, Math.PI * 2); ctx.fill(); }
+}
+
+function prop(ctx, p, r, handY, time) {
+  if (!p) return;
+  ctx.save();
+  ctx.lineWidth = Math.max(1, r * 0.12); ctx.strokeStyle = INK;
+  if (p === 'fan') {
+    ctx.translate(r * 1.05, handY); ctx.rotate(Math.sin(time * 6) * 0.4);
+    ctx.fillStyle = '#f2c14e'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, r * 0.75, -Math.PI * 0.9, -Math.PI * 0.4); ctx.closePath(); ctx.fill(); ctx.stroke();
+  } else if (p === 'mic') {
+    ctx.fillStyle = '#333'; ctx.fillRect(r * 0.95, handY - r * 0.1, r * 0.16, r * 0.55);
+    ctx.fillStyle = '#999'; ctx.beginPath(); ctx.arc(r * 1.03, handY - r * 0.12, r * 0.22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  } else if (p === 'bag') {
+    ctx.fillStyle = '#d23a2c'; ctx.beginPath(); ctx.roundRect(r * 0.85, handY - r * 0.1, r * 0.7, r * 0.6, r * 0.12); ctx.fill(); ctx.stroke();
+  } else if (p === 'slipper') {
+    ctx.translate(r * 1.0, handY - r * 0.3); ctx.rotate(-0.6 + Math.sin(time * 8) * 0.5);
+    ctx.fillStyle = '#3a8d5b'; ctx.beginPath(); ctx.ellipse(0, -r * 0.5, r * 0.25, r * 0.55, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  } else if (p === 'tie') {
+    ctx.fillStyle = '#d23a2c'; ctx.beginPath(); ctx.moveTo(-r * 0.12, -r * 2.5); ctx.lineTo(r * 0.12, -r * 2.5); ctx.lineTo(r * 0.18, -r * 1.6); ctx.lineTo(0, -r * 1.4); ctx.lineTo(-r * 0.18, -r * 1.6); ctx.closePath(); ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.fillRect(r * 0.3, -r * 2.3, r * 0.4, r * 0.25);
+  } else if (p === 'halo') {
+    ctx.strokeStyle = '#ffd34d'; ctx.lineWidth = r * 0.22; ctx.globalAlpha *= 0.6 + Math.sin(time * 3) * 0.3;
+    ctx.beginPath(); ctx.ellipse(0, -r * 4.55, r * 0.9, r * 0.3, 0, 0, Math.PI * 2); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Speech bubble anchored above a point (head top).
+function bubble(ctx, x, y, text, size = 15) {
+  if (!text) return;
+  ctx.save();
+  ctx.font = `800 ${size}px system-ui, "Noto Sans TC", "Microsoft JhengHei", sans-serif`;
+  const w = ctx.measureText(text).width + size * 1.1, h = size * 1.8;
+  const viewW = ctx.canvas.width / (ctx.getTransform().a || 1); // canvas px → drawing units (dpr transform)
+  const bx = Math.max(4, Math.min(viewW - w - 4, x - w / 2)), by = y - h - size * 0.8;
+  ctx.fillStyle = '#fff'; ctx.strokeStyle = INK; ctx.lineWidth = 2;
+  ctx.beginPath(); ctx.roundRect(bx, by, w, h, h / 2); ctx.fill(); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x - size * 0.35, by + h - 1); ctx.lineTo(x, by + h + size * 0.6); ctx.lineTo(x + size * 0.35, by + h - 1); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(x - size * 0.35, by + h); ctx.lineTo(x, by + h + size * 0.6); ctx.lineTo(x + size * 0.35, by + h); ctx.stroke();
+  ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, bx + w / 2, by + h / 2 + 1);
+  ctx.restore();
+}
+
+return { LOOKS, lookOf, person, bubble };
+})();
+
+// engine\fx.js
+const __m7 = (() => {
+
+// fx.js — live-only juice: particles, floating text, easing. Lives in lot
+// coordinates (x, y, z) so it follows the camera; never touches game state, so
+// it may use Math.random().
+
+function easeOutBack(t, s = 1.7) { const u = t - 1; return 1 + (s + 1) * u * u * u + s * u * u; }
+const easeOutCubic = t => 1 - (1 - t) ** 3;
+const easeInOut = t => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
+
+const CONFETTI = ['#d23a2c', '#f2b53a', '#3a8d5b', '#2d6fb5', '#e84fb0', '#ffffff'];
+
+function fxLayer() {
+  const parts = [], floats = [];
+  const R = Math.random;
+  return {
+    // Dust puffs along the bottom edge of a landed rect.
+    dust(r, n = 10) {
+      for (let k = 0; k < n; k++) {
+        const side = k % 2 ? 1 : -1;
+        parts.push({ kind: 'dust', x: r.x + R() * r.w, y: r.y + (R() < 0.5 ? 0 : r.h), z: 0.05,
+          vx: side * (0.6 + R() * 1.2), vy: (R() - 0.5) * 0.8, vz: 0.4 + R() * 0.6, life: 0.55 + R() * 0.3, age: 0, size: 0.12 + R() * 0.12 });
+      }
+    },
+    confetti(cx, cy, n = 28) {
+      for (let k = 0; k < n; k++) {
+        const a = R() * Math.PI * 2, sp = 1 + R() * 2.4;
+        parts.push({ kind: 'confetti', x: cx, y: cy, z: 0.8, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, vz: 2.5 + R() * 2,
+          life: 1.2 + R() * 0.6, age: 0, size: 0.08 + R() * 0.06, color: CONFETTI[k % CONFETTI.length], spin: R() * 6 });
+      }
+    },
+    sparkle(cx, cy, n = 8) {
+      for (let k = 0; k < n; k++) parts.push({ kind: 'spark', x: cx + (R() - 0.5) * 1.6, y: cy + (R() - 0.5) * 1.6, z: R() * 1.2,
+        vx: 0, vy: 0, vz: 0.3, life: 0.6 + R() * 0.5, age: 0, size: 0.1 + R() * 0.1 });
+    },
+    // Floating label that rises and fades (rare name, "+NT$" …).
+    text(x, y, str, color = '#d23a2c', life = 1.4) { floats.push({ x, y, z: 0.6, str, color, life, age: 0 }); },
+    get busy() { return parts.length + floats.length > 0; },
+    clear() { parts.length = 0; floats.length = 0; },
+    update(dt) {
+      for (const p of parts) {
+        p.age += dt;
+        p.x += p.vx * dt; p.y += p.vy * dt; p.z += p.vz * dt;
+        if (p.kind === 'confetti') { p.vz -= 6 * dt; p.vx *= 0.98; p.vy *= 0.98; if (p.z < 0) { p.z = 0; p.vz = 0; p.vx *= 0.8; p.vy *= 0.8; } }
+        if (p.kind === 'dust') { p.vx *= 0.9; p.vy *= 0.9; p.vz *= 0.92; }
+      }
+      for (const f of floats) { f.age += dt; f.z += dt * 0.9; }
+      for (let k = parts.length - 1; k >= 0; k--) if (parts[k].age >= parts[k].life) parts.splice(k, 1);
+      for (let k = floats.length - 1; k >= 0; k--) if (floats[k].age >= floats[k].life) floats.splice(k, 1);
+    },
+    // P(x, y, z) → [sx, sy] in canvas pixels; s = pixels per lot unit.
+    draw(ctx, P, s) {
+      ctx.save();
+      for (const p of parts) {
+        const [a, b] = P(p.x, p.y, p.z), k = p.age / p.life, r = Math.max(1, p.size * s);
+        if (p.kind === 'dust') {
+          ctx.globalAlpha = 0.45 * (1 - k); ctx.fillStyle = '#b9b2a3';
+          ctx.beginPath(); ctx.arc(a, b, r * (1 + k * 1.5), 0, Math.PI * 2); ctx.fill();
+        } else if (p.kind === 'confetti') {
+          ctx.globalAlpha = Math.min(1, (1 - k) * 2); ctx.fillStyle = p.color;
+          ctx.save(); ctx.translate(a, b); ctx.rotate(p.spin * p.age * 3);
+          ctx.fillRect(-r, -r * 0.45, r * 2, r * 0.9); ctx.restore();
+        } else {
+          ctx.globalAlpha = Math.sin(Math.PI * k); ctx.fillStyle = '#ffd34d';
+          star(ctx, a, b, r * 1.4);
+        }
+      }
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      for (const f of floats) {
+        const [a, b] = P(f.x, f.y, f.z), k = f.age / f.life;
+        const pop = k < 0.15 ? easeOutBack(k / 0.15) : 1;
+        ctx.globalAlpha = k > 0.7 ? (1 - k) / 0.3 : 1;
+        const size = Math.max(14, Math.min(34, s * 0.42)) * pop;
+        ctx.font = `900 ${size}px system-ui, "Noto Sans TC", "Microsoft JhengHei", sans-serif`;
+        ctx.lineWidth = size * 0.22; ctx.strokeStyle = '#fff'; ctx.lineJoin = 'round';
+        ctx.strokeText(f.str, a, b); ctx.fillStyle = f.color; ctx.fillText(f.str, a, b);
+      }
+      ctx.restore();
+    },
+  };
+}
+
+function star(ctx, x, y, r) {
+  ctx.beginPath();
+  for (let k = 0; k < 8; k++) {
+    const a = (k / 8) * Math.PI * 2 - Math.PI / 2, rr = k % 2 ? r * 0.38 : r;
+    k ? ctx.lineTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr) : ctx.moveTo(x + Math.cos(a) * rr, y + Math.sin(a) * rr);
+  }
+  ctx.closePath(); ctx.fill();
+}
+
+return { easeOutBack, easeOutCubic, easeInOut, fxLayer, star };
+})();
+
+// engine\grid-view.js
+const __m8 = (() => {
+const { lerp } = __m0;
+const { DIRS } = __m5;
+const { person, lookOf, bubble, LOOKS } = __m6;
+const { star } = __m7;
+// grid-view.js — draws a drop-grid house. One projection with a blend factor t:
+// t = 0 is the flat floor plan, t = 1 is the isometric view, so "the plan stands
+// up" is just animating t. Canvas 2D only, painter's order for walls + walker.
+
+
+
+
+
+
+const INK = '#1b1b1d';
+const PAPER = '#f5f3ee';
+const RED = '#d23a2c';
+const ROAD = '#dcd8cf', WALL = '#fbfaf6', WALL2 = '#ebe5d8';
+let NOW = 0; // seconds, for animated art; set per drawHouse call
+const CA = 0.866, SA = 0.5;
+
+const proj = (x, y, z, t) => [lerp(x, (x - y) * CA, t), lerp(-y, -(x + y) * SA - z, t)];
+
+// View that fits the lot (+ road + wall height) into box at blend t.
+// opts: rows (keep this many rows visible, for the crane), tight (fit the rooms,
+// not the whole lot), bottom (anchor to the box bottom instead of centring).
+function fitView(g, t, box, opts = {}) {
+  const top = Math.max(opts.rows || 0, g.top);
+  let x0 = -0.6, x1 = g.W + 0.6, y0 = -1.4, y1 = top + 0.4;
+  if (opts.tight && g.placed.length) {
+    x0 = Math.min(...g.placed.map(r => r.x)) - 0.4; x1 = Math.max(...g.placed.map(r => r.x + r.w)) + 0.4;
+    y0 = -1.0; y1 = g.top + 0.3;
+  }
+  const pts = [];
+  for (const [x, y] of [[x0, y0], [x1, y0], [x0, y1], [x1, y1]])
+    for (const z of [0, 1.1 * t]) pts.push(proj(x, y, z, t));
+  const xs = pts.map(p => p[0]), ys = pts.map(p => p[1]);
+  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+  const s = Math.min(box.w / (maxX - minX), box.h / (maxY - minY), opts.maxScale || Infinity);
+  const freeY = box.h - (maxY - minY) * s;
+  return { s, ox: box.x + (box.w - (maxX - minX) * s) / 2 - minX * s, oy: box.y + (opts.bottom ? freeY : freeY / 2) - minY * s, t };
+}
+
+const P = (V, x, y, z = 0) => { const [a, b] = proj(x, y, z, V.t); return [V.ox + a * V.s, V.oy + b * V.s]; };
+const screen = P;
+
+// Stable pseudo-random in [-1, 1] from coordinates: hand-drawn wobble that does not flicker.
+const jit = (x, y, k = 0) => { const v = Math.sin(x * 127.1 + y * 311.7 + k * 74.7) * 43758.5453; return (v - Math.floor(v)) * 2 - 1; };
+
+// Two slightly different strokes: reads as a marker line, not a CAD line.
+function rough(ctx, V, x0, y0, x1, y1, z = 0) {
+  const a = 0.035;
+  line(ctx, V, x0 + jit(x0, y0) * a, y0 + jit(y0, x0) * a, x1 + jit(x1, y1) * a, y1 + jit(y1, x1) * a, z);
+  ctx.save(); ctx.globalAlpha *= 0.35; ctx.lineWidth *= 0.5;
+  line(ctx, V, x0 + jit(x0, y0, 1) * a * 1.6, y0 + jit(y0, x0, 1) * a * 1.6, x1 + jit(x1, y1, 1) * a * 1.6, y1 + jit(y1, x1, 1) * a * 1.6, z);
+  ctx.restore();
+}
+
+function path(ctx, V, pts, z = 0) {
+  ctx.beginPath();
+  pts.forEach(([x, y], k) => { const [a, b] = P(V, x, y, z); k ? ctx.lineTo(a, b) : ctx.moveTo(a, b); });
+  ctx.closePath();
+}
+
+function line(ctx, V, x0, y0, x1, y1, z = 0) {
+  const [a, b] = P(V, x0, y0, z), [c, d] = P(V, x1, y1, z);
+  ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(c, d); ctx.stroke();
+}
+
+function ellipse(ctx, V, cx, cy, rx, ry, z = 0) {
+  const pts = [];
+  for (let k = 0; k < 24; k++) { const a = (k / 24) * Math.PI * 2; pts.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]); }
+  path(ctx, V, pts, z);
+}
+
+const rect = r => [[r.x, r.y], [r.x + r.w, r.y], [r.x + r.w, r.y + r.h], [r.x, r.y + r.h]];
+
+function edge(x, y, dx, dy) {
+  if (dx === 1) return [x + 1, y, x + 1, y + 1];
+  if (dx === -1) return [x, y, x, y + 1];
+  if (dy === 1) return [x, y + 1, x + 1, y + 1];
+  return [x, y, x + 1, y];
+}
+
+function pattern(ctx, V, r, pat) {
+  ctx.save();
+  path(ctx, V, rect(r)); ctx.clip();
+  ctx.strokeStyle = 'rgba(27,27,29,.16)'; ctx.lineWidth = Math.max(1, V.s * 0.02);
+  const { x, y, w, h } = r;
+  if (pat === 'wood') {
+    if (w >= h) for (let k = 0.25; k < h; k += 0.25) line(ctx, V, x, y + k, x + w, y + k);
+    else for (let k = 0.25; k < w; k += 0.25) line(ctx, V, x + k, y, x + k, y + h);
+  } else if (pat === 'tile') {
+    for (let k = 1 / 3; k < w; k += 1 / 3) line(ctx, V, x + k, y, x + k, y + h);
+    for (let k = 1 / 3; k < h; k += 1 / 3) line(ctx, V, x, y + k, x + w, y + k);
+  } else if (pat === 'stripe') {
+    for (let k = -h; k < w; k += 0.3) line(ctx, V, x + k, y, x + k + h, y + h);
+  } else if (pat === 'steps') {
+    const long = h >= w;
+    for (let k = 0.25; k < (long ? h : w); k += 0.25) long ? line(ctx, V, x, y + k, x + w, y + k) : line(ctx, V, x + k, y, x + k, y + h);
+    ctx.strokeStyle = RED; ctx.lineWidth = Math.max(1.5, V.s * 0.04);
+    long ? line(ctx, V, x + w / 2, y + 0.3, x + w / 2, y + h - 0.3) : line(ctx, V, x + 0.3, y + h / 2, x + w - 0.3, y + h / 2);
+  }
+  ctx.restore();
+}
+
+function mark(ctx, V, r, m) {
+  ctx.save();
+  ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1, V.s * 0.025); ctx.fillStyle = 'rgba(255,255,255,.7)';
+  const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+  if (m === 'wc') { ellipse(ctx, V, cx, cy - 0.08, 0.18, 0.24); ctx.fill(); ctx.stroke(); path(ctx, V, [[cx - 0.22, cy + 0.2], [cx + 0.22, cy + 0.2], [cx + 0.22, cy + 0.36], [cx - 0.22, cy + 0.36]]); ctx.fill(); ctx.stroke(); }
+  if (m === 'stove') { for (const dy of [-0.35, 0.35]) { ellipse(ctx, V, cx, cy + dy, 0.17, 0.17); ctx.stroke(); } }
+  if (m === 'bed') { path(ctx, V, [[r.x + 0.2, r.y + r.h - 1.5], [r.x + 1.1, r.y + r.h - 1.5], [r.x + 1.1, r.y + r.h - 0.15], [r.x + 0.2, r.y + r.h - 0.15]]); ctx.fill(); ctx.stroke(); }
+  if (m === 'sofa') { path(ctx, V, [[r.x + 0.3, r.y + r.h - 0.55], [r.x + 1.9, r.y + r.h - 0.55], [r.x + 1.9, r.y + r.h - 0.2], [r.x + 0.3, r.y + r.h - 0.2]]); ctx.fill(); ctx.stroke(); }
+  if (m === 'altar') { ctx.fillStyle = RED; path(ctx, V, [[cx - 0.3, r.y + r.h - 0.35], [cx + 0.3, r.y + r.h - 0.35], [cx + 0.3, r.y + r.h - 0.12], [cx - 0.3, r.y + r.h - 0.12]]); ctx.fill(); }
+  ctx.restore();
+}
+
+function label(ctx, V, text, x, y, maxW, z, color = INK) {
+  let size = Math.min(V.s * 0.34, 26);
+  ctx.font = `600 ${size}px system-ui, sans-serif`;
+  const w = ctx.measureText(text).width;
+  if (w > maxW * V.s * 0.92) { size *= (maxW * V.s * 0.92) / w; ctx.font = `600 ${size}px system-ui, sans-serif`; }
+  const [a, b] = P(V, x, y, z);
+  ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.fillText(text, a, b);
+}
+
+function figure(ctx, V, wk) {
+  const [a, b] = P(V, wk.x, wk.y, 0);
+  const r = Math.max(4, Math.min(16, V.s * 0.15));
+  person(ctx, a, b, r, LOOKS.tenant, { phase: wk.phase, walking: wk.walking, time: NOW, face: wk.face, alpha: wk.alpha ?? 1, shake: wk.shake });
+  return [a, b - r * 4.6];
+}
+
+function npcAt(ctx, V, n, k) {
+  const [a, b] = P(V, n.x, n.y, 0);
+  const r = Math.max(4, Math.min(15, V.s * 0.14));
+  person(ctx, a, b, r, lookOf(n.kind, k), { time: NOW + k * 1.7, face: n.face, walking: n.walking, phase: n.phase, alpha: n.alpha ?? 1 });
+  return [a, b - r * 4.6];
+}
+
+// o: { style(t) -> {fill, pat, mark, short, sign, art, glow}, ring, entry:{seg,kind}, walker, hang, roadText, plain,
+//      time (s, animates fx art), light (0 day … 1 night), npcs [{x,y,kind,face,say}], riseOf(room) -> 0..1.2,
+//      squash {room, k}, fx (fxLayer, drawn in lot space) }
+function drawHouse(ctx, g, V, o) {
+  const t = V.t, lw = Math.max(1.5, V.s * 0.07);
+  NOW = o.time ?? 1.3;
+  const rise = o.riseOf || (() => 1);
+  ctx.save();
+  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  // Squash & stretch of a freshly landed room (plan view), anchored at its bottom edge.
+  const sq = o.squash && o.squash.k ? o.squash : null;
+  const squashed = (room, fn) => {
+    if (!sq || sq.room !== room || !g.placed[room]) return fn();
+    const r = g.placed[room], [cx, cy] = P(V, r.x + r.w / 2, r.y, 0);
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(1 + sq.k, 1 - sq.k); ctx.translate(-cx, -cy); fn(); ctx.restore();
+  };
+
+  ctx.fillStyle = ROAD;
+  path(ctx, V, [[-0.6, -1.4], [g.W + 0.6, -1.4], [g.W + 0.6, 0], [-0.6, 0]]); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(1, V.s * 0.04); ctx.setLineDash([V.s * 0.3, V.s * 0.25]);
+  line(ctx, V, -0.6, -0.7, g.W + 0.6, -0.7);
+  ctx.setLineDash([V.s * 0.06, V.s * 0.12]); ctx.strokeStyle = 'rgba(27,27,29,.45)'; ctx.lineWidth = Math.max(1, V.s * 0.025);
+  path(ctx, V, [[0, 0], [g.W, 0], [g.W, g.H], [0, g.H]]); ctx.stroke();
+  ctx.setLineDash([]);
+  if (o.roadText && t < 0.5) label(ctx, V, o.roadText, g.W / 2, -1.05, 2, 0, 'rgba(27,27,29,.55)');
+
+  const faded = o.faded || (() => false);
+  if (t > 0.05) {
+    // soft contact shadow of the whole house
+    ctx.fillStyle = `rgba(60,50,30,${(0.13 * t).toFixed(3)})`;
+    for (const r of g.placed) { path(ctx, V, rect({ x: r.x + 0.18, y: r.y - 0.22, w: r.w, h: r.h })); ctx.fill(); }
+  }
+  for (const r of g.placed) {
+    const st = o.style(r.t);
+    ctx.globalAlpha = faded(r.i) ? 0.4 : 1;
+    squashed(r.i, () => {
+      ctx.fillStyle = st.fill; path(ctx, V, rect(r)); ctx.fill();
+      if (st.pat) pattern(ctx, V, r, st.pat);
+      if (st.mark) mark(ctx, V, r, st.mark);
+    });
+  }
+  ctx.globalAlpha = 1;
+
+  for (const gp of o.gaps || g.gaps) {
+    ctx.save();
+    for (const [x, y] of gp.cells) { path(ctx, V, [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]]); ctx.fillStyle = 'rgba(210,58,44,.08)'; ctx.fill(); }
+    ctx.strokeStyle = 'rgba(210,58,44,.55)'; ctx.lineWidth = Math.max(1, V.s * 0.025);
+    for (const [x, y] of gp.cells) for (let k = 0.2; k < 2; k += 0.25) {
+      const a = Math.max(0, k - 1), b = Math.min(1, k);
+      line(ctx, V, x + a, y + Math.min(1, k), x + b, y + Math.max(0, k - 1));
+    }
+    const c = gp.cells[Math.floor(gp.cells.length / 2)];
+    label(ctx, V, '?', c[0] + 0.5, c[1] + 0.5, 1, 0.05, RED);
+    ctx.restore();
+  }
+
+  // walls (+ walker) back to front
+  const items = [];
+  const doorAt = new Set(g.doors.map(d => `${d.x},${d.y},${d.dx},${d.dy}`));
+  for (const r of g.placed)
+    for (let x = r.x; x < r.x + r.w; x++)
+      for (let y = r.y; y < r.y + r.h; y++)
+        for (const [dx, dy] of DIRS) {
+          const nb = g.own(x + dx, y + dy);
+          if (nb === r.i || (nb >= 0 && nb < r.i)) continue;
+          const door = nb >= 0 && doorAt.has(`${x},${y},${dx},${dy}`);
+          const h = nb >= 0 ? 0.45 : (dx === -1 || dy === -1) ? 0.12 : 0.85;
+          const [x0, y0, x1, y1] = edge(x, y, dx, dy);
+          items.push({ k: (x0 + x1 + y0 + y1) / 2, wall: [x0, y0, x1, y1], h, door, dx, dy, room: r.i });
+        }
+  for (const r of g.placed) {
+    const art = o.style(r.t).art;
+    if (art && t > 0.02) items.push({ k: r.x + r.y + (r.w + r.h) / 2, art, r, room: r.i });
+  }
+  const heads = [];
+  if (o.walker && t >= 0.05) items.push({ k: o.walker.x + o.walker.y - 0.3, walker: o.walker });
+  if (t >= 0.05) (o.npcs || []).forEach((n, k) => items.push({ k: n.x + n.y - 0.3, npc: n, nk: k }));
+  items.sort((a, b) => b.k - a.k);
+  for (const it of items) {
+    if (it.walker) { heads.push([figure(ctx, V, it.walker), it.walker.say]); continue; }
+    if (it.npc) { heads.push([npcAt(ctx, V, it.npc, it.nk), it.npc.say]); continue; }
+    ctx.globalAlpha = faded(it.room) ? 0.4 : 1;
+    if (it.art) { drawArt(ctx, V, it.r, it.art, rise(it.room)); continue; }
+    const [x0, y0, x1, y1] = it.wall;
+    if (it.door) {
+      if (t < 0.6) {
+        // leaf hinged at (x0,y0), swinging into the room; dashed quarter arc
+        ctx.save(); ctx.globalAlpha = 1 - t / 0.6; ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1, V.s * 0.025);
+        const px = -it.dx, py = -it.dy, ex = x1 - x0, ey = y1 - y0;
+        line(ctx, V, x0, y0, x0 + px * 0.9, y0 + py * 0.9);
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        for (let k = 0; k <= 8; k++) {
+          const a = (k / 8) * Math.PI / 2, c = Math.cos(a), s = Math.sin(a);
+          const [u, v] = P(V, x0 + (px * c + ex * s) * 0.9, y0 + (py * c + ey * s) * 0.9);
+          k ? ctx.lineTo(u, v) : ctx.moveTo(u, v);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+      continue;
+    }
+    const zh = it.h * t * rise(it.room);
+    if (zh < 0.02) {
+      ctx.strokeStyle = INK; ctx.lineWidth = lw;
+      squashed(it.room, () => rough(ctx, V, x0, y0, x1, y1));
+    } else {
+      ctx.fillStyle = it.dx ? WALL2 : WALL; ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1, V.s * 0.03);
+      const q = [P(V, x0, y0, 0), P(V, x1, y1, 0), P(V, x1, y1, zh), P(V, x0, y0, zh)];
+      ctx.beginPath(); q.forEach(([a, b], k) => (k ? ctx.lineTo(a, b) : ctx.moveTo(a, b))); ctx.closePath();
+      ctx.fill(); ctx.stroke();
+      ctx.lineWidth = Math.max(1.5, V.s * 0.05); rough(ctx, V, x0, y0, x1, y1, zh);
+    }
+  }
+
+  ctx.globalAlpha = 1;
+
+  if (o.entry && o.entry.seg) {
+    const s = o.entry.seg, [x0, y0, x1, y1] = edge(s.x, s.y, s.dx, s.dy);
+    const mx = (x0 + x1) / 2 + s.dx * 0.35, my = (y0 + y1) / 2 + s.dy * 0.35;
+    ctx.fillStyle = RED;
+    path(ctx, V, [[mx - s.dy * 0.22 + s.dx * 0.18, my - s.dx * 0.22 + s.dy * 0.18], [mx + s.dy * 0.22 + s.dx * 0.18, my + s.dx * 0.22 + s.dy * 0.18], [mx - s.dx * 0.15, my - s.dy * 0.15]]);
+    ctx.fill();
+  }
+
+  if (o.light > 0.01) night(ctx, V, g, o);
+
+  if (!o.plain) for (const r of g.placed) {
+    const st = o.style(r.t);
+    const [cx, cy] = [r.x + r.w / 2, r.y + r.h / 2];
+    const h = t * rise(r.i);
+    ctx.globalAlpha = faded(r.i) ? 0.45 : 1;
+    if (st.art && t > 0.3) sign(ctx, V, cx, cy, (artTop(st.art) + 0.3) * h, st.short, st.fill, false);
+    else if (st.sign && t > 0.3) sign(ctx, V, cx, cy, 0.9 * h, st.short, st.fill, true);
+    else squashed(r.i, () => label(ctx, V, st.short, cx, cy, Math.min(r.w, 3), 0.02));
+  }
+  ctx.globalAlpha = 1;
+
+  // ring: a room index, or a rect {x,y,w,h} (e.g. a gap) — a hand-drawn marker loop
+  const r = typeof o.ring === 'object' && o.ring ? o.ring : o.ring >= 0 ? g.placed[o.ring] : null;
+  if (r) markerRing(ctx, V, r.x + r.w / 2, r.y + r.h / 2, r.w / 2 + 0.35, r.h / 2 + 0.3, Math.max(2.5, V.s * 0.09));
+
+  if (o.hang) drawHang(ctx, V, o.hang, o.style(o.hang.t), g.W);
+  if (o.walker && t < 0.05) heads.push([figure(ctx, V, o.walker), o.walker.say]);
+  if (o.fx) o.fx.draw(ctx, (x, y, z) => P(V, x, y, z), V.s);
+  const bsize = Math.max(12, Math.min(17, V.s * 0.22));
+  // Bubbles of people standing close stack upwards instead of overlapping.
+  const used = [];
+  for (const [[a, b0], say] of heads.filter(h => h[1]).sort((p, q) => q[0][1] - p[0][1])) {
+    let b = b0;
+    while (used.some(([u, v]) => Math.abs(u - a) < bsize * 6 && Math.abs(v - b) < bsize * 2.2)) b -= bsize * 2.3;
+    used.push([a, b]);
+    bubble(ctx, a, b, say, bsize);
+  }
+  ctx.restore();
+}
+
+function markerRing(ctx, V, cx, cy, rx, ry, w) {
+  ctx.save();
+  ctx.strokeStyle = RED;
+  const a0 = 2.2, seed = cx * 3 + cy;
+  for (let pass = 0; pass < 2; pass++) {
+    ctx.globalAlpha = pass ? 0.45 : 0.92; ctx.lineWidth = pass ? w * 0.5 : w;
+    ctx.beginPath();
+    const n = 40, span = Math.PI * 2 + 0.45;
+    for (let k = 0; k <= n; k++) {
+      const a = a0 + (k / n) * span, grow = 1 + 0.06 * (k / n) + 0.03 * jit(seed, k, pass);
+      const [u, v] = P(V, cx + Math.cos(a) * rx * grow, cy + Math.sin(a) * ry * grow, 0.05);
+      k ? ctx.lineTo(u, v) : ctx.moveTo(u, v);
+    }
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Night: multiply the scene dark blue, then add warm window light and each rare's own glow.
+function night(ctx, V, g, o) {
+  const l = Math.min(1, o.light);
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalCompositeOperation = 'multiply';
+  ctx.fillStyle = `rgb(${Math.round(255 - 165 * l)},${Math.round(255 - 150 * l)},${Math.round(255 - 70 * l)})`;
+  ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx.restore();
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  for (const r of g.placed) {
+    const st = o.style(r.t);
+    const [a, b] = P(V, r.x + r.w / 2, r.y + r.h / 2, 0.4 * V.t);
+    const rad = V.s * (Math.max(r.w, r.h) * 0.55 + 0.3);
+    const flick = st.glow ? 0.75 + 0.25 * Math.sin(NOW * 5 + r.x * 3) : 1;
+    const col = st.glow || '#ffb85a';
+    const grd = ctx.createRadialGradient(a, b, 0, a, b, rad);
+    grd.addColorStop(0, hexA(col, (st.glow ? 0.55 : 0.3) * l * flick));
+    grd.addColorStop(1, hexA(col, 0));
+    ctx.fillStyle = grd; ctx.fillRect(a - rad, b - rad, rad * 2, rad * 2);
+  }
+  ctx.restore();
+}
+
+function hexA(hex, a) {
+  let h = hex.slice(1);
+  if (h.length === 3) h = [...h].map(c => c + c).join('');
+  const n = parseInt(h, 16);
+  return `rgba(${(n >> 16) & 255},${(n >> 8) & 255},${n & 255},${Math.max(0, Math.min(1, a)).toFixed(3)})`;
+}
+
+function sign(ctx, V, cx, cy, z, text, fill, post) {
+  ctx.save();
+  ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1, V.s * 0.03);
+  const [a, b] = P(V, cx, cy, 0), [, c] = P(V, cx, cy, z);
+  if (post) { ctx.beginPath(); ctx.moveTo(a, b); ctx.lineTo(a, c); ctx.stroke(); }
+  ctx.font = `700 ${Math.min(V.s * 0.3, 22)}px system-ui, sans-serif`;
+  const w = ctx.measureText(text).width + V.s * 0.2, hgt = Math.min(V.s * 0.42, 30);
+  ctx.fillStyle = fill; ctx.beginPath(); ctx.roundRect(a - w / 2, c - hgt, w, hgt, 4); ctx.fill(); ctx.stroke();
+  ctx.fillStyle = INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, a, c - hgt / 2);
+  ctx.restore();
+}
+
+// ── art primitives (see art.js). Heights scale with t, so art lies flat in the plan.
+const artTop = prims => Math.max(0, ...prims.map(p => (p[0] === 'box' || p[0] === 'cyl' || p[0] === 'cone' ? p[p.length - 2] : p[0] === 'roof' ? p[6] : p[0] === 'sign' ? p[3] : 0)));
+
+function shade(hex, f) {
+  let h = hex.slice(1);
+  if (h.length === 3) h = [...h].map(c => c + c).join('');
+  const n = parseInt(h, 16), ch = s => Math.max(0, Math.min(255, Math.round(((n >> s) & 255) * f)));
+  return `rgb(${ch(16)},${ch(8)},${ch(0)})`;
+}
+
+function hull(pts) {
+  const p = pts.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cross = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const lo = [], up = [];
+  for (const q of p) { while (lo.length >= 2 && cross(lo[lo.length - 2], lo[lo.length - 1], q) <= 0) lo.pop(); lo.push(q); }
+  for (const q of p.reverse()) { while (up.length >= 2 && cross(up[up.length - 2], up[up.length - 1], q) <= 0) up.pop(); up.push(q); }
+  return lo.slice(0, -1).concat(up.slice(0, -1));
+}
+
+function poly3(ctx, V, pts, fill) {
+  ctx.beginPath();
+  pts.forEach(([x, y, z], k) => { const [a, b] = P(V, x, y, z); k ? ctx.lineTo(a, b) : ctx.moveTo(a, b); });
+  ctx.closePath(); ctx.fillStyle = fill; ctx.fill(); ctx.stroke();
+}
+
+// Back-to-front inside one piece: flats first, then by depth.
+function artKey(p, T) {
+  if (p[0] === 'flat') return 1e9;
+  const [x, y] = T(p[1], p[2]);
+  return x + y + (p[0] === 'box' || p[0] === 'roof' ? (p[3] + p[4]) / 2 : 0);
+}
+
+function drawArt(ctx, V, r, prims, hk = 1) {
+  const t = V.t * hk;
+  // piece-local → lot coordinates; a rotated piece is the transpose
+  const T = (x, y) => (r.rot ? [r.x + y, r.y + x] : [r.x + x, r.y + y]);
+  const box = (x, y, w, h) => {
+    const [ax, ay] = T(x, y), [bx, by] = T(x + w, y + h);
+    return [Math.min(ax, bx), Math.min(ay, by), Math.max(ax, bx), Math.max(ay, by)];
+  };
+  ctx.save();
+  ctx.strokeStyle = INK; ctx.lineWidth = Math.max(0.8, V.s * 0.02); ctx.lineJoin = 'round';
+  for (const p of prims.slice().sort((a, b) => artKey(b, T) - artKey(a, T))) {
+    const [type, ...a] = p;
+    if (type === 'flat') {
+      const [x0, y0, x1, y1] = box(a[0], a[1], a[2], a[3]);
+      poly3(ctx, V, [[x0, y0, 0.01], [x1, y0, 0.01], [x1, y1, 0.01], [x0, y1, 0.01]], a[4]);
+    } else if (type === 'box') {
+      const [x0, y0, x1, y1] = box(a[0], a[1], a[2], a[3]), z0 = a[4] * t, z1 = a[5] * t, c = a[6];
+      poly3(ctx, V, [[x0, y1, z0], [x0, y0, z0], [x0, y0, z1], [x0, y1, z1]], shade(c, 0.78));
+      poly3(ctx, V, [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], shade(c, 0.9));
+      poly3(ctx, V, [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], c);
+    } else if (type === 'cyl' || type === 'cone') {
+      const [cx, cy] = T(a[0], a[1]), rad = a[2], z0 = a[3] * t, z1 = a[4] * t, c = a[5];
+      const ring = z => Array.from({ length: 12 }, (_, k) => { const ang = (k / 12) * Math.PI * 2; return [cx + Math.cos(ang) * rad, cy + Math.sin(ang) * rad, z]; });
+      const pts = type === 'cyl' ? [...ring(z0), ...ring(z1)] : [...ring(z0), [cx, cy, z1]];
+      ctx.beginPath();
+      hull(pts.map(([x, y, z]) => P(V, x, y, z))).forEach(([u, v], k) => (k ? ctx.lineTo(u, v) : ctx.moveTo(u, v)));
+      ctx.closePath(); ctx.fillStyle = shade(c, 0.85); ctx.fill(); ctx.stroke();
+      if (type === 'cyl') poly3(ctx, V, ring(z1), c);
+    } else if (type === 'roof') {
+      const [x0, y0, x1, y1] = box(a[0], a[1], a[2], a[3]), z = a[4] * t, pk = a[5] * t, c = a[6];
+      if (x1 - x0 >= y1 - y0) {
+        const d = (y1 - y0) / 2, ym = (y0 + y1) / 2, r1 = [x0 + d, ym, pk], r2 = [x1 - d, ym, pk];
+        poly3(ctx, V, [[x1, y1, z], [x0, y1, z], r1, r2], shade(c, 0.7));
+        poly3(ctx, V, [[x1, y0, z], [x1, y1, z], r2], shade(c, 0.75));
+        poly3(ctx, V, [[x0, y1, z], [x0, y0, z], r1], shade(c, 0.82));
+        poly3(ctx, V, [[x0, y0, z], [x1, y0, z], r2, r1], c);
+      } else {
+        const d = (x1 - x0) / 2, xm = (x0 + x1) / 2, r1 = [xm, y0 + d, pk], r2 = [xm, y1 - d, pk];
+        poly3(ctx, V, [[x1, y1, z], [x1, y0, z], r1, r2], shade(c, 0.7));
+        poly3(ctx, V, [[x0, y1, z], [x1, y1, z], r2], shade(c, 0.75));
+        poly3(ctx, V, [[x0, y0, z], [x0, y1, z], r2, r1], shade(c, 0.82));
+        poly3(ctx, V, [[x1, y0, z], [x0, y0, z], r1], c);
+      }
+    } else if (type === 'sign') {
+      const [cx, cy] = T(a[0], a[1]);
+      sign(ctx, V, cx, cy, a[2] * t, a[3], '#fff', true);
+    } else if (type === 'fx') {
+      if (t > 0.3) fxArt(ctx, V, r, a[0], T(a[1], a[2]), a[3] * t, t);
+    } else if (type === 'npc') {
+      if (t > 0.3) { const [x, y] = T(a[1], a[2]); npcAt(ctx, V, { x, y, kind: a[0] }, Math.round(x * 7 + y * 3)); }
+    }
+  }
+  ctx.restore();
+}
+
+// Animated art. Runs on NOW (seconds); the card PNG gets one still frame.
+function fxArt(ctx, V, r, kind, [cx, cy], z, t) {
+  const s = V.s;
+  ctx.save();
+  if (kind === 'smoke' || kind === 'steam') {
+    const white = kind === 'steam';
+    for (let k = 0; k < 4; k++) {
+      const ph = (NOW * (white ? 0.7 : 0.45) + k / 4) % 1;
+      const [u, v] = P(V, cx + Math.sin(ph * 5 + k) * 0.12, cy, z + ph * (white ? 0.7 : 1.3) * t);
+      ctx.globalAlpha = (1 - ph) * (white ? 0.75 : 0.55);
+      ctx.fillStyle = white ? '#ffffff' : '#9a958c';
+      ctx.beginPath(); ctx.arc(u, v, s * (0.06 + ph * (white ? 0.1 : 0.2)), 0, Math.PI * 2); ctx.fill();
+    }
+  } else if (kind === 'neon') {
+    const [u, v] = P(V, cx, cy, z);
+    const col = Math.floor(NOW * 1.5) % 2 ? '#ff4fd8' : '#3ff0ff';
+    ctx.globalCompositeOperation = 'lighter';
+    const grd = ctx.createRadialGradient(u, v, 0, u, v, s * 0.9);
+    grd.addColorStop(0, hexA(col, 0.65 + 0.25 * Math.sin(NOW * 9))); grd.addColorStop(1, hexA(col, 0));
+    ctx.fillStyle = grd; ctx.fillRect(u - s, v - s, s * 2, s * 2);
+  } else if (kind === 'lantern') {
+    const [u0, v0] = P(V, cx, cy, z + 0.25 * t);
+    const sw = Math.sin(NOW * 2.4 + cx * 2) * 0.35, len = s * 0.28;
+    const u = u0 + Math.sin(sw) * len, v = v0 + Math.cos(sw) * len;
+    ctx.strokeStyle = INK; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(u0, v0); ctx.lineTo(u, v); ctx.stroke();
+    ctx.fillStyle = '#e0352b'; ctx.beginPath(); ctx.ellipse(u, v + s * 0.1, s * 0.12, s * 0.15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = '#ffd34d'; ctx.fillRect(u - s * 0.07, v - s * 0.03, s * 0.14, s * 0.035); ctx.fillRect(u - s * 0.07, v + s * 0.2, s * 0.14, s * 0.035);
+  } else if (kind === 'spark') {
+    ctx.fillStyle = '#ffd34d';
+    for (let k = 0; k < 3; k++) {
+      const ph = (NOW * 0.9 + k / 3) % 1;
+      const [u, v] = P(V, cx + Math.cos(k * 2.1) * 0.3, cy + Math.sin(k * 2.1) * 0.3, z + k * 0.15);
+      ctx.globalAlpha = Math.sin(Math.PI * ph); star(ctx, u, v, s * 0.1 * (0.5 + ph));
+    }
+  } else if (kind === 'note') {
+    ctx.fillStyle = '#e84fb0'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    for (let k = 0; k < 2; k++) {
+      const ph = (NOW * 0.6 + k / 2) % 1;
+      const [u, v] = P(V, cx + (k ? 0.25 : -0.2) + Math.sin(ph * 6) * 0.08, cy, z + ph * 1.1);
+      ctx.globalAlpha = 1 - ph;
+      ctx.font = `900 ${Math.max(10, s * 0.32)}px system-ui, sans-serif`; ctx.fillText(k ? '♫' : '♪', u, v);
+    }
+  } else if (kind === 'fire') {
+    const [u, v] = P(V, cx, cy, z);
+    const fl = 0.8 + 0.3 * Math.sin(NOW * 17) + 0.15 * Math.sin(NOW * 29);
+    ctx.fillStyle = '#ff8a1f'; ctx.beginPath(); ctx.moveTo(u - s * 0.12, v); ctx.quadraticCurveTo(u, v - s * 0.5 * fl, u + s * 0.12, v); ctx.fill();
+    ctx.fillStyle = '#ffd34d'; ctx.beginPath(); ctx.moveTo(u - s * 0.06, v); ctx.quadraticCurveTo(u, v - s * 0.28 * fl, u + s * 0.06, v); ctx.fill();
+  } else if (kind === 'train') {
+    const long = r.w >= r.h, L = long ? r.w : r.h, len = Math.min(1.4, L * 0.45);
+    const p = ((NOW * 0.5) % 1) * (L + len * 2) - len;
+    const a0 = Math.max(0, p), a1 = Math.min(L, p + len);
+    if (a1 > a0) {
+      const half = (long ? r.h : r.w) * 0.22;
+      const [x0, y0, x1, y1] = long ? [r.x + a0, cy - half, r.x + a1, cy + half] : [cx - half, r.y + a0, cx + half, r.y + a1];
+      const z0 = z, z1 = z + 0.38 * t;
+      ctx.strokeStyle = INK; ctx.lineWidth = Math.max(0.8, s * 0.02);
+      poly3(ctx, V, [[x0, y1, z0], [x0, y0, z0], [x0, y0, z1], [x0, y1, z1]], '#c9d3dc');
+      poly3(ctx, V, [[x0, y0, z0], [x1, y0, z0], [x1, y0, z1], [x0, y0, z1]], '#e9eef3');
+      poly3(ctx, V, [[x0, y0, z0 + 0.12 * t], [x1, y0, z0 + 0.12 * t], [x1, y0, z0 + 0.2 * t], [x0, y0, z0 + 0.2 * t]], '#2d6fb5');
+      poly3(ctx, V, [[x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]], '#f5f7f9');
+    }
+  }
+  ctx.restore();
+}
+
+function drawHang(ctx, V, h, st, W) {
+  ctx.save();
+  if (h.ghostX != null) {
+    ctx.setLineDash([5, 4]); ctx.strokeStyle = 'rgba(210,58,44,.7)'; ctx.lineWidth = 2;
+    path(ctx, V, rect({ x: h.ghostX, y: h.ghostY, w: h.w, h: h.h })); ctx.stroke();
+    ctx.setLineDash([]);
+  }
+  if (!h.falling) {
+    ctx.strokeStyle = 'rgba(27,27,29,.35)'; ctx.lineWidth = 2;
+    line(ctx, V, -0.4, h.rail + 0.4, W + 0.4, h.rail + 0.4);
+    ctx.strokeStyle = INK; ctx.lineWidth = 1.5;
+    line(ctx, V, h.x + h.w / 2, h.rail + 0.4, h.x + h.w / 2, h.y + h.h);
+    ctx.fillStyle = INK; path(ctx, V, [[h.x + h.w / 2 - 0.25, h.rail + 0.3], [h.x + h.w / 2 + 0.25, h.rail + 0.3], [h.x + h.w / 2 + 0.25, h.rail + 0.55], [h.x + h.w / 2 - 0.25, h.rail + 0.55]]); ctx.fill();
+  }
+  const r = { x: h.x, y: h.y, w: h.w, h: h.h };
+  ctx.fillStyle = st.fill; path(ctx, V, rect(r)); ctx.fill();
+  if (st.pat) pattern(ctx, V, r, st.pat);
+  ctx.strokeStyle = INK; ctx.lineWidth = Math.max(1.5, V.s * 0.07); path(ctx, V, rect(r)); ctx.stroke();
+  label(ctx, V, st.short, r.x + r.w / 2, r.y + r.h / 2, Math.min(r.w, 3), 0);
+  ctx.restore();
+}
+
+return { INK, PAPER, RED, proj, fitView, screen, drawHouse };
+})();
+
+// engine\card.js
+const __m9 = (() => {
+const { INK, PAPER, RED } = __m8;
+const { rng } = __m0;
+// card.js — 1200×630 result card (= OG / X card size). Layout reads only `f`;
+// the left art box is drawn by the game through drawArt(ctx, box).
+// f: { badge, name, tag, head, spec, pre, big, unit, sub, bullets[], stamp:{ok,text,req}, footer,
+//      tier?, burst?, was?, stickers?, comments?, seed? }
+
+
+
+
+const CARD_W = 1200;
+const CARD_H = 630;
+const FONT = 'system-ui, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif';
+const NO_START = '，。、；：？）」』,.;:?)';
+
+// Character wrap for CJK; punctuation never starts a line.
+function wrap(ctx, text, maxW) {
+  const lines = [];
+  let cur = '';
+  for (const ch of text) {
+    if (ctx.measureText(cur + ch).width > maxW && cur && !NO_START.includes(ch)) { lines.push(cur); cur = ch; }
+    else cur += ch;
+  }
+  if (cur) lines.push(cur);
+  return lines;
+}
+
+// Prefer breaking after 。， so each clause stays whole: 「事實。」「反轉」.
+function phraseLines(ctx, text, maxW) {
+  const parts = text.match(/[^。，]+[。，]?/g) || [text];
+  const lines = [];
+  for (const p of parts) {
+    const lastIdx = lines.length - 1;
+    if (lastIdx >= 0 && ctx.measureText(lines[lastIdx] + p).width <= maxW) lines[lastIdx] += p;
+    else if (ctx.measureText(p).width <= maxW) lines.push(p);
+    else return null;
+  }
+  return lines;
+}
+
+function fitLines(ctx, text, maxW, maxLines, from, to, weight) {
+  for (let size = from; size >= Math.max(to, from - 14); size -= 2) {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    const lines = phraseLines(ctx, text, maxW);
+    if (lines && lines.length <= maxLines) return { size, lines };
+  }
+  for (let size = from; size >= to; size -= 2) {
+    ctx.font = `${weight} ${size}px ${FONT}`;
+    const lines = wrap(ctx, text, maxW);
+    if (lines.length <= maxLines) return { size, lines };
+  }
+  ctx.font = `${weight} ${to}px ${FONT}`;
+  const lines = wrap(ctx, text, maxW).slice(0, maxLines);
+  lines[maxLines - 1] = lines[maxLines - 1].slice(0, -1) + '…';
+  return { size: to, lines };
+}
+
+function ellipsize(ctx, text, maxW) {
+  if (ctx.measureText(text).width <= maxW) return text;
+  let s = text;
+  while (s.length > 1 && ctx.measureText(s + '…').width > maxW) s = s.slice(0, -1);
+  return s + '…';
+}
+
+// f.tier: 'rare' (gold frame) | 'jackpot' (gold + burst) | anything else (plain).
+// f.burst: starburst text by the price · f.was: struck-out "original price" · f.stickers: ≤3 slap-on labels
+// f.comments: [{ tag: '推'|'噓'|'→', id, text }] forum-style replies under the bullets · f.seed: wobble/tilt seed
+function drawCard(ctx, f, drawArt) {
+  const R = rng('card:' + (f.seed || f.head));
+  ctx.save();
+  ctx.fillStyle = PAPER; ctx.fillRect(0, 0, CARD_W, CARD_H);
+  paper(ctx, R);
+  const gold = f.tier === 'rare' || f.tier === 'jackpot';
+  ctx.strokeStyle = gold ? '#c99a2e' : INK; ctx.lineWidth = gold ? 6 : 3; ctx.strokeRect(12, 12, CARD_W - 24, CARD_H - 24);
+  if (gold) { ctx.lineWidth = 1.5; ctx.strokeRect(22, 22, CARD_W - 44, CARD_H - 44); }
+
+  // The plan is a photo taped onto the flyer: slight tilt, white border, shadow, two tape strips.
+  const art = { x: 34, y: 34, w: 590, h: 562 };
+  const tilt = (R() - 0.5) * 0.025;
+  ctx.save();
+  ctx.translate(art.x + art.w / 2, art.y + art.h / 2); ctx.rotate(tilt); ctx.translate(-art.x - art.w / 2, -art.y - art.h / 2);
+  ctx.shadowColor = 'rgba(0,0,0,.18)'; ctx.shadowBlur = 14; ctx.shadowOffsetY = 4;
+  ctx.fillStyle = '#fff'; ctx.fillRect(art.x - 8, art.y - 8, art.w + 16, art.h + 16);
+  ctx.shadowColor = 'transparent';
+  ctx.save(); ctx.beginPath(); ctx.rect(art.x, art.y, art.w, art.h); ctx.clip();
+  ctx.fillStyle = '#fffdf8'; ctx.fillRect(art.x, art.y, art.w, art.h);
+  drawArt(ctx, art);
+  ctx.restore();
+  ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.strokeRect(art.x, art.y, art.w, art.h);
+  tape(ctx, art.x + 40, art.y - 6, -0.5);
+  tape(ctx, art.x + art.w - 40, art.y - 6, 0.45);
+  if (f.stickers && f.stickers.length) stickers(ctx, f.stickers.slice(0, 3), art, R);
+  ctx.restore();
+
+  if (f.stamp) stamp(ctx, art.x + art.w - 96, art.y + 96, f.stamp, R);
+  if (f.stamp && f.stamp.note) {
+    // the divination result, handwritten under the stamp
+    ctx.save();
+    ctx.translate(art.x + art.w - 96, art.y + 190); ctx.rotate(-0.06);
+    ctx.font = `900 22px ${FONT}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.lineWidth = 6; ctx.strokeStyle = '#fff'; ctx.lineJoin = 'round'; ctx.strokeText(f.stamp.note, 0, 0);
+    ctx.fillStyle = f.stamp.ok ? RED : '#3b5b8c'; ctx.fillText(f.stamp.note, 0, 0);
+    ctx.restore();
+  }
+
+  const X = 660, RW = 510;
+  let y = 44;
+  ctx.textBaseline = 'top'; ctx.textAlign = 'left';
+  ctx.font = `800 26px ${FONT}`;
+  const bw = ctx.measureText(f.badge).width + 24;
+  ctx.fillStyle = RED; ctx.fillRect(X, y, bw, 40);
+  ctx.fillStyle = '#fff'; ctx.fillText(f.badge, X + 12, y + 7);
+  ctx.fillStyle = INK; ctx.font = `800 30px ${FONT}`;
+  ctx.fillText(ellipsize(ctx, f.name, RW - bw - 14), X + bw + 14, y + 4);
+  y += 56;
+  if (f.tag) { ctx.fillStyle = RED; ctx.font = `700 24px ${FONT}`; ctx.fillText(ellipsize(ctx, f.tag, RW), X, y); y += 36; }
+
+  const comments = (f.comments || []).slice(0, 2); // the page lists all of them; the image keeps two, large
+  const hd = fitLines(ctx, f.head, RW, 3, comments.length ? 50 : 54, 30, 900);
+  for (const l of hd.lines) {
+    const w = ctx.measureText(l).width;
+    highlight(ctx, X - 4, y + hd.size * 0.45, w + 8, hd.size * 0.62, R);
+    ctx.fillStyle = RED; ctx.fillText(l, X, y); y += hd.size * 1.22;
+  }
+  y += 10;
+  ctx.strokeStyle = INK; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(X, y); ctx.lineTo(X + RW, y); ctx.stroke();
+  y += 14;
+
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = `800 36px ${FONT}`;
+  const spec = ellipsize(ctx, f.spec, RW);
+  const specW = ctx.measureText(spec).width;
+  ctx.font = `900 60px ${FONT}`;
+  const bigW = ctx.measureText(f.big).width;
+  ctx.font = `700 26px ${FONT}`;
+  const preW = ctx.measureText(f.pre).width, unitW = ctx.measureText(f.unit).width;
+  const rentW = preW + 6 + bigW + 4 + unitW;
+  let rx;
+  if (specW + 18 + rentW <= RW) { y += 58; rx = X + RW - rentW; }
+  else { y += 40; ctx.font = `800 36px ${FONT}`; ctx.fillStyle = INK; ctx.fillText(spec, X, y); y += 62; rx = X; }
+  if (rx !== X) { ctx.font = `800 36px ${FONT}`; ctx.fillStyle = INK; ctx.fillText(spec, X, y); }
+  ctx.fillStyle = RED;
+  ctx.font = `700 26px ${FONT}`; ctx.fillText(f.pre, rx, y);
+  ctx.font = `900 60px ${FONT}`; ctx.fillText(f.big, rx + preW + 6, y);
+  ctx.font = `700 26px ${FONT}`; ctx.fillText(f.unit, rx + preW + 6 + bigW + 4, y);
+  if (f.burst) burst(ctx, Math.min(X + RW - 40, rx + preW + bigW + unitW - 10), y - 74, f.burst);
+  y += 14;
+
+  ctx.textBaseline = 'top';
+  let sx = X;
+  if (f.was) {
+    ctx.font = `600 21px ${FONT}`; ctx.fillStyle = '#8a8a8e';
+    const ww = ctx.measureText(f.was).width;
+    ctx.fillText(f.was, sx, y);
+    ctx.strokeStyle = RED; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(sx - 2, y + 13); ctx.lineTo(sx + ww + 2, y + 9); ctx.stroke();
+    sx += ww + 14;
+  }
+  ctx.fillStyle = '#5a5a5e'; ctx.font = `500 21px ${FONT}`;
+  ctx.fillText(ellipsize(ctx, f.sub, X + RW - sx), sx, y);
+  y += 40;
+
+  const footerY = CARD_H - 56;
+  const cH = comments.length ? comments.length * 40 + 16 : 0;
+  const limitY = footerY - (cH ? cH + 10 : 0);
+  ctx.font = `600 23px ${FONT}`;
+  for (const b of f.bullets) {
+    if (y + 30 > limitY) break;
+    ctx.fillStyle = RED; ctx.fillText('●', X, y + 1);
+    ctx.fillStyle = INK; ctx.fillText(ellipsize(ctx, b, RW - 30), X + 28, y);
+    y += 36;
+  }
+  if (cH) board(ctx, X, limitY, RW, cH, comments);
+
+  ctx.font = `700 20px ${FONT}`; ctx.fillStyle = '#5a5a5e'; ctx.textAlign = 'right'; ctx.textBaseline = 'top';
+  ctx.fillText(f.footer, X + RW, footerY + 12);
+  ctx.restore();
+}
+
+// Forum reply strip (PTT style): dark terminal box, 推 white / 噓 red / → yellow.
+function board(ctx, x, y, w, h, list) {
+  ctx.save();
+  ctx.fillStyle = '#141416'; ctx.beginPath(); ctx.roundRect(x, y, w, h, 6); ctx.fill();
+  ctx.textBaseline = 'middle'; ctx.textAlign = 'left';
+  list.forEach((c, k) => {
+    const cy = y + 8 + 20 + k * 40;
+    ctx.font = `900 26px ${FONT}`;
+    ctx.fillStyle = c.tag === '噓' ? '#ff5c5c' : c.tag === '→' ? '#f2d35b' : '#f5f5f5';
+    ctx.fillText(c.tag, x + 14, cy);
+    let idSize = 21;
+    ctx.font = `700 ${idSize}px ui-monospace, Consolas, monospace`;
+    while (idSize > 15 && ctx.measureText(c.id).width > 150) { idSize--; ctx.font = `700 ${idSize}px ui-monospace, Consolas, monospace`; }
+    const idw = ctx.measureText(c.id).width;
+    ctx.fillStyle = '#f2d35b'; ctx.fillText(c.id, x + 50, cy);
+    ctx.fillStyle = '#f0f0f0'; ctx.font = `600 24px ${FONT}`;
+    ctx.fillText(ellipsize(ctx, ': ' + c.text, w - 64 - idw), x + 50 + idw, cy);
+  });
+  ctx.restore();
+}
+
+function paper(ctx, R) {
+  ctx.save();
+  for (let k = 0; k < 900; k++) {
+    ctx.fillStyle = R() < 0.5 ? 'rgba(80,60,30,.05)' : 'rgba(255,255,255,.35)';
+    ctx.fillRect(R() * CARD_W, R() * CARD_H, 1 + R() * 2, 1 + R() * 2);
+  }
+  ctx.restore();
+}
+
+function tape(ctx, cx, cy, rot) {
+  ctx.save();
+  ctx.translate(cx, cy); ctx.rotate(rot);
+  ctx.fillStyle = 'rgba(244,226,160,.78)'; ctx.fillRect(-46, -13, 92, 26);
+  ctx.strokeStyle = 'rgba(150,130,60,.25)'; ctx.lineWidth = 1; ctx.strokeRect(-46, -13, 92, 26);
+  ctx.restore();
+}
+
+function highlight(ctx, x, y, w, h, R) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(255,214,64,.55)';
+  ctx.beginPath();
+  ctx.moveTo(x, y + R() * 4); ctx.lineTo(x + w, y + R() * 4 - 2); ctx.lineTo(x + w + 4, y + h); ctx.lineTo(x - 2, y + h + R() * 3);
+  ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+
+function stickers(ctx, list, art, R) {
+  const COLORS = [['#f5c518', INK], ['#d23a2c', '#fff'], ['#2d6fb5', '#fff']];
+  let x = art.x + 18;
+  list.forEach((s, k) => {
+    ctx.save();
+    ctx.font = `900 26px ${FONT}`;
+    const w = ctx.measureText(s).width + 28;
+    const cx = x + w / 2, cy = art.y + art.h - 40 - (k % 2) * 8;
+    ctx.translate(cx, cy); ctx.rotate((R() - 0.5) * 0.3);
+    const [bg, fg] = COLORS[k % COLORS.length];
+    ctx.shadowColor = 'rgba(0,0,0,.25)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2;
+    ctx.fillStyle = bg; ctx.beginPath(); ctx.roundRect(-w / 2, -22, w, 44, 8); ctx.fill();
+    ctx.shadowColor = 'transparent';
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+    ctx.fillStyle = fg; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(s, 0, 1);
+    ctx.restore();
+    x += w + 10;
+  });
+}
+
+function burst(ctx, cx, cy, text) {
+  ctx.save();
+  ctx.translate(cx, cy); ctx.rotate(0.18);
+  ctx.fillStyle = '#ffd34d'; ctx.strokeStyle = RED; ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let k = 0; k < 24; k++) { const a = (k / 24) * Math.PI * 2, r = k % 2 ? 40 : 54; k ? ctx.lineTo(Math.cos(a) * r * 1.3, Math.sin(a) * r) : ctx.moveTo(Math.cos(a) * r * 1.3, Math.sin(a) * r); }
+  ctx.closePath(); ctx.fill(); ctx.stroke();
+  let size = 24;
+  ctx.font = `900 ${size}px ${FONT}`;
+  while (size > 14 && ctx.measureText(text).width > 100) { size -= 2; ctx.font = `900 ${size}px ${FONT}`; }
+  ctx.fillStyle = RED; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, 0, 1);
+  ctx.restore();
+}
+
+// Rubber stamp: tilted, uneven ink (holes punched out on an offscreen canvas when one exists).
+function stamp(ctx, cx, cy, s, R) {
+  const size = 160;
+  const off = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+  const c = off ? off.getContext('2d') : ctx;
+  if (off) { off.width = size; off.height = size; }
+  c.save();
+  if (off) c.translate(size / 2, size / 2); else c.translate(cx, cy);
+  c.rotate(-0.22 + (R() - 0.5) * 0.25);
+  c.strokeStyle = s.ok ? RED : '#3b5b8c'; c.fillStyle = c.strokeStyle;
+  c.lineWidth = 6; c.beginPath(); c.arc(0, 0, 68, 0, Math.PI * 2); c.stroke();
+  c.lineWidth = 2; c.beginPath(); c.arc(0, 0, 58, 0, Math.PI * 2); c.stroke();
+  c.textAlign = 'center'; c.textBaseline = 'middle';
+  let big = 30;
+  c.font = `900 ${big}px ${FONT}`;
+  while (big > 18 && c.measureText(s.text).width > 104) { big -= 2; c.font = `900 ${big}px ${FONT}`; }
+  c.fillText(s.text, 0, -6);
+  let small = 14;
+  c.font = `600 ${small}px ${FONT}`;
+  while (small > 10 && c.measureText(s.req).width > 100) { small--; c.font = `600 ${small}px ${FONT}`; }
+  c.fillText(ellipsize(c, s.req, 100), 0, 26);
+  c.restore();
+  if (!off) return;
+  c.save();
+  c.globalCompositeOperation = 'destination-out';
+  for (let k = 0; k < 260; k++) { c.globalAlpha = 0.3 + R() * 0.7; c.beginPath(); c.arc(R() * size, R() * size, 0.6 + R() * 1.8, 0, Math.PI * 2); c.fill(); }
+  c.restore();
+  ctx.save(); ctx.globalAlpha = 0.9; ctx.drawImage(off, cx - size / 2, cy - size / 2); ctx.restore();
+}
+
+return { CARD_W, CARD_H, wrap, drawCard };
+})();
+
+// engine\audio.js
+const __m10 = (() => {
+
+// audio.js — procedural music + SFX on WebAudio. No files, no deps; live only (never
+// touches game state). Locked until the first user gesture (browser autoplay rules).
+//
+//   const au = audio({ preset: 'temple-fair', tempo?, key? (semitones) }, storageKey)
+//   au.unlock()  au.toggle()  au.muted  au.music('build'|'day'|'night'|'card'|null)
+//   au.intensity(0..8)  au.sfx(name, { size, step })  au.stream() → MediaStream (for recording)
+//
+// Presets are pattern data: per section { tempo, lead, bass, drums{kick,snare,block,cym}, voice }.
+// Melody strings: one char per 16th; '0'–'9' = pentatonic degree (0 = tonic), '.' rest, '-' hold.
+
+const SOUNDS = ['gong', 'chime', 'echo', 'fry', 'firecracker', 'bell', 'horn', 'cash', 'bird', 'splash', 'boing', 'crowd'];
+const MUSIC_PRESETS = ['temple-fair', 'muzak', 'courtroom'];
+
+const PENTA = [0, 2, 4, 7, 9, 12, 14, 16, 19, 21];
+
+const PRESETS = {
+  // 台式電子琴廟會: organ + 嗩吶 lead, 大鼓 / 小鼓 / 梆子 / 鈸, rolls into each loop.
+  'temple-fair': {
+    build: { tempo: 128, voice: 'suona',
+      lead: '5-3-5-6-7---6-5-3-5-3-2-1-------5-3-5-6-8---7-6-7-6-5-3-5-------',
+      bass: ['0', '4', '0', '3'],
+      drums: { kick: 'x.......x.x.....', snare: '....x.......x...', block: 'x.x.x.x.x.x.x.x.', cym: '..x...x...x...x.' } },
+    day: { tempo: 116, voice: 'organ',
+      lead: '7.8.7.5.6.5.3...5.6.7.6.5.3.2...3.5.6.8.7.6.5.3.2.3.5.3.2.1.0...',
+      bass: ['0', '3', '4', '0'],
+      drums: { kick: 'x.......x.......', snare: '........x.......', block: 'x...x...x...x...', cym: '' } },
+    night: { tempo: 84, voice: 'organ', soft: true,
+      lead: '4---7---6---5---4---3---1---4---7---8---7---6---5-------4-------',
+      bass: ['4', '1', '3', '4'],
+      drums: { kick: 'x...............', snare: '', block: '....x.......x...', cym: '' } },
+    card: { tempo: 136, voice: 'suona',
+      lead: '5.5.6.8.7-6-5---3.5.6.5.3.2.1---5.5.6.8.9-8-7---8.7.6.5.3.2.0---',
+      bass: ['0', '3', '0', '4'],
+      drums: { kick: 'x...x...x...x...', snare: '....x.......x.xx', block: 'x.x.x.x.x.x.x.x.', cym: 'x...x...x...x...' } },
+  },
+  // Elevator / hospital lobby muzak: soft keys, brushed beat.
+  muzak: {
+    build: { tempo: 96, voice: 'keys', lead: '5---7---6-5-3---5---6---7-8-7---', bass: ['0', '4'], drums: { kick: 'x.......x.......', snare: '....x.......x...', block: '', cym: 'x.x.x.x.x.x.x.x.' } },
+    day: { tempo: 92, voice: 'keys', lead: '7---5---6---3---5---6---5-3-2---', bass: ['0', '3'], drums: { kick: 'x.......', snare: '....x...', block: '', cym: 'x.x.x.x.' } },
+    night: { tempo: 72, voice: 'keys', soft: true, lead: '4-------6-------5-------3-------', bass: ['4', '3'], drums: { kick: '', snare: '', block: '', cym: '' } },
+    card: { tempo: 100, voice: 'keys', lead: '5-6-7-8-7-6-5---3-5-6-5-3-2-0---', bass: ['0', '4'], drums: { kick: 'x...x...', snare: '....x...', block: '', cym: 'x.x.x.x.' } },
+  },
+  // Courtroom drama: low strings + timpani.
+  courtroom: {
+    build: { tempo: 76, voice: 'strings', lead: '0---1---2---1---0-------3---2---', bass: ['0', '0'], drums: { kick: 'x.......x.......', snare: '', block: '', cym: '' } },
+    day: { tempo: 70, voice: 'strings', lead: '2---3---4---3---2-------1-------', bass: ['0', '3'], drums: { kick: 'x...............', snare: '', block: '', cym: '' } },
+    night: { tempo: 60, voice: 'strings', soft: true, lead: '0-------1-------0-------', bass: ['0'], drums: { kick: '', snare: '', block: '', cym: '' } },
+    card: { tempo: 80, voice: 'strings', lead: '0-2-3-5-4---3---2-3-4-5-7-------', bass: ['0', '4'], drums: { kick: 'x...x...x.x.x...', snare: '', block: '', cym: 'x...............' } },
+  },
+};
+
+function audio(cfg = {}, storageKey = 'vt.mute') {
+  const AC = typeof window !== 'undefined' && (window.AudioContext || window.webkitAudioContext);
+  const preset = PRESETS[cfg.preset] || PRESETS['temple-fair'];
+  const key = cfg.key || 0, tempoScale = cfg.tempo ? cfg.tempo / 128 : 1;
+  let muted = false;
+  try { muted = localStorage.getItem(storageKey) === '1'; } catch {}
+  let ac = null, master, musicBus, sfxBus, noiseBuf, recDest = null;
+  let section = null, level = 0, step = 0, nextT = 0, timer = null;
+
+  function init() {
+    if (ac || !AC) return !!ac;
+    try { ac = new AC(); } catch { ac = null; return false; }
+    const comp = ac.createDynamicsCompressor();
+    comp.threshold.value = -14; comp.ratio.value = 4;
+    master = ac.createGain(); master.gain.value = muted ? 0 : 0.55;
+    musicBus = ac.createGain(); musicBus.gain.value = 0.32;
+    sfxBus = ac.createGain(); sfxBus.gain.value = 0.7;
+    musicBus.connect(comp); sfxBus.connect(comp); comp.connect(master); master.connect(ac.destination);
+    noiseBuf = ac.createBuffer(1, ac.sampleRate, ac.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    document.addEventListener('visibilitychange', () => {
+      if (!ac) return;
+      if (document.hidden) ac.suspend(); else if (!muted) ac.resume();
+    });
+    return true;
+  }
+
+  const hz = (deg, oct = 0) => 261.63 * 2 ** ((PENTA[deg] + key) / 12 + oct);
+
+  // ── instruments: (time, freq, dur, bus, vol)
+  function env(g, t, a, peak, d, sustain = 0.0001) {
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(peak, t + a);
+    g.gain.exponentialRampToValueAtTime(Math.max(0.0001, sustain), t + a + d);
+  }
+  function osc(type, f, t, dur, bus, vol, opts = {}) {
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = type; o.frequency.setValueAtTime(opts.from || f, t);
+    if (opts.from) o.frequency.exponentialRampToValueAtTime(f, t + (opts.slide || 0.06));
+    if (opts.to) o.frequency.exponentialRampToValueAtTime(opts.to, t + dur);
+    if (opts.detune) o.detune.value = opts.detune;
+    let node = o;
+    if (opts.filter) { const fl = ac.createBiquadFilter(); fl.type = opts.filter[0]; fl.frequency.value = opts.filter[1]; fl.Q.value = opts.filter[2] || 1; node.connect(fl); node = fl; }
+    if (opts.vib) {
+      const l = ac.createOscillator(), lg = ac.createGain();
+      l.frequency.value = opts.vib; lg.gain.setValueAtTime(0, t); lg.gain.linearRampToValueAtTime(f * 0.012, t + 0.18);
+      l.connect(lg); lg.connect(o.frequency); l.start(t); l.stop(t + dur + 0.1);
+    }
+    node.connect(g); g.connect(bus);
+    const a = opts.a || 0.01;
+    env(g, t, a, vol, dur, opts.sus);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + a + dur + 0.12); // release: no click at stop
+    o.start(t); o.stop(t + a + dur + 0.2);
+  }
+  function noise(t, dur, bus, vol, filter = ['highpass', 1000, 1], opts = {}) {
+    const s = ac.createBufferSource(), g = ac.createGain(), fl = ac.createBiquadFilter();
+    s.buffer = noiseBuf; s.loop = true;
+    fl.type = filter[0]; fl.frequency.setValueAtTime(filter[1], t); fl.Q.value = filter[2] || 1;
+    if (opts.sweep) fl.frequency.exponentialRampToValueAtTime(opts.sweep, t + dur);
+    s.connect(fl); fl.connect(g); g.connect(bus);
+    env(g, t, opts.a || 0.003, vol, dur);
+    s.start(t, Math.random() * 0.5); s.stop(t + dur + 0.1);
+  }
+  const VOICES = {
+    organ: (t, f, d, bus, v) => { osc('square', f, t, d, bus, v * 0.35, { detune: -7, filter: ['lowpass', 2600], vib: 5.5, sus: v * 0.12 }); osc('square', f, t, d, bus, v * 0.35, { detune: 7, filter: ['lowpass', 2600] }); osc('sine', f / 2, t, d, bus, v * 0.4); },
+    suona: (t, f, d, bus, v) => { osc('sawtooth', f, t, d, bus, v * 0.55, { from: f * 0.94, slide: 0.05, filter: ['bandpass', 1500, 1.6], vib: 6.5, sus: v * 0.2 }); osc('square', f * 2, t, d, bus, v * 0.08, { filter: ['lowpass', 3500] }); },
+    keys: (t, f, d, bus, v) => { osc('sine', f, t, d * 1.5, bus, v * 0.6); osc('triangle', f * 2, t, d, bus, v * 0.12); },
+    strings: (t, f, d, bus, v) => { osc('sawtooth', f / 2, t, d, bus, v * 0.4, { a: 0.12, filter: ['lowpass', 900], vib: 4.5, sus: v * 0.3 }); osc('sawtooth', f, t, d, bus, v * 0.2, { a: 0.15, filter: ['lowpass', 1400], detune: 8, sus: v * 0.15 }); },
+  };
+  const kick = (t, bus, v = 0.9) => osc('sine', 48, t, 0.28, bus, v, { from: 150, slide: 0.12 });
+  const snare = (t, bus, v = 0.35) => { noise(t, 0.12, bus, v, ['highpass', 1800]); osc('triangle', 220, t, 0.06, bus, v * 0.6); };
+  const block = (t, bus, v = 0.3) => osc('sine', 1100, t, 0.05, bus, v, { from: 1400, slide: 0.01 });
+  const cym = (t, bus, v = 0.18) => noise(t, 0.35, bus, v, ['highpass', 6500]);
+  function gong(t, bus, v = 0.6, f = 150) {
+    for (const [r, a] of [[1, 1], [1.48, 0.6], [2.03, 0.45], [2.74, 0.3], [3.9, 0.2]]) osc('sine', f * r, t, 2.4 / r, bus, v * a * 0.5, { a: 0.005, to: f * r * 0.985 });
+    noise(t, 0.4, bus, v * 0.3, ['bandpass', 900, 0.8]);
+  }
+
+  // ── sequencer
+  function schedule() {
+    const S = section && preset[section];
+    if (!S) return;
+    const spb = 60 / (S.tempo * tempoScale) / 4; // seconds per 16th
+    while (nextT < ac.currentTime + 0.15) {
+      const t = nextT, i = step;
+      const bar = Math.floor(i / 16), s16 = i % 16;
+      const soft = S.soft ? 0.6 : 1;
+      const d = S.drums;
+      const hit = (pat, k) => pat && pat[k % pat.length] === 'x';
+      if (hit(d.block, s16) && (level >= 0)) block(t, musicBus, 0.22 * soft);
+      if (hit(d.kick, s16) && (level >= 1 || section !== 'build')) kick(t, musicBus, 0.8 * soft);
+      if (hit(d.snare, s16) && (level >= 2 || section === 'card')) snare(t, musicBus, 0.28 * soft);
+      if (hit(d.cym, s16) && (level >= 4 || section === 'card')) cym(t, musicBus, 0.14);
+      // roll into the next loop
+      if (section !== 'night' && (level >= 3 || section === 'card') && bar % 4 === 3 && s16 >= 12) snare(t, musicBus, 0.12 + (s16 - 12) * 0.05);
+      if (s16 % 4 === 0 || (section === 'card' && s16 % 2 === 0)) {
+        const root = +S.bass[bar % S.bass.length];
+        const f = hz(root, -2);
+        osc('triangle', s16 % 8 === 4 && section !== 'night' ? f * 1.5 : f, t, spb * 3, musicBus, 0.5 * soft);
+      }
+      const ch = S.lead[i % S.lead.length];
+      if (ch >= '0' && ch <= '9' && (level >= 2 || section !== 'build')) {
+        let len = 1;
+        while (S.lead[(i + len) % S.lead.length] === '-' && len < 16) len++;
+        VOICES[S.voice](t, hz(+ch), spb * len * 0.95, musicBus, 0.5 * soft);
+        if (level >= 5 && section === 'build') VOICES.organ(t, hz(+ch, -1), spb * len * 0.9, musicBus, 0.2);
+      }
+      if (section === 'night' && s16 === 8 && bar % 2) for (let k = 0; k < 3; k++) osc('sine', 4200 + Math.random() * 400, t + k * 0.06, 0.03, musicBus, 0.05); // crickets
+      nextT += spb;
+      step++;
+    }
+  }
+
+  const api = {
+    get muted() { return muted; },
+    get state() { return ac ? ac.state : 'none'; },
+    get section() { return section; },
+    unlock() { if (init() && !muted && ac.state !== 'running') ac.resume(); },
+    toggle() {
+      muted = !muted;
+      try { localStorage.setItem(storageKey, muted ? '1' : '0'); } catch {}
+      if (init()) { master.gain.setTargetAtTime(muted ? 0 : 0.55, ac.currentTime, 0.03); if (!muted) ac.resume(); }
+      return muted;
+    },
+    music(name) {
+      if (name === section) return;
+      section = name;
+      if (!init()) return;
+      step = 0; nextT = ac.currentTime + 0.05;
+      if (timer) clearInterval(timer);
+      timer = name ? setInterval(schedule, 25) : null;
+    },
+    intensity(n) { level = n; },
+    sfx(name, o = {}) {
+      if (!init() || ac.state !== 'running') return;
+      const t = ac.currentTime + 0.01, B = sfxBus;
+      switch (name) {
+        case 'tick': block(t, B, 0.12); break;
+        case 'drop': osc('sine', 300, t, 0.18, B, 0.25, { from: 900, slide: 0.18 }); break;
+        case 'land': { const s = Math.min(6, o.size || 1); kick(t, B, 0.5 + s * 0.08); noise(t, 0.12, B, 0.25, ['lowpass', 500]); osc('square', 110 - s * 8, t, 0.08, B, 0.1); break; }
+        case 'pop': osc('sine', 500 + (o.step || 0) * 90, t, 0.09, B, 0.25, { from: 300 + (o.step || 0) * 90, slide: 0.05 }); break;
+        case 'rise': noise(t, 1.1, B, 0.25, ['bandpass', 300, 2], { sweep: 4000, a: 0.6 }); osc('sawtooth', 880, t, 1.1, B, 0.07, { from: 110, slide: 1.1, filter: ['lowpass', 2000] }); break;
+        case 'stamp': kick(t, B, 0.9); noise(t, 0.08, B, 0.4, ['lowpass', 1200]); break;
+        case 'gong': gong(t, B); break;
+        case 'bell': gong(t, B, 0.35, 620); break;
+        case 'chime': osc('sine', hz(7), t, 0.5, B, 0.35); osc('sine', hz(5), t + 0.28, 0.8, B, 0.35); break; // 叮咚
+        case 'echo': for (let k = 0; k < 4; k++) VOICES.organ(t + k * 0.22, hz(5 + (k % 2) * 2), 0.18, B, 0.35 / (k + 1)); break;
+        case 'fry': for (let k = 0; k < 26; k++) noise(t + Math.random() * 1.1, 0.02, B, 0.12 + Math.random() * 0.15, ['bandpass', 2500 + Math.random() * 3000, 3]); break;
+        case 'firecracker': for (let k = 0; k < (o.n || 22); k++) noise(t + k * 0.045 + Math.random() * 0.03, 0.035, B, 0.35 + Math.random() * 0.3, ['bandpass', 1200 + Math.random() * 2500, 1.2]); break;
+        case 'horn': osc('sawtooth', 330, t, 0.5, B, 0.25, { filter: ['lowpass', 1400] }); osc('sawtooth', 415, t, 0.5, B, 0.2, { filter: ['lowpass', 1400] }); break;
+        case 'cash': osc('square', 1318, t, 0.08, B, 0.15); osc('square', 1760, t + 0.08, 0.3, B, 0.15); noise(t, 0.2, B, 0.1, ['highpass', 7000]); break;
+        case 'bird': for (let k = 0; k < 3; k++) osc('sine', 2600, t + k * 0.12, 0.08, B, 0.15, { from: 3600, slide: 0.07 }); break;
+        case 'splash': noise(t, 0.6, B, 0.35, ['lowpass', 2500], { sweep: 400 }); break;
+        case 'boing': osc('triangle', 180, t, 0.4, B, 0.4, { from: 420, slide: 0.35, vib: 18 }); break;
+        case 'crowd': noise(t, 1.2, B, 0.18, ['bandpass', 700, 0.6], { a: 0.3 }); break;
+        case 'sad': ['5', '4', '3'].forEach((dg, k) => osc('sawtooth', hz(+dg, -1) * 0.94, t + k * 0.42, 0.38, B, 0.28, { filter: ['lowpass', 1100] }));
+          osc('sawtooth', hz(2, -1) * 0.94, t + 1.26, 1.1, B, 0.28, { filter: ['lowpass', 1100], vib: 6 }); break; // wah wah wah wahhh
+        case 'jackpot': ['0', '2', '3', '5', '7', '8'].forEach((dg, k) => VOICES.suona(t + k * 0.09, hz(+dg), 0.12, B, 0.45));
+          gong(t + 0.55, B, 0.6); api.sfx('firecracker', { n: 34 }); break;
+        case 'clack': osc('sine', 700, t, 0.06, B, 0.4, { from: 1100, slide: 0.01 }); osc('sine', 520, t + 0.07, 0.08, B, 0.35, { from: 900, slide: 0.01 }); break;
+        case 'confetti': osc('sine', 1568, t, 0.1, B, 0.15); osc('sine', 2093, t + 0.07, 0.15, B, 0.15); break;
+        default: break;
+      }
+    },
+    // Live audio as a MediaStream (for canvas + sound recording); null without WebAudio.
+    stream() {
+      if (!init() || !ac.createMediaStreamDestination) return null;
+      if (!recDest) { recDest = ac.createMediaStreamDestination(); master.connect(recDest); }
+      return recDest.stream;
+    },
+  };
+  return api;
+}
+
+return { SOUNDS, MUSIC_PRESETS, audio };
+})();
+
+// engine\stage.js
+const __m11 = (() => {
+const { rng, newRun } = __m0;
+const { encode, decode } = __m1;
+const { setStrings, tr, applyDom } = __m2;
+const { zukan } = __m3;
+const { cardFile, saveFile, shareText, post } = __m4;
+const { CARD_W, CARD_H, drawCard } = __m9;
+const { crane, dims, placeDrop, replay, streetGrid, crossDoors } = __m5;
+const { PAPER, fitView, drawHouse, screen } = __m8;
+const { fxLayer, easeOutBack, easeInOut } = __m7;
+const { audio } = __m10;
+const { person, LOOKS } = __m6;
+// stage.js — modes title → build → reveal → card (+ shared view of someone else's run).
+// Game contract: see templates/game/README.md. The stage owns DOM, timing and
+// sharing; the game owns rules, copy and styles.
+//
+// Town mode: ?h=code1.code2… is a street (oldest first). The page shows the last
+// house; "build next door" appends yours, and your link carries the whole street.
+// Daily: everyone gets the same brief + bag per local date (seed 'daily:YYYY-MM-DD').
+
+
+
+
+
+
+
+
+
+
+
+
+
+const ENGINE_STRINGS = {
+  next: '下一個', hint: '點一下放下', skip: '略過', go: '隨便蓋', zukan: '稀有空間圖鑑',
+  close: '關閉', post: '分享到 X', save: '存圖', again: '再蓋一間', mine: '我也來蓋',
+  watch: '住住看', hold: '長按快轉', newFind: n => '新發現：' + n, locked: '？？？',
+  daily: d => '今日物件 ' + d, nextdoor: '在隔壁蓋',
+  record: (n, best) => `今日物件第${n}次 · 你的最高 ${best}`,
+  soundOn: '音效 開', soundOff: '音效 關', video: '存影片', recording: '錄影中…',
+};
+
+const WALK_SPEED = 3.4, DWELL = 0.75, STUCK = 0.9, RISE = 1.2, TOSS = 1.9, TOSS_LAND = 0.85;
+const MAX_STREET = 6, ART_HOUSES = 2; // card art: my house + the one I built next to
+
+const pad2 = n => String(n).padStart(2, '0');
+function today() {
+  const d = new Date();
+  return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+}
+
+function boot(game) {
+  setStrings(ENGINE_STRINGS);
+  setStrings(game.strings);
+  applyDom(document);
+  document.title = tr('title') + ' — ' + tr('sub');
+
+  const $ = id => document.getElementById(id);
+  const cv = $('c'), ctx = cv.getContext('2d');
+  const card = document.createElement('canvas');
+  card.width = CARD_W; card.height = CARD_H;
+  $('card-slot').append(card);
+
+  const { W, H } = game.grid;
+  const zk = zukan(game.meta.id);
+  const mech = crane({ W, H, pieces: game.pieces });
+  const limits = { names: game.names.length, reqs: game.requests.length, pieces: game.pieces.length, maxDrops: 16 };
+  const S = { mode: 'title', run: null, an: game.analyze([], { name: 0, req: 0 }), res: null, code: '',
+    rev: null, steps: [], hold: false, theirs: false, rows: H + 3, dpr: 1, cw: 0, ch: 0,
+    street: [], daily: null, art: null, time: 0, light: 0, zoom: 1, squash: null };
+  const fx = fxLayer();
+  const au = audio(game.music || {}, `vt.${game.meta.id}.mute`);
+  // Sound on/off: the corner pill + big switches on the title and result panels, one shared state.
+  const soundBtns = [...document.querySelectorAll('.sound')];
+  const showMute = () => soundBtns.forEach(b => {
+    b.classList.toggle('off', au.muted);
+    b.setAttribute('aria-pressed', String(!au.muted));
+    const l = b.querySelector('.lbl'); if (l) l.textContent = tr(au.muted ? 'soundOff' : 'soundOn');
+  });
+  const toggleSound = () => { au.toggle(); showMute(); if (!au.muted) au.unlock(); return au.muted; };
+  showMute();
+  for (const b of soundBtns) {
+    b.addEventListener('pointerdown', e => e.stopPropagation());
+    b.addEventListener('click', e => { e.stopPropagation(); toggleSound(); });
+  }
+
+  // The agent: a chibi in a suit with a speech bubble, talking while you build.
+  const agentFace = $('agent-face');
+  if (agentFace) {
+    const c = agentFace.getContext('2d'), k = 2;
+    agentFace.width = 48 * k; agentFace.height = 56 * k;
+    c.scale(k, k);
+    person(c, 24, 54, 10, LOOKS.agent, { face: 'happy', time: 0 });
+  }
+  let agentTimer = 0;
+  const showAgent = line => {
+    if (!line || !$('agent')) return;
+    S.agentLine = line;
+    $('agent-line').textContent = line;
+    const el = $('agent');
+    el.hidden = false; el.classList.remove('talk'); void el.offsetWidth; el.classList.add('talk');
+    clearTimeout(agentTimer);
+    agentTimer = setTimeout(() => { el.hidden = true; }, 2600);
+  };
+  // Browsers only start audio after a gesture: unlock on the first one, anywhere.
+  document.addEventListener('pointerdown', () => au.unlock(), { capture: true });
+
+  const panels = ['title', 'zukan', 'result'];
+  const mmdd = date => date.slice(5).replace('-', '/');
+  // Re-read the date whenever the title shows: a tab left open past midnight must not show yesterday.
+  const dailyLabel = () => { $('daily').textContent = tr('daily', mmdd(today())); };
+  const show = id => { if (id === 'title') dailyLabel(); panels.forEach(p => { $(p).hidden = p !== id; }); };
+  dailyLabel();
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) dailyLabel(); });
+
+  function resize() {
+    const el = $('stage');
+    S.dpr = Math.min(3, window.devicePixelRatio || 1);
+    S.cw = el.clientWidth; S.ch = el.clientHeight;
+    cv.width = Math.round(S.cw * S.dpr); cv.height = Math.round(S.ch * S.dpr);
+  }
+
+  function hud() {
+    const run = S.run;
+    $('bname').textContent = game.names[run.brief.name];
+    $('req').textContent = tr('reqPrefix', game.requests[run.brief.req].text);
+    $('pips').innerHTML = run.bag.map((_, k) => `<i class="${k < run.drops.length ? 'on' : ''}"></i>`).join('');
+    const nx = run.bag[run.drops.length + 1];
+    $('next-name').textContent = nx ? game.pieces[nx.t].name : '—';
+  }
+
+  function zkCount() {
+    const total = game.pieces.filter(p => p.rare).length;
+    const n = zk.list().length;
+    document.querySelectorAll('.zk-count').forEach(el => { el.textContent = `${n}/${total}`; });
+  }
+
+  // opts: { daily: 'YYYY-MM-DD' | null, street: [{ code, drops }] (houses to the left) }
+  function startRun(seed, opts = {}) {
+    S.run = newRun(game, seed);
+    S.an = game.analyze([], S.run.brief);
+    S.theirs = false; S.res = null; S.rows = H + 3;
+    S.daily = opts.daily || null;
+    S.street = (opts.street || []).slice(-(MAX_STREET - 1));
+    const ev = S.event = S.run.event || null;
+    mech.speedOf = ev && ev.speed ? idx => (ev.from == null || (idx >= ev.from && idx < ev.from + ev.len) ? ev.speed : 1) : null;
+    S.agentLine = ''; S.tour = false;
+    if ($('agent')) $('agent').hidden = true;
+    mech.start(S.run, onLand);
+    S.mode = 'build';
+    au.unlock(); au.music('build'); au.intensity(0);
+    show(null);
+    $('hint').hidden = false;
+    $('hud').hidden = false;
+    const ban = (game.banner ? game.banner(S.run.bag) : '') || (ev ? ev.banner : '');
+    $('banner').textContent = ban; $('banner').hidden = !ban;
+    if (ban) setTimeout(() => { $('banner').hidden = true; }, 2600);
+    if (ev) { if (ev.sound) au.sfx(ev.sound); if (ev.agent) setTimeout(() => S.mode === 'build' && showAgent(ev.agent), 900); }
+    hud();
+  }
+
+  function onLand() {
+    S.an = game.analyze(S.run.placed, S.run.brief); // once per landing, not per frame
+    const r = S.run.placed[S.run.placed.length - 1], p = game.pieces[r.t];
+    fx.dust(r, 6 + r.w * r.h * 2);
+    S.squash = { room: r.i, k: 0.22, age: 0 };
+    mech.shake = 0.1 + Math.min(0.25, r.w * r.h * 0.03);
+    au.sfx('land', { size: r.w * r.h }); au.intensity(S.run.drops.length);
+    if (p.rare) { fx.confetti(r.x + r.w / 2, r.y + r.h / 2); fx.text(r.x + r.w / 2, r.y + r.h / 2, p.name); au.sfx(p.sound || 'gong'); au.sfx('confetti'); }
+    if (S.event && S.event.quake) mech.shake += 0.25;
+    if (game.agent) {
+      const n = S.run.drops.length, o = { n, total: S.run.bag.length, piece: p };
+      let line = game.agent(S.an, { ...o, rand: rng(S.run.seed + ':agent:' + n) });
+      if (line === S.agentLine) line = game.agent(S.an, { ...o, rand: rng(S.run.seed + ':agent2:' + n) });
+      showAgent(line);
+    }
+    hud();
+    if (S.run.drops.length === S.run.bag.length) setTimeout(() => beginReveal(true), 350);
+  }
+
+  function settle() {
+    S.code = encode(S.run, W);
+    const extra = { daily: S.daily, houseNo: S.street.length + 1, quirks: [] };
+    S.art = null;
+    if (S.street.length) {
+      const houses = [...S.street.map(h => h.drops), S.run.drops];
+      const full = streetGrid(houses, game.pieces, W, H);
+      if (game.neighbor) extra.quirks = game.neighbor(crossDoors(full, houses.length - 1), S.an);
+      const shown = houses.slice(-ART_HOUSES);
+      S.art = streetGrid(shown, game.pieces, W, H);
+      S.art.mine = shown.length - 1;
+    }
+    S.res = game.card(S.an, S.code, extra);
+    S.steps = game.day(S.an);
+  }
+
+  // Residents brought by rare rooms: style(t).npc = kind; game.npcs(facts) may override.
+  // They stand at the room's front edge so the 3D art never hides them.
+  function npcsOf(an) {
+    if (game.npcs) return game.npcs(an) || [];
+    return an.placed.flatMap(r => { const k = game.style(r.t).npc; return k ? [{ x: r.x + r.w * 0.78, y: r.y + 0.18, kind: k }] : []; });
+  }
+  const hourOf = time => { const m = /^(\d{1,2}):(\d{2})/.exec(time || ''); return m ? +m[1] + +m[2] / 60 : 12; };
+  const lightAt = h => (h >= 22 || h < 5 ? 1 : h >= 19 ? 0.75 : h >= 17.5 ? 0.35 : h < 6.5 ? 0.6 : 0);
+
+  function beginReveal(rise) {
+    if (!S.res) settle();
+    S.rev = { t: rise ? 0 : 1, phase: rise ? 'rise' : 'day', k: -1, wk: null, timer: 0, seg: 0, light: 0, popped: 0 };
+    if (rise) { au.music(null); au.sfx('rise'); }
+    S.npcs = npcsOf(S.an);
+    fx.clear();
+    S.mode = 'reveal';
+    $('banner').hidden = true; if ($('agent')) $('agent').hidden = true;
+    show(null);
+    $('hud').hidden = !rise;
+    $('skip').hidden = false;
+  }
+
+  function nextStep() {
+    const R = S.rev;
+    R.k++;
+    if (R.k >= S.steps.length) return finish();
+    const st = S.steps[R.k];
+    $('cap').hidden = false;
+    $('cap-time').textContent = st.time;
+    $('cap-line').textContent = st.line;
+    if (st.pts && st.pts.length) {
+      if (!R.wk || st.jump) R.wk = { x: st.pts[0][0], y: st.pts[0][1], phase: 0, alpha: 1 };
+      R.wk.alpha = 1;
+    }
+    if (st.out && R.wk) R.wk.alpha = 0;
+    R.light = lightAt(hourOf(st.time));
+    au.music(R.light >= 0.7 ? 'night' : 'day');
+    if (st.stuck) au.sfx('boing');
+    if (st.sound) au.sfx(st.sound);
+    if (R.wk) { R.wk.face = st.face || (st.stuck ? 'sweat' : 'normal'); R.wk.say = st.say || ''; }
+    R.actors = (st.npcs || []).filter(n => n.pts && n.pts.length).map(n => ({ kind: n.kind, x: n.pts[0][0], y: n.pts[0][1], pts: n.pts, seg: 1,
+      say: n.say || '', face: n.face, phase: 0, walking: false }));
+    R.dwell = R.actors.length || st.say ? DWELL * 2 : DWELL;
+    if (S.tour && R.k % 3 === 0) { const b = S.res.fields.bullets; if (b.length) showAgent(b[(R.k / 3) % b.length]); }
+    R.seg = 1; R.timer = 0; R.shake = st.stuck ? STUCK : 0;
+  }
+
+  function updateReveal(dt) {
+    const R = S.rev;
+    if (R.freeze) return; // test hook: hold a frame for screenshots
+    if (R.phase === 'rise') {
+      R.t = Math.min(1, R.t + dt / RISE);
+      const n = Math.max(1, S.an.placed.length);
+      while (R.popped < n && R.t - (R.popped / n) * 0.45 > 0.05) au.sfx('pop', { step: R.popped++ });
+      if (R.t >= 1) { R.phase = 'day'; nextStep(); }
+      return;
+    }
+    if (R.k < 0) return nextStep();
+    const st = S.steps[R.k];
+    const wk = R.wk;
+    let busy = false;
+    for (const a of R.actors || []) {
+      if (a.seg >= a.pts.length) { a.walking = false; continue; }
+      busy = true;
+      const [tx, ty] = a.pts[a.seg], dx = tx - a.x, dy = ty - a.y, d = Math.hypot(dx, dy), stepLen = WALK_SPEED * 0.85 * dt;
+      a.phase += dt * 14; a.walking = true;
+      if (d <= stepLen) { a.x = tx; a.y = ty; a.seg++; } else { a.x += (dx / d) * stepLen; a.y += (dy / d) * stepLen; }
+    }
+    if (R.shake > 0) { R.shake -= dt; if (wk) wk.shake = R.shake > 0 ? R.shake : 0; if (R.shake <= 0) R.timer = 0.0001; return; }
+    if (wk && st.pts && R.seg < st.pts.length) {
+      const [tx, ty] = st.pts[R.seg];
+      const dx = tx - wk.x, dy = ty - wk.y, dist = Math.hypot(dx, dy), stepLen = WALK_SPEED * dt;
+      wk.phase += dt * 14; wk.walking = true;
+      if (dist <= stepLen) { wk.x = tx; wk.y = ty; R.seg++; }
+      else { wk.x += (dx / dist) * stepLen; wk.y += (dy / dist) * stepLen; }
+      return;
+    }
+    if (wk) wk.walking = false;
+    if (busy) return;
+    R.timer += dt;
+    if (R.timer >= (R.dwell || DWELL)) nextStep();
+  }
+
+  function dailyRecord() {
+    if (!S.daily || S.theirs) return '';
+    if (S.res.recordText != null) return S.res.recordText; // a replay (watch / save video) must not count again
+    const key = `vt.${game.meta.id}.daily.${S.daily}`;
+    let rec = { n: 0, best: 0 };
+    try { rec = { ...rec, ...JSON.parse(localStorage.getItem(key) || '{}') }; } catch {}
+    rec.n++;
+    rec.best = Math.max(rec.best, S.res.rent || 0);
+    try { localStorage.setItem(key, JSON.stringify(rec)); } catch {}
+    return (S.res.recordText = tr('record', rec.n, S.res.fields.pre + rec.best.toLocaleString('en-US')));
+  }
+
+  // opts.noToss: straight to the card (autoplay, shared links); otherwise the toss plays first.
+  function finish(opts = {}) {
+    const toss = S.res && S.res.fields.toss;
+    if (toss && !opts.noToss && S.mode !== 'toss') {
+      S.mode = 'toss'; S.toss = { t: 0, landed: false, ...toss };
+      $('cap').hidden = true; $('skip').hidden = true; $('hud').hidden = true; if ($('agent')) $('agent').hidden = true;
+      au.music(null);
+      return;
+    }
+    S.mode = 'card';
+    if (S.rec) { const rec = S.rec; S.rec = null; setTimeout(() => rec.state !== 'inactive' && rec.stop(), 900); }
+    au.music('card');
+    au.sfx('stamp');
+    const hit = S.res && (S.res.sfx || (S.res.jackpot ? 'jackpot' : ''));
+    if (hit) setTimeout(() => au.sfx(hit), 260);
+    if (!S.npcs) S.npcs = npcsOf(S.an);
+    $('cap').hidden = true; $('skip').hidden = true; $('hud').hidden = true;
+    drawResult();
+    showBoard(S.res.fields.comments || []);
+    $('r-mine').hidden = S.theirs; $('r-theirs').hidden = !S.theirs;
+    const fresh = S.theirs ? [] : zk.add(S.res.rares);
+    const names = fresh.map(id => game.pieces.find(p => p.id === id).name);
+    $('new-find').textContent = names.length ? tr('newFind', names.join('、')) : '';
+    $('new-find').hidden = !names.length;
+    const rec = dailyRecord();
+    $('record').textContent = rec; $('record').hidden = !rec;
+    zkCount();
+    show('result');
+  }
+
+  // Forum replies as page text (the card image only has room for two). textContent only: no HTML injection.
+  function showBoard(list) {
+    const ul = $('r-board');
+    if (!ul) return;
+    ul.replaceChildren(...list.map(c => {
+      const li = document.createElement('li'), tag = document.createElement('b'), id = document.createElement('code'), tx = document.createElement('span');
+      tag.textContent = c.tag; tag.className = c.tag === '噓' ? 'boo' : c.tag === '→' ? 'arrow' : '';
+      id.textContent = c.id + ':'; tx.textContent = c.text;
+      li.append(tag, id, tx);
+      return li;
+    }));
+    ul.hidden = !list.length;
+  }
+
+  // Ring / entry of my house, moved into the street art's coordinates.
+  const shiftX = (v, dx) => (v && typeof v === 'object' ? { ...v, x: v.x + dx } : v);
+
+  function drawResult() {
+    const f = S.res.fields;
+    drawCard(card.getContext('2d'), f, (c, box) => {
+      const artBox = { x: box.x + 16, y: box.y + 150, w: box.w - 32, h: box.h - 166 };
+      if (S.art) {
+        const A = S.art, dx = A.mine * W;
+        const ring = typeof f.at === 'number' ? (f.at >= 0 ? f.at + A.start[A.mine] : -1) : shiftX(f.at, dx);
+        // My entry arrow, unless it is a window facing into the neighbour's house.
+        const seg = S.an.entry && S.an.entry.seg;
+        const entry = seg && !(seg.dx === -1 && seg.x === 0 && A.mine > 0) ? { ...S.an.entry, seg: shiftX(seg, dx) } : null;
+        // Gaps: the neighbours' as the street sees them, mine exactly as my own facts (and copy) say.
+        const gaps = A.gaps.map(gp => ({ cells: gp.cells.filter(([x]) => x < dx) })).filter(gp => gp.cells.length)
+          .concat(S.an.gaps.map(gp => ({ cells: gp.cells.map(([x, y]) => [x + dx, y]) })));
+        const npcs = npcsOf(S.an).map(n => ({ ...n, x: n.x + dx }));
+        drawHouse(c, A, fitView(A, 1, artBox, { tight: true, maxScale: 60 }),
+          { style: game.style, ring, entry, gaps, faded: i => A.house[i] !== A.mine, npcs, time: 1.3 });
+      } else {
+        drawHouse(c, S.an, fitView(S.an, 1, artBox, { tight: true, maxScale: 72 }),
+          { style: game.style, ring: f.at, entry: S.an.entry, npcs: npcsOf(S.an), time: 1.3 });
+      }
+      const ib = { x: box.x + 12, y: box.y + 12, w: 200, h: 200 };
+      c.fillStyle = '#fff'; c.fillRect(ib.x, ib.y, ib.w, ib.h);
+      c.strokeStyle = '#1b1b1d'; c.lineWidth = 1.5; c.strokeRect(ib.x, ib.y, ib.w, ib.h);
+      drawHouse(c, S.an, fitView(S.an, 0, { x: ib.x + 6, y: ib.y + 6, w: ib.w - 12, h: ib.h - 12 }, { tight: true }), { style: game.style, ring: f.at, entry: S.an.entry, plain: true });
+    });
+  }
+
+  function render() {
+    ctx.setTransform(S.dpr, 0, 0, S.dpr, 0, 0);
+    ctx.fillStyle = PAPER; ctx.fillRect(0, 0, S.cw, S.ch);
+    const box = { x: 12, y: 8, w: S.cw - 24, h: S.ch - 16 };
+    if (S.mode === 'build' || S.mode === 'title') {
+      const hang = S.mode === 'build' ? mech.hanging() : null;
+      const want = hang ? hang.rail + 1 : S.an.top + 1;
+      S.rows += (Math.max(H + 2, want) - S.rows) * 0.12;
+      const V = fitView(S.an, 0, box, { rows: S.rows, bottom: true });
+      if (mech.shake > 0) ctx.translate(Math.sin(mech.shake * 90) * 3 * (1 + mech.shake * 8), Math.cos(mech.shake * 70) * mech.shake * 10);
+      if (S.mode === 'build' && S.event && S.event.quake) ctx.translate(Math.sin(S.time * 37) * 1.6, Math.cos(S.time * 29) * 1.2);
+      drawHouse(ctx, S.an, V, { style: game.style, hang, entry: S.an.entry, roadText: tr('road'), time: S.time, fx,
+        squash: S.squash && { room: S.squash.room, k: S.squash.k * Math.cos(S.squash.age * 28) * Math.exp(-S.squash.age * 7) } });
+      if (S.mode === 'build' && S.event && S.event.rain) rain();
+      return;
+    }
+    const R = S.mode === 'reveal' ? S.rev : null;
+    const raw = R ? R.t : 1, t = easeInOut(raw);
+    let V = fitView(S.an, t, box, { bottom: t < 0.5 });
+    // Day: push the camera in on the walker.
+    const want = R && R.phase === 'day' && R.wk && R.wk.alpha > 0 ? 1.2 : 1;
+    S.zoom += (want - S.zoom) * 0.06;
+    if (S.zoom > 1.01 && R && R.wk) {
+      const [fx0, fy0] = screen(V, R.wk.x, R.wk.y, 0.5), k = (S.zoom - 1) / 0.2 * 0.35;
+      const tx = fx0 + (box.x + box.w / 2 - fx0) * k, ty = fy0 + (box.y + box.h / 2 - fy0) * k;
+      V = { ...V, s: V.s * S.zoom, ox: tx - (fx0 - V.ox) * S.zoom, oy: ty - (fy0 - V.oy) * S.zoom };
+    }
+    const n = Math.max(1, S.an.placed.length);
+    const riseOf = R && R.phase === 'rise' ? i => easeOutBack(Math.max(0, Math.min(1, (raw - (i / n) * 0.45) / 0.55)), 2.2) : null;
+    const actors = R && R.phase === 'day' ? R.actors || [] : [];
+    const busyKinds = new Set(actors.map(a => a.kind));
+    const npcs = S.mode === 'card' || S.mode === 'toss' || (R && R.phase === 'day') ? (S.npcs || []).filter(n => !busyKinds.has(n.kind)).concat(actors) : null;
+    drawHouse(ctx, S.an, V, { style: game.style, entry: S.an.entry, walker: R ? R.wk : null,
+      ring: S.mode === 'card' ? S.res.fields.at : null, roadText: tr('road'), time: S.time, fx, riseOf,
+      light: S.light, npcs });
+    if (S.mode === 'toss') drawToss(S.toss);
+  }
+
+  function rain() {
+    ctx.save();
+    ctx.strokeStyle = 'rgba(70,100,150,.38)'; ctx.lineWidth = 1.5;
+    for (let k = 0; k < 80; k++) {
+      const x = ((k * 97 + S.time * 240) % (S.cw + 120)) - 60, y = ((k * 53 + S.time * 720) % (S.ch + 40)) - 20;
+      ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 9, y + 20); ctx.stroke();
+    }
+    ctx.restore();
+  }
+
+  // 擲筊: two red moon blocks fly up, spin and land; the faces decide the stamp note.
+  // sheng (聖筊) = one flat + one round · xiao (笑筊) = both flat · yin (陰筊) = both round
+  function drawToss(T) {
+    const t = T.t, cx = S.cw / 2, base = S.ch * 0.56, R0 = Math.min(46, S.cw * 0.11);
+    ctx.save();
+    ctx.fillStyle = 'rgba(245,243,238,.6)'; ctx.fillRect(0, 0, S.cw, S.ch);
+    const faces = T.result === 'sheng' ? ['flat', 'round'] : T.result === 'xiao' ? ['flat', 'flat'] : ['round', 'round'];
+    for (let k = 0; k < 2; k++) {
+      const sgn = k ? 1 : -1, p = Math.min(1, t / TOSS_LAND);
+      const x = cx + sgn * (R0 * 0.9 + R0 * 0.7 * p);
+      const after = t - TOSS_LAND;
+      const y = after < 0 ? base - Math.sin(p * Math.PI) * S.ch * 0.3 : base - Math.abs(Math.sin(after * 14)) * 16 * Math.exp(-after * 7);
+      const rot = after < 0 ? t * 13 * sgn : Math.sin(after * 20) * 0.2 * Math.exp(-after * 8);
+      const face = after < 0 ? (Math.sin(t * 13 + k) > 0 ? 'flat' : 'round') : faces[k];
+      block(x, y, R0, rot, face, k ? 1 : -1);
+    }
+    if (t > TOSS_LAND + 0.15) {
+      const q = Math.min(1, (t - TOSS_LAND - 0.15) / 0.25), sc = easeOutBack(q, 2.5);
+      ctx.translate(cx, base + R0 * 2.1); ctx.scale(sc, sc);
+      ctx.font = `900 ${Math.round(R0 * 1.1)}px system-ui, "Noto Sans TC", "Microsoft JhengHei", sans-serif`;
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.lineJoin = 'round';
+      ctx.lineWidth = 8; ctx.strokeStyle = '#fff'; ctx.strokeText(T.label || '', 0, 0);
+      ctx.fillStyle = '#d23a2c'; ctx.fillText(T.label || '', 0, 0);
+    }
+    ctx.restore();
+  }
+  function block(x, y, r, rot, face, mirror) {
+    ctx.save();
+    ctx.translate(x, y); ctx.rotate(rot); ctx.scale(mirror, 1);
+    ctx.fillStyle = 'rgba(0,0,0,.15)'; ctx.beginPath(); ctx.ellipse(0, r * 0.55, r * 0.9, r * 0.18, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(0, 0, r, Math.PI, 0);
+    ctx.quadraticCurveTo(0, -r * 0.45, -r, 0);
+    ctx.closePath();
+    ctx.fillStyle = face === 'flat' ? '#e8604a' : '#a3281b'; ctx.strokeStyle = '#1b1b1d'; ctx.lineWidth = 2.5;
+    ctx.fill(); ctx.stroke();
+    if (face === 'round') { ctx.strokeStyle = 'rgba(255,255,255,.45)'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(0, 0, r * 0.75, Math.PI * 1.15, Math.PI * 1.55); ctx.stroke(); }
+    ctx.restore();
+  }
+
+  let last = performance.now(), lastDir = 0;
+  function frame(now) {
+    const cur = S.mode === 'build' && mech.cur && !mech.fall ? mech.cur.dir : 0;
+    if (cur && lastDir && cur !== lastDir) au.sfx('tick');
+    lastDir = cur;
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    S.time += dt;
+    fx.update(dt);
+    if (S.squash) { S.squash.age += dt; if (S.squash.age > 0.6) S.squash = null; }
+    const wantLight = S.mode === 'reveal' && S.rev.phase === 'day' ? S.rev.light : 0;
+    S.light += (wantLight - S.light) * Math.min(1, dt * 2.5);
+    if (S.mode === 'build') mech.update(dt);
+    if (S.mode === 'reveal') updateReveal(dt * (S.hold ? 3 : S.rec ? 1.5 : 1));
+    if (S.mode === 'toss') {
+      S.toss.t += dt;
+      if (!S.toss.landed && S.toss.t >= TOSS_LAND) { S.toss.landed = true; au.sfx('clack'); setTimeout(() => au.sfx('clack'), 90); }
+      if (S.toss.t >= TOSS) finish({ noToss: true });
+    }
+    render();
+    requestAnimationFrame(frame);
+  }
+
+  const chain = () => [...S.street, { code: S.code, drops: S.run.drops }];
+
+  function shareUrl() {
+    const h = chain().slice(-MAX_STREET).map(x => x.code).join('.');
+    return location.origin + location.pathname + '?h=' + h + (S.daily ? '&d=' + S.daily.replace(/-/g, '') : '');
+  }
+
+  const randomSeed = () => Math.random().toString(36).slice(2, 10);
+  const startDaily = () => { const d = today(); startRun('daily:' + d, { daily: d }); };
+
+  $('stage').addEventListener('pointerdown', e => {
+    if (S.mode === 'build' && mech.tap()) { $('hint').hidden = true; au.sfx('drop'); }
+    if (S.mode === 'reveal') S.hold = true;
+    e.preventDefault();
+  });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('stage').addEventListener(ev, () => { S.hold = false; });
+  $('skip').addEventListener('click', e => { e.stopPropagation(); if (S.mode === 'reveal') finish(); });
+  $('skip').addEventListener('pointerdown', e => e.stopPropagation());
+  $('daily').addEventListener('click', startDaily);
+  $('go').addEventListener('click', () => startRun(randomSeed()));
+  $('again').addEventListener('click', () => startRun(randomSeed()));
+  $('mine').addEventListener('click', () => startRun(randomSeed()));
+  $('nextdoor').addEventListener('click', () => startRun(randomSeed(), { street: chain() }));
+  $('watch').addEventListener('click', () => { beginReveal(false); S.tour = S.theirs; });
+  // Save video: replay the rise + day while recording the canvas and the music (webm).
+  const vbtn = $('r-video');
+  const canRec = !!(vbtn && window.MediaRecorder && cv.captureStream);
+  if (vbtn) vbtn.hidden = !canRec;
+  if (canRec) vbtn.addEventListener('click', () => {
+    if (S.rec || !S.res) return;
+    const stream = cv.captureStream(30);
+    au.unlock();
+    const as = au.stream();
+    if (as) as.getAudioTracks().forEach(tk => stream.addTrack(tk));
+    const mime = ['video/webm;codecs=vp9,opus', 'video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4'].find(m => MediaRecorder.isTypeSupported(m));
+    let rec;
+    try { rec = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined); } catch { return; }
+    const chunks = [];
+    rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+    rec.onstop = () => {
+      vbtn.disabled = false; vbtn.textContent = tr('video');
+      const type = rec.mimeType || 'video/webm', ext = type.includes('mp4') ? 'mp4' : 'webm';
+      saveFile(new File([new Blob(chunks, { type })], `${game.meta.id}-${S.code}.${ext}`, { type }));
+    };
+    vbtn.disabled = true; vbtn.textContent = tr('recording');
+    S.rec = rec;
+    rec.start(250);
+    beginReveal(true);
+  });
+  $('r-img').addEventListener('click', () => saveFile(cardFile(card, game.meta.id + '-' + S.code + '.png')));
+  $('r-post').addEventListener('click', () => {
+    const s = S.res.share;
+    post({ canvas: card, text: shareText(s.lines, s.optional), url: shareUrl(), filename: game.meta.id + '.png' });
+  });
+  const openZukan = () => {
+    const have = new Set(zk.list());
+    $('z-list').innerHTML = game.pieces.filter(p => p.rare)
+      .map(p => `<li class="${have.has(p.id) ? 'got' : ''}">${have.has(p.id) ? p.name : tr('locked')}</li>`).join('');
+    zkCount();
+    S.back = $('result').hidden ? 'title' : 'result';
+    show('zukan');
+  };
+  $('t-zukan').addEventListener('click', openZukan);
+  $('r-zukan').addEventListener('click', openZukan);
+  $('z-close').addEventListener('click', () => show(S.back));
+
+  window.addEventListener('resize', resize);
+  resize();
+  zkCount();
+
+  // Shared link: show their card (the last house of the street) first.
+  const params = new URLSearchParams(location.search);
+  const codes = (params.get('h') || '').split('.').filter(Boolean).slice(-MAX_STREET);
+  const decoded = codes.map(c => decode(c, W, limits));
+  if (codes.length && decoded.every(Boolean)) {
+    const houses = decoded.map((d, k) => ({ code: codes[k], drops: d.drops, brief: d.brief }));
+    const mine = houses.pop();
+    S.street = houses;
+    const d = params.get('d');
+    S.daily = /^\d{8}$/.test(d || '') ? `${d.slice(0, 4)}-${d.slice(4, 6)}-${d.slice(6)}` : null;
+    S.run = { seed: 'shared', brief: mine.brief, bag: mine.drops.map(x => ({ t: x.t, rot: x.rot })), drops: mine.drops, placed: replay(mine.drops, game.pieces, W) };
+    S.an = game.analyze(S.run.placed, S.run.brief);
+    S.npcs = npcsOf(S.an);
+    S.theirs = true;
+    settle();
+    finish({ noToss: true });
+    try { history.replaceState(null, '', location.pathname); } catch {}
+  } else {
+    $('hud').hidden = true;
+    show('title');
+  }
+  requestAnimationFrame(frame);
+
+  // Test hook for smoke.mjs (headless): deterministic full runs without animation.
+  function autoplay(seed, opts) {
+    startRun(seed, opts);
+    const r = rng(seed + ':auto');
+    while (S.run.drops.length < S.run.bag.length) {
+      const b = S.run.bag[S.run.drops.length];
+      const { w } = dims(game.pieces[b.t], b.rot);
+      const d = { t: b.t, rot: b.rot, x: Math.floor(r() * (W - w + 1)) };
+      S.run.drops.push(d);
+      S.run.placed.push(placeDrop(S.run.placed, game.pieces, d, W));
+    }
+    mech.next();
+    S.an = game.analyze(S.run.placed, S.run.brief);
+    S.npcs = npcsOf(S.an);
+    settle();
+    finish({ noToss: true });
+    return S.code;
+  }
+  window.__vt = {
+    get mode() { return S.mode; },
+    get drops() { return S.run ? S.run.drops.length : 0; },
+    get bag() { return S.run ? S.run.bag.length : 0; },
+    get bagIds() { return S.run ? JSON.stringify(S.run.bag) : ''; },
+    get theirs() { return S.theirs; },
+    get audio() { return { state: au.state, section: au.section, muted: au.muted }; },
+    toggleMute: () => toggleSound(),
+    get event() { return S.event ? S.event.id : null; },
+    get agentLine() { return S.agentLine || ''; },
+    get canRecord() { return canRec; },
+    toss: () => S.res && S.res.fields.toss ? S.res.fields.toss.result + ':' + S.res.fields.stamp.note : null,
+    comments: () => S.res ? S.res.fields.comments.map(c => c.tag + ' ' + c.text) : [],
+    boardRows: () => [...document.querySelectorAll('#r-board li')].map(li => li.textContent),
+    start: seed => startRun(seed),
+    startDaily,
+    autoplay: seed => autoplay(seed),
+    nextdoor: seed => autoplay(seed, { street: chain() }),
+    dailyAuto: () => { const d = today(); return autoplay('daily:' + d, { daily: d }); },
+    url: () => shareUrl(),
+    result: () => S.res && { code: S.code, head: S.res.fields.head, big: S.res.fields.big, spec: S.res.fields.spec,
+      badge: S.res.fields.badge, tag: S.res.fields.tag, keys: S.res.keys, street: S.street.length + 1 },
+    cardPNG: () => card.toDataURL('image/png'),
+    // Jump the reveal to day step n (for screenshots of night scenes); returns that step's time.
+    seekStep: (n, live) => {
+      if (!S.res) return null;
+      beginReveal(false);
+      const R = S.rev;
+      R.phase = 'day'; R.k = Math.max(-1, Math.min(S.steps.length - 1, n) - 1);
+      nextStep();
+      if (R.wk && S.steps[R.k] && S.steps[R.k].pts) { const p = S.steps[R.k].pts.at(-1); R.wk.x = p[0]; R.wk.y = p[1]; R.seg = 1e9; }
+      S.light = R.light; S.zoom = 1.2; R.freeze = !live; // live: let NPCs walk (the step still waits for them)
+      return S.steps[R.k] ? S.steps[R.k].time : null;
+    },
+    steps: () => S.steps.map(st => st.time + ' ' + st.line),
+  };
+}
+
+return { boot };
+})();
+
+// src\spec.js
+const __m12 = (() => {
+
+// spec.js — 「格局」 content. PIECES order is frozen forever (share codes store the
+// index): append new pieces at the end only.
+//
+// Rare fields: rent (NT$/month delta), theme, text(q) flyer line, verb (day script).
+// q = { near(ids) -> bool, road: faces the road, through: on the way to a bedroom,
+//       other: a neighbour's name or '' }
+
+const W = 6;
+const H = 6;
+const ROOMS = 8;
+
+const core = (id, name, w, h, extra = {}) => ({ id, name, short: name, w, h, ...extra });
+const rare = (id, name, w, h, rent, theme, verb, text, extra = {}) =>
+  ({ id, name, short: extra.short || name, w, h, rare: true, rent, theme, verb, text, ...extra });
+
+const PIECES = [
+  core('ke', '客廳', 3, 2),
+  core('fang', '房間', 2, 2),
+  core('wei', '衛浴', 1, 1),
+  core('men', '大門', 1, 1),
+  core('chu', '廚房', 1, 2),
+  core('yang', '陽台', 2, 1),
+  core('ti', '樓梯', 1, 2),
+  core('cang', '儲藏室', 1, 1, { short: '儲藏' }),
+  core('shen', '神明廳', 1, 1, { short: '神明' }),
+  core('lang', '走廊', 1, 3),
+
+  rare('miao', '宮廟', 2, 2, -3000, 'temple', '去宮廟拜拜',
+    q => q.near(['fang']) ? '房間隔壁是宮廟。神明幫你顧門' : '緊鄰宮廟。每天免費聽北管'),
+  rare('tudi', '土地公廟', 1, 1, -1000, 'temple', '跟土地公打招呼',
+    q => q.road ? '門口就是土地公廟。房東說財運很旺' : '屋內附土地公廟。拜拜不用出門', { short: '土地公' }),
+  rare('xitai', '廟會戲台', 2, 1, -2000, 'temple', '看歌仔戲',
+    q => q.near(['ke']) ? '客廳附戲台。歌仔戲免費看到飽' : '附設戲台。週末自動有布袋戲', { short: '戲台' }),
+  rare('jinlu', '金紙爐', 1, 1, -1500, 'temple', '燒金紙',
+    q => q.near(['chu']) ? '廚房旁邊有金紙爐。火力很充足' : '附金紙爐。冬天特別溫暖', { short: '金爐' }),
+  rare('rongshu', '廟口榕樹', 2, 2, 0, 'temple', '在榕樹下乘涼',
+    () => '附百年老榕樹。阿伯會自己來下棋', { short: '老榕樹' }),
+
+  rare('binlang', '檳榔攤', 1, 1, 1000, 'market', '買包檳榔',
+    q => q.road ? '臨路檳榔攤。房租可以分潤' : '檳榔攤在屋內。客人找不到', { short: '檳榔' }),
+  rare('yeshi', '夜市攤位', 4, 1, 3000, 'market', '逛夜市',
+    () => '整排夜市在家裡。睡前特別熱鬧', { short: '夜市' }),
+  rare('yansuji', '鹹酥雞攤', 1, 1, 500, 'market', '買鹹酥雞',
+    q => q.near(['fang']) ? '房間隔壁鹹酥雞。減肥計畫的終點' : '內附鹹酥雞攤。九層塔香到半夜', { short: '鹹酥雞' }),
+  rare('zhenai', '手搖飲店', 1, 1, 800, 'market', '買一杯半糖去冰',
+    () => '家裡有手搖飲店。半糖去冰直達', { short: '手搖' }),
+  rare('jiawawa', '夾娃娃機店', 2, 1, 500, 'market', '夾娃娃',
+    () => '內附夾娃娃機台。保夾到天荒地老', { short: '夾娃娃' }),
+
+  rare('seven', '超商', 2, 1, 2000, 'store', '去超商買東西',
+    q => q.near(['ke']) ? '客廳旁邊是超商。冰箱可以不用買' : '家裡就是超商。出門理由少一個'),
+  rare('laundry', '投幣洗衣', 1, 1, 500, 'store', '投幣洗衣服',
+    () => '附投幣洗衣。洗衣機要自備零錢', { short: '洗衣' }),
+  rare('biandang', '便當店', 1, 1, 500, 'store', '買排骨便當',
+    q => q.near(['chu']) ? '廚房隔壁是便當店。煮飯沒動力' : '內附便當店。排骨飯步行零分鐘', { short: '便當' }),
+  rare('gym', '健身房', 2, 2, 2500, 'store', '去健身房',
+    () => '附健身房。會員費另計'),
+  rare('caishi', '菜市場', 3, 2, 1500, 'store', '去菜市場',
+    () => '家裡就是菜市場。早上五點開市'),
+
+  rare('mrt', '捷運站', 2, 1, 6000, 'transit', '搭捷運',
+    () => '捷運站在家裡。步行零分鐘', { walk0: true, short: '捷運' }),
+  rare('ubike', 'YouBike站', 1, 1, 500, 'transit', '借YouBike',
+    () => '屋內YouBike站。借車還車都在家', { short: 'YouBike' }),
+  rare('bus', '公車站牌', 1, 1, 300, 'transit', '等公車',
+    q => q.road ? '家門口公車站。等車可以坐沙發' : '公車站在屋內。公車開不進來', { short: '公車站' }),
+  rare('jiche', '機車停車格', 1, 1, 800, 'transit', '牽機車',
+    q => q.through ? '要穿過機車格才能回房。機油香' : '室內機車格。颱風天特別安心', { short: '機車格' }),
+  rare('mrtgao', '捷運高架', 4, 1, 3000, 'transit', '看捷運經過',
+    () => '捷運從家裡經過。每四分鐘一班', { short: '高架' }),
+  rare('jichehang', '機車行', 2, 1, 800, 'transit', '換機油',
+    () => '家裡有機車行。換機油不用出門'),
+
+  rare('tiepi', '鐵皮頂加', 2, 2, -2000, null, '在鐵皮屋流汗',
+    () => '附鐵皮屋。夏天自帶三溫暖', { short: '鐵皮屋' }),
+  rare('majiang', '麻將間', 2, 2, 1000, null, '打一圈麻將',
+    q => q.near(['fang']) ? '房間隔壁麻將間。洗牌聲很助眠' : '附麻將間。三缺一不用找人'),
+  rare('ktv', 'KTV包廂', 2, 2, 1500, null, '唱一首',
+    q => q.near(['fang']) ? '房間隔壁是KTV。凌晨兩點有演唱會' : '附KTV包廂。鄰居會自己點歌', { short: 'KTV' }),
+  rare('bball', '籃球場', 3, 2, 1000, null, '鬥牛',
+    q => q.near(['ke']) ? '客廳外面是籃球場。鬥牛很方便' : '附半場籃球場。球鞋另購'),
+  rare('buxiban', '補習班', 2, 2, 1500, null, '去補習',
+    () => '附補習班。小孩放學不用接送'),
+  rare('lese', '垃圾車點', 1, 1, -2000, null, '追垃圾車',
+    () => '垃圾車停在家裡。每天聽給愛麗絲', { short: '垃圾車' }),
+  rare('fengli', '鳳梨田', 2, 2, 0, null, '採鳳梨',
+    () => '附鳳梨田。旺來到不行'),
+  rare('yuchi', '魚池', 2, 2, 500, null, '餵魚',
+    q => q.near(['ke']) ? '客廳旁邊是魚池。風水老師也說讚' : '附魚池。錦鯉吳郭魚都能養'),
+  rare('wenquan', '溫泉', 1, 1, 2000, null, '泡溫泉',
+    () => '附溫泉。洗澡不用再燒熱水'),
+  rare('t101', '101大樓', 1, 1, 9000, null, '看101',
+    () => '附101大樓。跨年不用去信義區', { short: '101' }),
+
+  // ── v2 rares (append-only from here on)
+  rare('linggu', '靈骨塔', 1, 2, -3000, 'temple', '去探望祖先',
+    q => q.near(['fang']) ? '房間隔壁是靈骨塔。鄰居都很安靜' : '附靈骨塔。親戚來訪很方便'),
+  rare('binyi', '殯儀館', 2, 2, -4000, 'temple', '參加告別式',
+    q => q.near(['fang']) ? '房間隔壁是殯儀館。半夜誦經助眠' : '附殯儀館。人生終點步行零分鐘'),
+  rare('budai', '布袋戲台', 1, 1, -500, 'temple', '看布袋戲',
+    () => '附布袋戲台。史艷文天天來', { short: '布袋戲' }),
+  rare('laojie', '老街', 4, 1, 1000, 'market', '逛老街',
+    () => '整條老街在家裡。週末觀光客很多'),
+  rare('anmo', '投幣按摩椅', 1, 1, 500, 'store', '投十塊按摩',
+    () => '附投幣按摩椅。十元按十分鐘', { short: '按摩椅' }),
+  rare('runway', '機場跑道', 4, 1, 5000, 'transit', '看飛機起降',
+    q => q.near(['fang']) ? '房間外面是跑道。每天起飛前叫你起床' : '附機場跑道。出國不用搭捷運', { short: '跑道' }),
+  rare('tianqiao', '天橋', 3, 1, 0, 'transit', '過天橋',
+    () => '家裡有天橋。在客廳就能過馬路'),
+  rare('jiayou', '加油站', 2, 2, 2000, 'transit', '加九五',
+    () => '附加油站。九五無鉛不用排隊'),
+  rare('hsr', '高鐵月台', 4, 1, 6000, 'transit', '搭高鐵',
+    () => '附高鐵月台。南下北上都在客廳', { short: '高鐵' }),
+  rare('zaoshi', '造勢舞台', 2, 1, -1000, 'election', '聽候選人喊凍蒜',
+    q => q.near(['fang']) ? '房間隔壁是造勢台。凍蒜聲陪你入睡' : '附造勢晚會舞台。凍蒜聲不用錢', { short: '造勢台' }),
+  rare('kanban', '選舉看板', 1, 1, -800, 'election', '看候選人微笑',
+    q => q.road ? '門口是選舉看板。候選人幫你看門' : '屋內選舉看板。每天被候選人盯著', { short: '看板' }),
+  rare('lifa', '立法院議場', 3, 2, 2000, 'election', '看立委吵架',
+    q => q.near(['ke']) ? '客廳旁邊是議場。新聞直播不用開電視' : '附立法院議場。每天都有人打架', { short: '議場' }),
+  rare('caiquan', '彩券行', 1, 1, 800, 'night', '買一張大樂透',
+    () => '附彩券行。中頭獎房租全免', { short: '彩券' }),
+  rare('wangka', '網咖', 2, 1, 1200, 'night', '在網咖打一場',
+    q => q.near(['fang']) ? '房間隔壁是網咖。泡麵香二十四小時' : '附網咖。斷網也不用怕'),
+  rare('youle', '廢棄遊樂園', 3, 2, -2500, 'night', '騎生鏽的旋轉木馬',
+    () => '附廢棄遊樂園。晚上特別有氣氛', { short: '遊樂園' }),
+  rare('hunsha', '婚紗攝影棚', 2, 1, 1500, null, '拍婚紗',
+    () => '附婚紗攝影棚。單身也能拍一組', { short: '婚紗' }),
+  rare('jingyu', '鯨魚標本', 3, 1, -1500, null, '跟鯨魚合照',
+    () => '附鯨魚標本。全長十二米', { short: '鯨魚' }),
+  rare('taikong', '太空艙', 1, 1, 8000, null, '模擬登月',
+    () => '附太空艙。隨時可以離開地球'),
+  rare('dama', '廣場舞區', 2, 2, -500, null, '跳廣場舞',
+    q => q.near(['fang']) ? '房間外面是廣場舞。早上五點準時開跳' : '附廣場舞區。阿姨會自己來', { short: '廣場舞' }),
+];
+
+// 3D art per rare (engine/art.js): a preset ['name', color] or primitive lists in
+// piece-local coordinates of the unrotated w×h piece.
+const ART = {
+  miao: ['temple', '#c8342b', [['fx', 'lantern', 0.45, 0.12, 0.62], ['fx', 'lantern', 1.55, 0.12, 0.62], ['fx', 'smoke', 1, 0.3, 1.0]]],
+  tudi: ['shrine', '#c8342b', [['fx', 'smoke', 0.5, 0.25, 0.75]]],
+  xitai: [['box', 0.1, 0.2, 1.8, 0.7, 0, 0.35, '#b0473a'], ['box', 0.1, 0.75, 1.8, 0.15, 0.35, 0.95, '#f2c14e'], ['roof', 0, 0.15, 2, 0.85, 0.95, 1.2, '#c8342b'],
+    ['fx', 'lantern', 0.3, 0.15, 0.95], ['fx', 'lantern', 1.7, 0.15, 0.95], ['fx', 'note', 1, 0.5, 0.5]],
+  jinlu: [['cyl', 0.5, 0.5, 0.28, 0, 0.55, '#b5452f'], ['cone', 0.5, 0.5, 0.3, 0.55, 0.85, '#8c2f22'], ['fx', 'fire', 0.5, 0.3, 0.3], ['fx', 'smoke', 0.5, 0.5, 0.9]],
+  rongshu: ['tree', '#4f8a48'],
+  binlang: ['booth', '#5aa04f', [['fx', 'neon', 0.5, 0.2, 0.9]]],
+  yeshi: ['nightmarket', '#f2b53a'],
+  yansuji: ['stall', '#e8a33c', [['fx', 'steam', 0.5, 0.5, 0.45], ['fx', 'fire', 0.5, 0.6, 0.05]]],
+  zhenai: ['shop', '#7cc4b8'],
+  jiawawa: [['box', 0.15, 0.2, 0.7, 0.6, 0, 0.9, '#f28fb5'], ['box', 1.15, 0.2, 0.7, 0.6, 0, 0.9, '#7fb8f0'], ['fx', 'spark', 1, 0.5, 0.9]],
+  seven: ['shop', '#3a8d5b'],
+  laundry: ['shop', '#6aa7d8', [['fx', 'steam', 0.5, 0.5, 0.7]]],
+  biandang: ['shop', '#d9822b', [['fx', 'steam', 0.5, 0.5, 0.7]]],
+  gym: ['shop', '#444b55'],
+  caishi: ['stall', '#d24f3a'],
+  mrt: [['box', 0.1, 0.1, 1.8, 0.8, 0, 0.5, '#e9eef3'], ['box', 0, 0.05, 2, 0.9, 0.5, 0.62, '#2d6fb5'], ['fx', 'train', 1, 0.5, 0.62]],
+  ubike: [['box', 0.2, 0.4, 0.6, 0.2, 0, 0.3, '#f5c518'], ['cyl', 0.5, 0.3, 0.05, 0, 0.45, '#666666']],
+  bus: [['cyl', 0.5, 0.5, 0.05, 0, 0.9, '#777777'], ['box', 0.25, 0.45, 0.5, 0.1, 0.75, 1.05, '#2d6fb5']],
+  jiche: [['cyl', 0.5, 0.2, 0.1, 0, 0.15, '#333333'], ['cyl', 0.5, 0.8, 0.1, 0, 0.15, '#333333'], ['box', 0.3, 0.15, 0.4, 0.7, 0.1, 0.35, '#d23a2c']],
+  mrtgao: ['mrt', '#2d6fb5'],
+  jichehang: ['shop', '#c55a2b'],
+  tiepi: [['box', 0.1, 0.1, 1.8, 1.8, 0, 0.75, '#b8c2c8'], ['roof', 0.05, 0.05, 1.9, 1.9, 0.75, 0.95, '#8fa1ab']],
+  majiang: [['box', 0.6, 0.6, 0.8, 0.8, 0, 0.35, '#2f7d4f']],
+  ktv: ['ktv', '#e84fb0'],
+  bball: ['court', '#d9894a'],
+  buxiban: ['shop', '#4a76b8'],
+  lese: [['box', 0.15, 0.2, 0.7, 0.6, 0, 0.5, '#f5d94a'], ['box', 0.15, 0.2, 0.7, 0.6, 0.5, 0.6, '#3a7d44'], ['fx', 'note', 0.5, 0.5, 0.65]],
+  fengli: ['field', '#d8a32a'],
+  yuchi: ['pool', '#5aa9d6'],
+  wenquan: [['flat', 0.1, 0.1, 0.8, 0.8, '#9fd3c7'], ['fx', 'steam', 0.35, 0.4, 0.05], ['fx', 'steam', 0.65, 0.6, 0.05]],
+  t101: ['tower', '#5f8f6e', [['fx', 'spark', 0.5, 0.5, 2.9]]],
+  linggu: [['box', 0.15, 0.2, 0.7, 1.6, 0, 1.6, '#e7dcc4'], ['roof', 0.08, 0.12, 0.84, 1.76, 1.6, 2.0, '#b0473a'], ['fx', 'smoke', 0.5, 0.3, 0.3]],
+  binyi: ['temple', '#5a5a5e', [['fx', 'smoke', 1, 0.3, 1.0], ['fx', 'lantern', 0.45, 0.12, 0.62], ['fx', 'lantern', 1.55, 0.12, 0.62]]],
+  budai: ['booth', '#c8342b', [['fx', 'note', 0.5, 0.5, 0.95]]],
+  laojie: ['nightmarket', '#c8342b'],
+  anmo: [['box', 0.2, 0.25, 0.6, 0.5, 0, 0.35, '#8a5a3b'], ['box', 0.2, 0.6, 0.6, 0.15, 0.35, 0.9, '#6b4430']],
+  runway: [['flat', 0, 0.1, 4, 0.8, '#6f6f6f'], ['flat', 0.3, 0.45, 0.6, 0.1, '#ffffff'], ['flat', 1.3, 0.45, 0.6, 0.1, '#ffffff'],
+    ['flat', 2.3, 0.45, 0.6, 0.1, '#ffffff'], ['flat', 3.3, 0.45, 0.6, 0.1, '#ffffff'], ['fx', 'spark', 0.2, 0.2, 0.1], ['fx', 'spark', 3.8, 0.8, 0.1]],
+  tianqiao: ['track', '#9a9a9a'],
+  jiayou: ['shop', '#3a8d5b', [['box', 0.4, 1.3, 0.3, 0.3, 0, 0.5, '#d23a2c'], ['box', 1.3, 1.3, 0.3, 0.3, 0, 0.5, '#d23a2c']]],
+  hsr: ['mrt', '#f28c28'],
+  zaoshi: ['stall', '#2d6fb5', [['fx', 'note', 1, 0.5, 0.7], ['fx', 'spark', 1, 0.3, 0.9]]],
+  kanban: [['cyl', 0.5, 0.5, 0.05, 0, 0.8, '#777777'], ['box', 0.1, 0.45, 0.8, 0.1, 0.8, 1.5, '#2d6fb5']],
+  lifa: [['box', 0.2, 0.3, 2.6, 1.4, 0, 0.7, '#e8e4da'], ['roof', 0.1, 0.2, 2.8, 1.6, 0.7, 1.1, '#6b7c93'],
+    ['cyl', 0.4, 0.3, 0.07, 0, 0.7, '#ffffff'], ['cyl', 1.5, 0.3, 0.07, 0, 0.7, '#ffffff'], ['cyl', 2.6, 0.3, 0.07, 0, 0.7, '#ffffff']],
+  caiquan: ['shop', '#e0352b', [['fx', 'spark', 0.5, 0.4, 0.8]]],
+  wangka: [['box', 0.1, 0.15, 1.8, 0.75, 0, 0.75, '#2b2b3a'], ['box', 0.05, 0.1, 1.9, 0.15, 0.75, 0.9, '#3ff0ff'], ['fx', 'neon', 1, 0.2, 0.95]],
+  youle: [['flat', 0.1, 0.1, 2.8, 1.8, '#c9b27a'], ['cyl', 1.5, 1, 0.8, 0, 0.2, '#d9b8f0'], ['cyl', 1.5, 1, 0.06, 0.2, 0.9, '#9a9a9a'],
+    ['cone', 1.5, 1, 0.85, 0.9, 1.4, '#e84fb0'], ['fx', 'lantern', 0.9, 0.3, 1.0], ['fx', 'lantern', 2.1, 0.3, 1.0]],
+  hunsha: ['shop', '#f5b7c8', [['fx', 'spark', 1, 0.5, 0.8]]],
+  jingyu: [['box', 0.2, 0.25, 2.3, 0.5, 0.2, 0.6, '#5a7fa8'], ['cone', 2.6, 0.5, 0.3, 0.2, 0.7, '#5a7fa8'], ['cyl', 1.2, 0.5, 0.05, 0, 0.2, '#666666']],
+  taikong: [['cyl', 0.5, 0.5, 0.3, 0, 0.6, '#f5f7f9'], ['cone', 0.5, 0.5, 0.3, 0.6, 1.1, '#d23a2c'], ['fx', 'spark', 0.5, 0.5, 1.2]],
+  dama: [['flat', 0.1, 0.1, 1.8, 1.8, '#d9894a'], ['fx', 'note', 0.6, 0.6, 0.6], ['fx', 'note', 1.4, 1.4, 0.6]],
+};
+// Residents a rare brings along (engine/people.js kinds) and its night glow.
+const NPC = { rongshu: 'abo', miao: 'god', ktv: 'drunk', majiang: 'ama', yeshi: 'crowd', caishi: 'ama',
+  bball: 'kid', buxiban: 'kid', jichehang: 'worker', tiepi: 'worker', xitai: 'crowd', binlang: 'abo',
+  binyi: 'god', budai: 'kid', laojie: 'crowd', jiayou: 'worker', zaoshi: 'crowd', lifa: 'drunk', wangka: 'kid',
+  youle: 'kid', dama: 'ama', anmo: 'abo', linggu: 'ama' };
+const GLOW = { ktv: '#ff4fd8', seven: '#7dffb0', yeshi: '#ffd34d', miao: '#ff6a4d', jinlu: '#ff8a1f', mrtgao: '#7fd3ff',
+  t101: '#a0ffcf', jiawawa: '#ff7fd0', zhenai: '#7fffe0', binlang: '#7dff6a', xitai: '#ffb347', majiang: '#9dff7a',
+  laojie: '#ffd34d', runway: '#ffd34d', jiayou: '#7dffb0', hsr: '#ffb347', zaoshi: '#ff6a4d', caiquan: '#ffd34d',
+  wangka: '#3ff0ff', youle: '#ff7fd0', taikong: '#a0d8ff', binyi: '#9db4ff' };
+// What a rare sounds like when it lands (engine/audio.js SOUNDS).
+const SOUND = { miao: 'gong', tudi: 'bell', xitai: 'gong', jinlu: 'firecracker', rongshu: 'bird', binlang: 'cash',
+  yeshi: 'crowd', yansuji: 'fry', zhenai: 'cash', jiawawa: 'bell', seven: 'chime', laundry: 'splash', biandang: 'fry',
+  gym: 'boing', caishi: 'crowd', mrt: 'chime', ubike: 'bell', bus: 'horn', jiche: 'horn', mrtgao: 'chime', jichehang: 'horn',
+  tiepi: 'splash', majiang: 'cash', ktv: 'echo', bball: 'boing', buxiban: 'bell', lese: 'echo', fengli: 'bird',
+  yuchi: 'splash', wenquan: 'splash', t101: 'firecracker',
+  linggu: 'bell', binyi: 'gong', budai: 'gong', laojie: 'crowd', anmo: 'boing', runway: 'horn', tianqiao: 'horn',
+  jiayou: 'cash', hsr: 'chime', zaoshi: 'firecracker', kanban: 'crowd', lifa: 'crowd', caiquan: 'cash', wangka: 'chime',
+  youle: 'echo', hunsha: 'bell', jingyu: 'splash', taikong: 'horn', dama: 'echo' };
+for (const p of PIECES) {
+  if (ART[p.id]) p.art = ART[p.id];
+  if (SOUND[p.id]) p.sound = SOUND[p.id];
+  if (NPC[p.id]) p.npc = NPC[p.id];
+  if (GLOW[p.id]) p.glow = GLOW[p.id];
+}
+
+const TYPE = Object.fromEntries(PIECES.map((p, i) => [p.id, i]));
+
+const THEMES = {
+  temple: { name: '宮廟生活圈', line: (a, b) => `${a}加${b}。神明比住戶還多` },
+  market: { name: '夜市商圈', line: (a, b) => `${a}加${b}。晚餐不用出門` },
+  store: { name: '超商生活圈', line: (a, b) => `${a}加${b}。生活機能好到不用出門` },
+  transit: { name: '捷運共構', line: (a, b) => `${a}加${b}。通勤從客廳開始` },
+  election: { name: '選舉總部', line: (a, b) => `${a}加${b}。投票前一晚最熱鬧` },
+  night: { name: '不夜城', line: (a, b) => `${a}加${b}。凌晨三點才是白天` },
+};
+
+const NAMES = [
+  '帝寶三期', '信義之星', '大安森林首席', '海景第一排（南投）', '湖景首排（無湖）', '雲端天廈（一樓）',
+  '台北之心（基隆）', '幸福小鎮', '陽光山莊', '富貴大鎮', '好野人山莊', '春天大地', '百萬夜景（地下室）',
+  '學府首席', '捷運共構旗艦', '鄉村別墅（市中心）', '綠意盎然（無窗）', '王者之巔', '頂級豪邸（雅房）',
+  '永春透天', '阿嬤的家', '林家古厝', '碧潭水岸', '天母靜巷', '北投溫泉莊', '三重國際城', '板橋皇家',
+  '新莊幸福城', '冠軍大樓', '日日好運居', '東區秘境', '高鐵特區首排（農地）',
+];
+
+// Requests: text here, checks in rules.js (same order).
+const REQUEST_TEXT = [
+  '大門要面馬路',
+  '要有一間房間面馬路',
+  '衛浴要在房間旁邊',
+  '廁所離客廳遠一點',
+  '動線要簡單',
+  '要能曬衣服',
+  '不能蓋出地界',
+];
+
+// Odd rounds are recognisable from counts alone (a normal bag can't reach them),
+// so share links never need a flag.
+const ODD = [
+  { id: 'fang', name: '雅房之亂', min: 6, bag: ['ke', 'men', 'fang', 'fang', 'fang', 'fang', 'fang', 'fang'] },
+  { id: 'wei', name: '衛浴祭', min: 5, bag: ['ke', 'fang', 'men', 'wei', 'wei', 'wei', 'wei', 'wei'] },
+  { id: 'shen', name: '神明廳之家', min: 4, bag: ['ke', 'fang', 'men', 'wei', 'shen', 'shen', 'shen', 'shen'] },
+];
+
+// Two specific rares in one house: a line of their own (sim: every combo must fire).
+const COMBOS = [
+  [['miao', 'tudi', 'xitai'], ['ktv'], '宮廟隔壁是KTV。神明也會點歌'],
+  [['mrt', 'mrtgao', 'hsr'], ['majiang'], '捷運站旁邊麻將間。末班車三缺一'],
+  [['yeshi', 'yansuji', 'laojie'], ['gym'], '吃完夜市直接健身。熱量當場歸零'],
+  [['binyi', 'linggu'], ['hunsha'], '婚紗棚隔壁殯儀館。人生一次辦完'],
+  [['binyi', 'linggu'], ['ktv', 'dama'], '靈堂旁邊在唱歌。氣氛很難拿捏'],
+  [['zaoshi', 'kanban'], ['miao', 'tudi'], '廟口辦造勢。神明也被拜票'],
+  [['caiquan'], ['miao', 'tudi', 'jinlu'], '拜完馬上買彩券。財神就在隔壁'],
+  [['runway', 'hsr'], ['mrt', 'mrtgao', 'bus'], '飛機高鐵捷運都有。交通部表示羨慕'],
+  [['jingyu'], ['yuchi', 'wenquan'], '鯨魚標本旁邊有水。差一點就能放生'],
+  [['taikong'], ['t101', 'runway'], '太空艙配跑道。下一站火星'],
+  [['wangka'], ['yansuji', 'zhenai', 'seven'], '網咖配宵夜。可以三天不出門'],
+  [['lifa'], ['majiang', 'ktv', 'dama'], '議場隔壁很吵。立委說他沒聽到'],
+];
+
+
+return { W, H, ROOMS, PIECES, ART, NPC, GLOW, SOUND, TYPE, THEMES, NAMES, REQUEST_TEXT, ODD, COMBOS };
+})();
+
+// src\rules.js
+const __m13 = (() => {
+const { rng, pick, clamp, weighted, shuffle } = __m0;
+const { analyzeGrid, bfs, pathTo, center, waypoints } = __m5;
+const { W, H, ROOMS, PIECES, TYPE, THEMES, NAMES, REQUEST_TEXT, ODD, COMBOS } = __m12;
+// rules.js — 「格局」 rules. Pure (no DOM): sim.mjs imports this in Node.
+
+
+
+
+
+const CORE = ['ke', 'fang', 'fang', 'wei', 'men', 'chu'];
+const FILL = [['cang', 1.8], ['yang', 1.6], ['wei', 1.5], ['fang', 1.0], ['ti', 1.0], ['lang', 0.8], ['shen', 0.7], ['men', 0.7], ['chu', 0.4], ['ke', 0.4]];
+const RARE_CHAIN = [0.54, 0.55, 0.4, 0.3]; // first link > .5: odd rounds (8%) carry no rares
+const RARES = PIECES.filter(p => p.rare).map(p => p.id);
+const FILLERS = new Set(['cang', 'ti', 'shen', 'lang', 'yang']);
+const MUST_KEEP = ['ke', 'men', 'wei', 'fang'];
+
+function brief(rand) {
+  return { name: Math.floor(rand() * NAMES.length), req: Math.floor(rand() * REQUEST_TEXT.length) };
+}
+
+function makeBag(rand) {
+  const oddR = rng('odd:' + Math.floor(rand() * 1e9));
+  const o = oddR();
+  const odd = o < 0.03 ? ODD[0] : o < 0.06 ? ODD[1] : o < 0.08 ? ODD[2] : null;
+  let ids;
+  if (odd) ids = odd.bag.slice();
+  else {
+    ids = CORE.slice();
+    if (rand() < 0.22) {
+      const [gone] = ids.splice(Math.floor(rand() * ids.length), 1);
+      if (gone === 'fang' && rand() < 0.3) ids.splice(ids.indexOf('fang'), 1); // rare: no bedroom at all
+    }
+    while (ids.length < ROOMS) ids.push(weighted(rand, FILL));
+    for (const p of RARE_CHAIN) {
+      if (rand() >= p) break;
+      const k = replaceable(ids);
+      if (k < 0) break;
+      const pool = RARES.filter(id => !ids.includes(id));
+      // A later rare is often a combo partner of one already in the bag, so combos actually happen.
+      const partners = ids.flatMap(id => COMBOS.flatMap(([a, b]) => (a.includes(id) ? b : b.includes(id) ? a : [])))
+        .filter(id => pool.includes(id));
+      ids[k] = partners.length && rand() < 0.45 ? pick(rand, partners) : pick(rand, pool);
+    }
+  }
+  return shuffle(rand, ids).map(id => {
+    const p = PIECES[TYPE[id]];
+    return { t: TYPE[id], rot: p.w !== p.h && rand() < 0.5 ? 1 : 0 };
+  });
+}
+
+// Least essential slot, searching from the end: fillers, then spare core copies.
+function replaceable(ids) {
+  for (let k = ids.length - 1; k >= 0; k--) if (FILLERS.has(ids[k])) return k;
+  for (let k = ids.length - 1; k >= 0; k--) {
+    const id = ids[k];
+    if (PIECES[TYPE[id]].rare) continue;
+    if (!MUST_KEEP.includes(id) || ids.filter(x => x === id).length > 1) return k;
+  }
+  return -1;
+}
+
+function banner(bag) {
+  const odd = oddOf(countIds(bag.map(b => PIECES[b.t].id)));
+  return odd ? '特殊物件：' + odd.name : '';
+}
+
+const countIds = ids => ids.reduce((c, id) => ((c[id] = (c[id] || 0) + 1), c), {});
+const oddOf = c => ODD.find(o => (c[o.id] || 0) >= o.min) || null;
+
+const ENTRY_PREF = ['ke', 'fang', 'chu', 'yang', 'lang', 'cang', 'wei', 'shen', 'ti'];
+
+const REQUEST_CHECKS = [
+  f => f.entry.kind === 'road',
+  f => f.roomsOf('fang').some(i => f.faces[i].road > 0),
+  f => f.roomsOf('wei').some(i => f.near(i, ['fang'])),
+  f => f.count.wei > 0 && !f.roomsOf('wei').some(i => f.near(i, ['ke'])),
+  f => f.entry.room >= 0 && f.lost.length === 0 && Math.max(0, ...f.dist.filter(Number.isFinite)) <= 4,
+  f => f.roomsOf('yang').some(i => f.faces[i].out > 0) || f.openRoad >= 2, // balcony, or the front yard
+  f => f.over.length === 0,
+];
+
+function analyze(placed, br) {
+  const g = analyzeGrid(placed, W, H);
+  const ids = placed.map(r => PIECES[r.t].id);
+  const count = countIds(ids);
+  const roomsOf = id => ids.flatMap((x, i) => (x === id ? [i] : []));
+  const near = (i, want) => g.adj[i].some(e => want.includes(ids[e.o]));
+
+  let entry = { room: -1, kind: 'none', seg: null };
+  const men = roomsOf('men');
+  const roadMen = men.find(i => g.faces[i].road > 0);
+  const yardMen = men.find(i => g.faces[i].out > 0);
+  if (roadMen !== undefined) entry = { room: roadMen, kind: 'road', seg: g.faces[roadMen].roadSeg };
+  else if (yardMen !== undefined) entry = { room: yardMen, kind: 'yard', seg: g.faces[yardMen].outSeg };
+  else {
+    const byPref = (test) => ENTRY_PREF.flatMap(roomsOf).concat(placed.map(r => r.i)).find(test);
+    const win = byPref(i => g.faces[i].road > 0) ?? byPref(i => g.faces[i].out > 0);
+    if (win !== undefined) entry = { room: win, kind: 'window', seg: g.faces[win].roadSeg || g.faces[win].outSeg };
+  }
+
+  const { dist, prev } = bfs(g.adj, entry.room);
+  const lost = placed.map(r => r.i).filter(i => dist[i] === Infinity);
+  const over = placed.filter(r => r.y + r.h > H).map(r => r.i);
+  const xs = placed.flatMap(r => [r.x, r.x + r.w]);
+  const rareRooms = placed.map(r => r.i).filter(i => PIECES[placed[i].t].rare);
+  const rares = [...new Set(rareRooms.map(i => ids[i]))];
+  let theme = null;
+  for (const key of Object.keys(THEMES)) {
+    const got = rares.filter(id => PIECES[TYPE[id]].theme === key);
+    if (got.length >= 2) { theme = { key, ids: got }; break; }
+  }
+  const openRoad = [...Array(W).keys()].filter(x => g.own(x, 0) < 0 && g.open.has(x + ',0')).length;
+
+  const f = {
+    ...g, brief: br, ids, count: new Proxy(count, { get: (c, k) => c[k] || 0 }), roomsOf, near,
+    entry, dist, prev, lost, over, rareRooms, rares, theme, openRoad,
+    odd: oddOf(count),
+    area: placed.reduce((s, r) => s + r.w * r.h, 0),
+    width: xs.length ? Math.max(...xs) - Math.min(...xs) : 0,
+    gapCells: g.gaps.reduce((s, gp) => s + gp.cells.length, 0),
+    path: target => pathTo(prev, dist, target),
+  };
+  f.reqOk = placed.length ? REQUEST_CHECKS[br.req](f) : false;
+  return f;
+}
+
+// Nearest room of a type from the entry (by door steps).
+function nearestOf(f, id, from = f.entry.room) {
+  const rooms = f.roomsOf(id);
+  if (!rooms.length) return { room: -1, path: null, none: true };
+  const { dist, prev } = bfs(f.adj, from);
+  const reach = rooms.filter(i => dist[i] < Infinity).sort((a, b) => dist[a] - dist[b]);
+  if (!reach.length) return { room: rooms[0], path: null };
+  return { room: reach[0], path: pathTo(prev, dist, reach[0]) };
+}
+
+const AGE_JOKES = ['屋齡0天（剛蓋好）', '屋齡300年（清領時期）', '屋齡負3年（預售屋）', '屋齡46億年（跟地球同年）', '屋齡400年（荷蘭時期）'];
+const WALK_JOKES = ['捷運步行3天', '捷運步行180分', '捷運步行1分（用跑的）', '捷運還沒蓋（規劃中）', '捷運步行40分（游泳）'];
+
+function info(f, code) {
+  const r = rng(code + ':rent');
+  const c = f.count;
+  let rent = 5000 + f.area * 800 + c.wei * 1500 + c.chu * 1200 + c.fang * 600 + (r() - 0.5) * 2000;
+  if (!c.wei) rent -= 4000;
+  rent -= Math.min(2, f.lost.length) * 2500;
+  if (f.gaps.length) rent -= 1500;
+  rent -= f.over.length * 600;
+  for (const id of f.ids) rent += PIECES[TYPE[id]].rent || 0;
+  rent = Math.max(3000, Math.round(rent / 100) * 100);
+  let jackpot = false;
+  if (r() < 0.05) { jackpot = true; rent = clamp(Math.round((rent * (3 + r() * 7)) / 1000) * 1000, 30000, 99800); }
+
+  const ri = rng(code + ':info');
+  const age = 1 + Math.floor(ri() * 45), walk = 1 + Math.floor(ri() * 20);
+  const ageText = ri() < 0.04 ? pick(ri, AGE_JOKES) : `屋齡${age}年`;
+  const walkText = f.ids.some(id => PIECES[TYPE[id]].walk0) ? '捷運步行0分' : ri() < 0.04 ? pick(ri, WALK_JOKES) : `捷運${walk}分`;
+  return { rent, jackpot, sub: `${f.area}坪 ／ ${ageText} ／ ${walkText}` };
+}
+
+function specLine(f) {
+  const c = f.count;
+  let s = `${c.fang}房${c.ke}廳${c.wei}衛`;
+  if (f.gaps.length) s += '+密室';
+  if (f.rares.length >= 4) s += `+稀有×${f.rares.length}`;
+  else for (const id of f.rares) s += '+' + PIECES[TYPE[id]].short;
+  return s;
+}
+
+// One day in the house: [{ time, line, pts, jump?, stuck?, out? }]
+// Residents' interruptions: [line, what they say, tenant's face]
+const MEET = {
+  abo: ['被阿伯拉去下棋三小時', '再一盤', 'sweat'],
+  ama: ['被阿嬤塞了一袋青菜', '帶回去', 'happy'],
+  god: ['神明託夢要你添香油錢', '心誠則靈', 'shock'],
+  drunk: ['被醉漢拉去合唱', '來一首', 'sweat'],
+  kid: ['被小孩抓去當鬼', '換你當', 'sweat'],
+  worker: ['師傅順便幫你換機油', '算你便宜', 'happy'],
+  crowd: ['被人潮推回原地', '借過一下', 'shock'],
+};
+
+// 02:00 events, first match wins. walk: the NPC tours the house.
+const NIGHT = [
+  { ids: ['ktv'], line: '隔壁KTV開唱。整晚陪唱', npc: 'drunk', say: '再一首', sound: 'echo' },
+  { ids: ['miao', 'tudi', 'binyi'], line: '神明出巡。全家都被繞境', npc: 'god', say: '巡房', sound: 'gong', walk: true },
+  { ids: ['mrtgao', 'mrt', 'hsr'], line: '末班車開過臥室。床跟著晃', sound: 'chime' },
+  { ids: ['yeshi', 'laojie'], line: '夜市收攤。滿地竹籤', npc: 'crowd', say: '收攤囉', sound: 'crowd' },
+  { ids: ['zaoshi'], line: '造勢晚會加場。凍蒜到天亮', npc: 'crowd', say: '凍蒜', sound: 'firecracker' },
+  { ids: ['lese'], line: '垃圾車又來了。給愛麗絲第三輪', sound: 'echo' },
+  { ids: ['majiang'], line: '麻將間還在洗牌。睡意全無', npc: 'ama', say: '自摸', sound: 'cash' },
+  { ids: ['jinlu'], line: '有人半夜來燒金紙。很暖', sound: 'firecracker' },
+  { ids: ['wangka'], line: '網咖有人大喊。全家驚醒', npc: 'kid', say: '殺了啦', sound: 'boing' },
+  { ids: ['runway'], line: '紅眼班機起飛。窗戶在抖', sound: 'horn' },
+  { ids: ['youle'], line: '旋轉木馬自己轉了起來', sound: 'echo' },
+];
+
+// A path through up to four rooms starting at `from` (for walking NPCs).
+function roomTour(f, from) {
+  const order = [from];
+  let cur = from;
+  for (let k = 0; k < 3; k++) {
+    const next = f.adj[cur].map(e => e.o).find(o => !order.includes(o));
+    if (next === undefined) break;
+    order.push(next); cur = next;
+  }
+  return waypoints(f, order);
+}
+
+function day(f) {
+  const steps = [];
+  if (!f.placed.length) return steps;
+  const name = i => PIECES[f.placed[i].t].name;
+  const fangs = f.roomsOf('fang');
+  let cur = fangs.length ? fangs[0] : f.roomsOf('ke')[0] ?? 0;
+  const at = i => [center(f.placed[i])];
+  steps.push({ time: '07:00', line: '起床', pts: at(cur), jump: true });
+
+  const route = rooms => {
+    let s = rooms.length >= 4 ? `（${rooms.map(name).join('→')}）` : '';
+    if (rooms.slice(1, -1).some(i => f.ids[i] === 'ti')) s += '。順便爬樓梯上下一趟';
+    return s;
+  };
+  const go = (time, id, ok, none, blocked, face) => {
+    const n = nearestOf(f, id, cur);
+    if (n.none) { steps.push({ time, line: none, pts: at(cur), face: 'sweat' }); return false; }
+    if (!n.path) { steps.push({ time, line: blocked(name(n.room)), pts: at(cur), stuck: true }); return false; }
+    steps.push({ time, line: ok + route(n.path), pts: waypoints(f, n.path), face });
+    cur = n.room;
+    return true;
+  };
+
+  go('07:05', 'wei', '上廁所', '沒有衛浴。忍到公司再說', () => '衛浴進不去。忍到公司再說');
+  if (f.count.chu) go('07:20', 'chu', '吃早餐', '', () => '走不到廚房。早餐先跳過');
+  else steps.push({ time: '07:20', line: '沒有廚房。站著吃飯糰', pts: at(cur) });
+
+  let left = false;
+  if (f.entry.room < 0) steps.push({ time: '07:40', line: '找不到出口。今天在家上班', pts: at(cur), stuck: true });
+  else {
+    const { dist, prev } = bfs(f.adj, cur);
+    const p = pathTo(prev, dist, f.entry.room);
+    if (!p) steps.push({ time: '07:40', line: '出不了門。今天在家上班', pts: at(cur), stuck: true });
+    else {
+      const how = f.entry.kind === 'window' ? `從${name(f.entry.room)}的窗戶出門` : f.entry.kind === 'yard' ? '從後面繞出門' : '出門上班';
+      steps.push({ time: '07:40', line: how + route(p), pts: waypoints(f, p) });
+      steps.push({ time: '08:00', line: '（上班中）', pts: null, out: true });
+      cur = f.entry.room;
+      left = true;
+    }
+  }
+  if (left) steps.push({ time: '19:00', line: '回家', pts: at(f.entry.room), jump: true });
+
+  f.rareRooms.slice(0, 2).forEach((i, k) => {
+    const time = k ? '19:50' : '19:30';
+    const p = PIECES[f.placed[i].t];
+    const { dist, prev } = bfs(f.adj, cur);
+    const path = pathTo(prev, dist, i);
+    if (!path) { steps.push({ time, line: `${p.name}進不去。只能隔牆欣賞`, pts: at(cur), stuck: true }); return; }
+    steps.push({ time, line: p.verb + route(path), pts: waypoints(f, path), face: 'happy', sound: p.sound });
+    cur = i;
+    // The rare's resident drags you into something.
+    const meet = p.npc && MEET[p.npc];
+    if (meet) {
+      const [x, y] = center(f.placed[i]);
+      steps.push({ time: k ? '20:00' : '19:40', line: meet[0], pts: at(cur), face: meet[2],
+        npcs: [{ kind: p.npc, pts: [[x + 0.6, y - 0.3], [x + 0.35, y - 0.1]], say: meet[1] }] });
+    }
+  });
+  if (f.count.ke) go('20:30', 'ke', '在客廳看電視', '', n => `走不到${n}。坐在原地滑手機`);
+  else steps.push({ time: '20:30', line: '沒有客廳。坐在床上滑手機', pts: at(cur) });
+  go('21:30', 'wei', '洗澡', '沒有衛浴。去朋友家洗澡', () => '衛浴進不去。今天不洗了');
+  go('22:30', 'fang', '睡覺', '沒有房間。睡在客廳沙發', () => `進不了房間。今晚睡${name(cur)}`, 'sleep');
+
+  // 02:00: the first rare that keeps the house awake.
+  const ev = NIGHT.find(n => n.ids.some(id => f.rares.includes(id)));
+  if (ev) {
+    const src = f.rareRooms.find(i => ev.ids.includes(f.ids[i]));
+    const [x, y] = center(f.placed[src]);
+    const npcs = ev.npc ? [{ kind: ev.npc, pts: ev.walk ? roomTour(f, src) : [[x + 0.4, y - 0.2]], say: ev.say }] : [];
+    steps.push({ time: '02:00', line: ev.line, pts: at(cur), face: 'shock', sound: ev.sound, npcs });
+  }
+  // 06:30: the landlady walks in from the front door to collect the rent.
+  if (f.entry.room >= 0 && f.placed.length > 1) {
+    const { dist, prev } = bfs(f.adj, f.entry.room);
+    const p = pathTo(prev, dist, cur);
+    if (p) steps.push({ time: '06:30', line: '包租婆來收房租', pts: at(cur), face: 'sweat', say: '明天給',
+      npcs: [{ kind: 'landlady', pts: waypoints(f, p).map(([a, b], k, all) => (k === all.length - 1 ? [a + 0.45, b] : [a, b])), say: '繳房租', face: 'angry' }] });
+  }
+  return steps;
+}
+
+// Event "神明指示": one more rare in the bag (odd rounds stay as they are, so they remain recognisable).
+function eventBag(ev, bag, rand) {
+  if (banner(bag)) return bag;
+  const ids = bag.map(b => PIECES[b.t].id);
+  const k = replaceable(ids);
+  if (k < 0) return bag;
+  const id = pick(rand, RARES.filter(x => !ids.includes(x)));
+  const p = PIECES[TYPE[id]];
+  const out = bag.slice();
+  out[k] = { t: TYPE[id], rot: p.w !== p.h && rand() < 0.5 ? 1 : 0 };
+  return out;
+}
+
+return { brief, makeBag, banner, REQUEST_CHECKS, analyze, nearestOf, info, specLine, day, eventBag };
+})();
+
+// src\banter.js
+const __m14 = (() => {
+const { rng, pick, shuffle } = __m0;
+const { PIECES, TYPE } = __m12;
+// banter.js — third-party voices around the flyer: the agent talking while you build,
+// forum replies (PTT style) under the card, slap-on stickers, the struck-out "original
+// price", and the random events of a run. Pure: facts + rng in, strings out.
+
+
+
+
+// ── live agent line after each landing. o = { n, total, piece, rand }
+const OPENERS = ['先從這裡開始。很有遠見', '第一塊就很有個性', '這個起手式我看過一次'];
+const RARE_LINES = ['這個我要加價', '稀有物件。立刻漲價', '這個社區沒有第二間', '這也能蓋。我服了'];
+const DONE = ['完工。我先去印傳單', '很好。馬上可以帶看', '這間我想自己留著'];
+const FILL = ['這個位置很有巧思', '好。這叫彈性格局', '我會說是設計師款', '採光應該不錯吧', '動線很有創意',
+  '嗯。很適合文青', '這個角度很好拍', '沒問題。我很會寫', '收到。我來包裝'];
+
+function agent(f, o) {
+  const last = f.placed.length - 1;
+  const r = f.placed[last];
+  if (!r) return '';
+  if (o.n === 1) return pick(o.rand, OPENERS);
+  if (o.piece.rare) return pick(o.rand, RARE_LINES);
+  if (f.top - f.H >= 3 && r.y + r.h === f.top) return '往上蓋了。就叫景觀樓層';
+  if (f.over.includes(last)) return '蓋出去了。說是陽台就好';
+  if (f.entry.room >= 0 && f.lost.includes(last)) return '這間進不去。防盜很好';
+  if (f.faces[last].gap > 0) return '多了一間密室。不加價';
+  if (f.ids[last] === 'wei' && f.adj[last].length >= 3) return '廁所門很多。社交型衛浴';
+  if (o.n === o.total) return pick(o.rand, DONE);
+  return pick(o.rand, FILL);
+}
+
+// ── forum replies: [tag, text] (or a list of them to vary a common case); tag 推 / 噓 / →
+const RARE_CM = {
+  miao: ['推', '這間我拜過。很靈'], tudi: ['推', '土地公是我乾爹'], ktv: ['噓', '我就是隔壁那個'],
+  yansuji: ['推', '老闆是我舅舅'], seven: ['推', '店員會幫你收包裹'], mrt: ['→', '捷運局表示不知情'],
+  mrtgao: ['噓', '我家就在列車上'], t101: ['噓', '這是模型吧'], yeshi: ['推', '求攤位招租'],
+  majiang: ['推', '三缺一請私訊'], binyi: ['→', '真的有人敢住嗎'], linggu: ['→', '管理費怎麼算'],
+  runway: ['噓', '航管說不行'], hsr: ['推', '高鐵直達很方便'], lifa: ['噓', '立委說要拆'],
+  zaoshi: ['推', '凍蒜凍蒜'], caiquan: ['推', '上週這裡開出頭獎'], wangka: ['推', '可以包台嗎'],
+  jingyu: ['→', '鯨魚會漏水嗎'], taikong: ['推', 'NASA也在看'], dama: ['噓', '早上五點真的很吵'],
+  gym: ['→', '月費另計嗎'], lese: ['推', '垃圾終於不用追'], tiepi: ['噓', '夏天會熟'],
+  wenquan: ['推', '泡湯不用去北投'], youle: ['→', '晚上有人在轉嗎'], hunsha: ['推', '單身也想拍'],
+  jiawawa: ['噓', '保夾是騙人的'], bus: ['→', '公車真的會進來嗎'], rongshu: ['推', '阿伯棋藝很好'],
+};
+const HEAD_CM = {
+  gap: ['→', '密室裡面有東西嗎'], lost: ['噓', '進得去再說'], 'lost-wei': ['噓', '廁所是裝飾嗎'],
+  'men-alone': ['→', '大門是藝術品'], men0: ['推', '爬窗順便練身體'], over: ['噓', '我家被佔了一半'],
+  weijian: [['噓', '已檢舉'], ['→', '頂樓風景不錯吧'], ['噓', '都更第一名']], 'via-wei': ['→', '全家都很尷尬'], wei0: ['噓', '所以廁所呢'],
+  'wei-doors': ['→', '上廁所要排隊'], odd: [['推', '可以分租給社團'], ['→', '房東是開宿舍的嗎']], 'wei-window': ['噓', '從廁所進出喔'],
+  'men-inner': ['→', '大門在中間很有想法'], combo: [['推', '這組合我第一次看到'], ['→', '都市計畫是誰做的']], theme: ['推', '生活圈完整'],
+};
+const GENERIC = [
+  ['推', '價格合理到可疑'], ['噓', '房仲又在亂寫'], ['→', '有人去看過嗎'], ['推', '我阿嬤說讚'], ['噓', '照騙吧'],
+  ['推', '風水老師說很旺'], ['→', '附近有好吃的嗎'], ['推', '房東人很好'], ['→', '先卡位'], ['推', '求室友'],
+  ['噓', '這格局是誰畫的'], ['→', '可以養貓嗎'], ['推', '看起來很有故事'], ['噓', '上次去看門打不開'],
+  ['→', '管理費多少'], ['推', '通勤很方便的樣子'], ['噓', '這不是我家嗎'], ['→', '房東在線嗎'],
+  ['推', '比我現在住的好'], ['噓', '又是頂加'], ['→', '有車位嗎'], ['推', '這價格在台北很佛'],
+  ['噓', '房仲照片有修'], ['→', '坪數是實坪嗎'], ['推', '鄰居看起來很熱情'], ['→', '可以短租嗎'],
+];
+const IDS = ['ahbo1958', '591master', 'tainan_ama', 'rentking', 'sleepless', 'kevin0912', 'shrimp88', 'temple_fan',
+  'night_owl', 'landlord01', 'ubike_rider', 'ktv_queen', 'gogoro99', 'bento_guy', 'pttpolice', 'mrt_kid'];
+
+const flat = list => list.flatMap(v => (Array.isArray(v[0]) ? v : [v]));
+const COMMENT_POOL = [...Object.values(RARE_CM), ...flat(Object.values(HEAD_CM)), ...GENERIC,
+  ['噓', '這價格房東認真的嗎'], ['→', '房客需求完全沒在管']];
+
+function comments(f, code, headKey, jackpot) {
+  const r = rng(code + ':cm');
+  const out = [];
+  const add = c => { if (c && out.length < 3 && !out.some(x => x[1] === c[1])) out.push(c); };
+  const hk = headKey.startsWith('rare:') ? null : headKey.split(':')[0];
+  if (headKey.startsWith('rare:')) add(RARE_CM[headKey.slice(5)]);
+  const hc = HEAD_CM[hk];
+  add(hc && Array.isArray(hc[0]) ? pick(r, hc) : hc);
+  for (const id of shuffle(r, f.rares)) if (RARE_CM[id]) { add(RARE_CM[id]); break; }
+  if (jackpot) add(['噓', '這價格房東認真的嗎']);
+  if (!f.reqOk && r() < 0.14) add(['→', '房客需求完全沒在管']);
+  for (const c of shuffle(r, GENERIC)) add(c);
+  const ids = shuffle(r, IDS);
+  return out.map(([tag, text], k) => ({ tag, id: ids[k], text }));
+}
+
+// ── stickers: one from the facts, topped up with a generic one
+const THEME_STICKER = { temple: '神明認證', market: '近夜市', store: '機能佳', transit: '近捷運', election: '選舉限定', night: '24H營業' };
+const GENERIC_STICKERS = ['屋主自售', '急售', '可議', '看屋請預約', '限女性', '可寵物', '低總價', '投資首選'];
+
+function stickers(f, code, jackpot) {
+  const r = rng(code + ':st');
+  const out = [];
+  const themes = f.rares.map(id => PIECES[TYPE[id]].theme).filter(Boolean);
+  if (jackpot) out.push('房東自訂價');
+  else if (themes.length) out.push(THEME_STICKER[themes[0]]);
+  else if (f.top - f.H >= 3) out.push('景觀戶');
+  else if (f.gaps.length) out.push('附密室');
+  else if (!f.count.men && f.placed.length) out.push('免鑰匙');
+  if (out.length < 2 && r() < 0.75) out.push(pick(r, GENERIC_STICKERS.filter(s => !out.includes(s))));
+  return out;
+}
+
+// ── the struck-out "original price": always lower. The landlord just raised it.
+function was(rent, code, jackpot) {
+  const r = rng(code + ':was');
+  if (jackpot || r() < 0.3) return '';
+  const v = Math.round((rent * (0.5 + r() * 0.3)) / 500) * 500;
+  return '原價 ' + v.toLocaleString('en-US');
+}
+
+// ── random run events (engine core.newRun picks one from rng(seed + ':event'))
+const EVENTS = [
+  { id: 'typhoon', name: '颱風天', banner: '颱風警報：吊車會亂晃', weight: 0.07, speed: 1.5, rain: true, sound: 'splash',
+    agent: '颱風天也要開工。很敬業' },
+  { id: 'call', name: '房東來電', banner: '房東來電：接下來要快一點', weight: 0.06, speed: 2.0, from: 2, len: 3, sound: 'horn',
+    agent: '房東在催。我們快一點' },
+  { id: 'quake', name: '地震', banner: '地震來了：房子會晃', weight: 0.05, quake: true, sound: 'boing',
+    agent: '有點晃。說是減震設計' },
+  { id: 'jiao', name: '神明指示', banner: '神明指示：這局必有稀有', weight: 0.04, bag: true, sound: 'gong',
+    agent: '神明有交代。這間很特別' },
+];
+
+// 擲筊 before the stamp: [result, stamp note]
+const JIAO = [['sheng', '神明同意出租'], ['xiao', '神明在笑'], ['yin', '神明不同意']];
+function jiao(code) {
+  const v = rng(code + ':jiao')();
+  return v < 0.5 ? JIAO[0] : v < 0.78 ? JIAO[1] : JIAO[2];
+}
+
+return { agent, COMMENT_POOL, comments, stickers, was, EVENTS, jiao };
+})();
+
+// src\quirks.js
+const __m15 = (() => {
+const { PIECES, TYPE, THEMES, COMBOS } = __m12;
+const { nearestOf } = __m13;
+// quirks.js — flyer copy rules, 591 agent voice: state the flaw, sell it, no 「！」.
+// Each rule reads facts only. pri bands: rare/theme 95–97 > structural disasters
+// 75–90 > odd layouts 40–70 > plain facts 10–30 > fallback 1.
+
+
+
+
+const nm = (f, i) => PIECES[f.placed[i].t].name;
+const first = (f, id, test) => f.roomsOf(id).find(test) ?? -1;
+const passes = (f, targetId, viaId) => {
+  const n = nearestOf(f, targetId);
+  return n.path && n.path.slice(1, -1).some(i => f.ids[i] === viaId) ? n.room : -1;
+};
+const doorsOf = (f, i) => f.adj[i].length;
+const maxDoors = (f, id) => Math.max(0, ...f.roomsOf(id).map(i => doorsOf(f, i)));
+const has = f => f.placed.length > 0;
+
+const RULES = [
+  { key: 'combo', pri: 96.8, when: f => comboOf(f) >= 0,
+    text: f => COMBOS[comboOf(f)][2], at: f => comboRoom(f) },
+  { key: 'weijian', pri: f => 89.5 + (f.top - f.H) / 10, when: f => f.top - f.H >= 3,
+    text: f => `頂樓違建${f.top - f.H}樓。景觀第一排`, at: f => f.over[0] ?? -1 },
+  { key: 'rare-many', pri: 97, when: f => f.rares.length >= 4,
+    text: f => `稀有空間${f.rares.length}個。已經看不出是住家`, at: f => f.rareRooms[0] },
+  { key: 'theme', pri: 96.5, when: f => !!f.theme,
+    text: f => THEMES[f.theme.key].line(PIECES[TYPE[f.theme.ids[0]]].name, PIECES[TYPE[f.theme.ids[1]]].name),
+    at: f => f.rareRooms.find(i => f.ids[i] === f.theme.ids[0]) },
+  { key: 'odd', pri: 93, when: f => !!f.odd,
+    text: f => ({ fang: `房間${f.count.fang}間。適合分租給整個社團`, wei: `衛浴${f.count.wei}套。每天換一間用`,
+      shen: `神明廳${f.count.shen}間。拜拜要排班` })[f.odd.id], at: f => f.roomsOf(f.odd.id)[0] },
+  { key: 'over', pri: f => (f.over.length >= 3 ? 89 : 56), when: f => f.over.length > 0,
+    text: f => `${f.over.length}間蓋出地界。請與鄰居和平協商`, at: f => f.over[0] },
+  { key: 'men-alone', pri: 88, when: f => f.entry.kind !== 'window' && f.entry.room >= 0 && f.placed.length > 1 && doorsOf(f, f.entry.room) === 0,
+    text: () => '打開大門，哪裡都去不了', at: f => f.entry.room },
+  { key: 'gap', pri: 86, when: f => f.gapCells > 0,
+    text: f => `神秘空間${f.gapCells}坪。誰都進不去`, at: f => cellsRect(f.gaps[0].cells) },
+  { key: 'lost-wei', pri: 84, when: f => f.entry.room >= 0 && f.roomsOf('wei').some(i => f.lost.includes(i)),
+    text: () => '打不開的衛浴。純觀賞用', at: f => f.roomsOf('wei').find(i => f.lost.includes(i)) },
+  { key: 'wei-window', pri: 82, when: f => f.entry.kind === 'window' && f.ids[f.entry.room] === 'wei',
+    text: () => '廁所的窗戶就是大門', at: f => f.entry.room },
+  { key: 'lost', pri: 80, when: f => f.entry.room >= 0 && f.lost.some(i => f.ids[i] !== 'wei'),
+    text: f => `沒有入口的${nm(f, f.lost.find(i => f.ids[i] !== 'wei'))}。防盜一流`, at: f => f.lost.find(i => f.ids[i] !== 'wei') },
+  { key: 'via-wei', pri: 79, when: f => passes(f, 'fang', 'wei') >= 0 || passes(f, 'ke', 'wei') >= 0,
+    text: f => `要穿過廁所才到${passes(f, 'fang', 'wei') >= 0 ? '房間' : '客廳'}。家人感情更緊密`,
+    at: f => f.roomsOf('wei')[0] },
+  { key: 'men0', pri: 77, when: f => has(f) && !f.count.men,
+    text: () => '無大門設計。爬窗進出很有感', at: f => f.entry.room },
+  { key: 'wei-doors', pri: f => 76 + maxDoors(f, 'wei') / 10, when: f => maxDoors(f, 'wei') >= 3,
+    text: f => `衛浴有${maxDoors(f, 'wei')}扇門。全家動線共享`, at: f => f.roomsOf('wei').find(i => doorsOf(f, i) === maxDoors(f, 'wei')) },
+  { key: 'wei0', pri: 75, when: f => has(f) && !f.count.wei,
+    text: () => '沒有衛浴。巷口公廁步行一分鐘', at: () => -1 },
+  { key: 'men-inner', pri: 74, when: f => f.roomsOf('men').some(i => f.faces[i].out === 0),
+    text: () => '大門在房子正中間。回家要先爬窗', at: f => f.roomsOf('men').find(i => f.faces[i].out === 0) },
+  { key: 'yang-in', pri: 71, when: f => f.roomsOf('yang').some(i => f.faces[i].out === 0),
+    text: () => '室內陽台。衣服永遠曬不乾', at: f => f.roomsOf('yang').find(i => f.faces[i].out === 0) },
+  { key: 'via-cang', pri: 70, when: f => passes(f, 'fang', 'cang') >= 0,
+    text: () => '穿過儲藏室才到房間。納尼亞風格', at: f => f.roomsOf('cang')[0] },
+  { key: 'cang-hub', pri: f => 67 + maxDoors(f, 'cang') / 10, when: f => maxDoors(f, 'cang') >= 3,
+    text: f => `儲藏室通${maxDoors(f, 'cang')}個房間。收納就是動線`, at: f => f.roomsOf('cang').find(i => doorsOf(f, i) === maxDoors(f, 'cang')) },
+  { key: 'men-yard', pri: 66, when: f => f.entry.kind === 'yard',
+    text: () => '大門在後面。要借道鄰居家', at: f => f.entry.room },
+  { key: 'dark', pri: 63, when: f => ['fang', 'ke'].some(id => first(f, id, i => f.faces[i].out === 0) >= 0),
+    text: f => `${nm(f, darkRoom(f))}全暗房設計。追劇沉浸感一流`, at: f => darkRoom(f) },
+  { key: 'fang0', pri: 62, when: f => has(f) && !f.count.fang,
+    text: () => '無房間設計。全家睡客廳感情好', at: () => -1 },
+  { key: 'chu0', pri: 60, when: f => has(f) && !f.count.chu,
+    text: () => '沒有廚房。外食族首選', at: () => -1 },
+  { key: 'ke0', pri: 58, when: f => has(f) && !f.count.ke,
+    text: () => '沒有客廳。訪客請改約咖啡廳', at: () => -1 },
+  { key: 'ti2', pri: 57, when: f => f.count.ti >= 2,
+    text: f => `樓梯${f.count.ti}座。全部沒有二樓`, at: f => f.roomsOf('ti')[0] },
+  { key: 'far', pri: 54, when: f => farRoom(f) >= 0,
+    text: f => `從大門到${nm(f, farRoom(f))}要經過${f.dist[farRoom(f)]}間。在家就能散步`, at: f => farRoom(f) },
+  { key: 'ke2', pri: 52, when: f => f.count.ke >= 2,
+    text: f => `客廳${f.count.ke}個。三代同堂沒問題`, at: f => f.roomsOf('ke')[1] },
+  { key: 'shen-wei', pri: 50, when: f => f.roomsOf('shen').some(i => f.near(i, ['wei'])),
+    text: () => '神明廳隔壁是廁所。請神明多包涵', at: f => f.roomsOf('shen').find(i => f.near(i, ['wei'])) },
+  { key: 'shen-road', pri: 48, when: f => f.roomsOf('shen').some(i => f.faces[i].road > 0),
+    text: () => '神明廳面馬路。香火特別鼎盛', at: f => f.roomsOf('shen').find(i => f.faces[i].road > 0) },
+  { key: 'ti', pri: 45, when: f => f.count.ti === 1,
+    text: () => '通往天空的樓梯。浪漫無價', at: f => f.roomsOf('ti')[0] },
+  { key: 'lang-dead', pri: 44, when: f => f.roomsOf('lang').some(i => doorsOf(f, i) <= 1),
+    text: () => '走廊走到底沒有路。像極了人生', at: f => f.roomsOf('lang').find(i => doorsOf(f, i) <= 1) },
+  { key: 'narrow', pri: 42, when: f => has(f) && f.width <= 3,
+    text: f => `面寬${(f.width * 1.82).toFixed(1)}米。台式長條街屋`, at: () => -1 },
+  { key: 'wei-chu', pri: 40, when: f => f.roomsOf('wei').some(i => f.near(i, ['chu'])),
+    text: () => '廚房隔壁就是廁所。動線超短', at: f => f.roomsOf('wei').find(i => f.near(i, ['chu'])) },
+  { key: 'men-wei', pri: 38, when: f => f.roomsOf('men').some(i => f.near(i, ['wei'])),
+    text: () => '一進門就是廁所。回家馬上安心', at: f => f.roomsOf('men').find(i => f.near(i, ['wei'])) },
+  { key: 'park', pri: 30, when: f => f.openRoad >= 2,
+    text: f => `門口空地可停機車${f.openRoad * 2}台`, at: () => -1 },
+  { key: 'yang-road', pri: 20, when: f => f.roomsOf('yang').some(i => f.faces[i].road > 0),
+    text: () => '陽台面馬路。曬衣兼看鄰居', at: f => f.roomsOf('yang').find(i => f.faces[i].road > 0) },
+  { key: 'normal', pri: 1, when: () => true,
+    text: () => '正常的房子。正常最難得', at: () => -1 },
+];
+
+const FALLBACK = 'normal';
+
+function comboOf(f) {
+  return COMBOS.findIndex(([a, b]) => a.some(id => f.rares.includes(id)) && b.some(id => f.rares.includes(id)));
+}
+function comboRoom(f) {
+  const [a] = COMBOS[comboOf(f)];
+  return f.rareRooms.find(i => a.includes(f.ids[i])) ?? -1;
+}
+
+// Town mode: jokes about doors into the house next door (engine crossDoors).
+// [mine, theirs, pri, text(mineName, theirsName)]; '*' any, 'temple' a temple-theme
+// rare, 'rare' any rare. First matching rule per door wins.
+const NEIGHBOR = [
+  ['fang', 'wei', 94, () => '房間有門通隔壁廁所。半夜很熱鬧'],
+  ['*', 'temple', 93.8, (m, t) => `${m}跟隔壁${t}相通。香火免費`],
+  ['men', '*', 93.6, () => '大門開在隔壁家裡。進出要打招呼'],
+  ['wei', 'fang', 93.5, () => '廁所有門通隔壁房間。很難專心'],
+  ['ke', 'ke', 93, () => '客廳跟隔壁打通。兩家一起看電視'],
+  ['chu', 'chu', 93, () => '廚房跟隔壁相通。醬油不用再借'],
+  ['fang', 'fang', 92.8, () => '房間跟隔壁房間相通。室友多一個'],
+  ['*', 'rare', 92.5, (m, t) => `${m}有門通隔壁的${t}。生活圈再擴大`],
+];
+
+const matchType = (want, p) => want === '*' || p.id === want || (want === 'rare' && p.rare) || (want === 'temple' && p.theme === 'temple');
+
+function neighbor(cross) {
+  const out = [], seen = new Set();
+  for (const c of cross) {
+    const m = PIECES[c.mineT], t = PIECES[c.theirsT];
+    const k = NEIGHBOR.findIndex(([a, b]) => matchType(a, m) && matchType(b, t));
+    if (k < 0 || seen.has(k)) continue;
+    seen.add(k);
+    out.push({ key: 'nb:' + k, pri: NEIGHBOR[k][2], text: NEIGHBOR[k][3](m.name, t.name), at: c.mine });
+  }
+  if (cross.length) out.push({ key: 'nb:doors', pri: 91, at: cross[0].mine,
+    text: cross.length > 1 ? `跟隔壁有${cross.length}扇門相通。敦親睦鄰` : '跟隔壁有一扇門相通。敦親睦鄰' });
+  return out;
+}
+
+function cellsRect(cells) {
+  const xs = cells.map(c => c[0]), ys = cells.map(c => c[1]);
+  const x = Math.min(...xs), y = Math.min(...ys);
+  return { x, y, w: Math.max(...xs) - x + 1, h: Math.max(...ys) - y + 1 };
+}
+
+function darkRoom(f) {
+  for (const id of ['fang', 'ke']) { const i = first(f, id, k => f.faces[k].out === 0); if (i >= 0) return i; }
+  return -1;
+}
+
+function farRoom(f) {
+  let best = -1;
+  for (const id of ['fang', 'ke', 'wei'])
+    for (const i of f.roomsOf(id))
+      if (Number.isFinite(f.dist[i]) && f.dist[i] >= 4 && (best < 0 || f.dist[i] > f.dist[best])) best = i;
+  return best;
+}
+
+// Rare rooms: one line each, worded from their neighbours.
+function rareQuirks(f) {
+  const seen = new Set();
+  const toBed = nearestOf(f, 'fang').path || [];
+  return f.rareRooms.flatMap((i, k) => {
+    const p = PIECES[f.placed[i].t];
+    if (seen.has(p.id)) return [];
+    seen.add(p.id);
+    const q = {
+      near: ids => f.near(i, ids),
+      road: f.faces[i].road > 0,
+      through: toBed.slice(1, -1).includes(i),
+      other: f.adj[i].length ? nm(f, f.adj[i][0].o) : '',
+    };
+    return [{ key: 'rare:' + p.id, pri: 96 - k * 0.01, text: p.text(q), at: i }];
+  });
+}
+
+function quirks(f) {
+  const out = rareQuirks(f);
+  RULES.forEach((r, k) => {
+    if (!r.when(f)) return;
+    const pri = typeof r.pri === 'function' ? r.pri(f) : r.pri;
+    out.push({ key: r.key, pri: pri - k * 0.001, text: r.text(f), at: r.at(f) ?? -1 });
+  });
+  return out.sort((a, b) => b.pri - a.pri);
+}
+
+return { RULES, FALLBACK, comboOf, neighbor, quirks };
+})();
+
+// engine\art.js
+const __m16 = (() => {
+
+// art.js — data-driven 3D art for pieces. A piece's `art` is either a preset
+// ['temple', '#c8342b'] or a list of primitives in piece-local coordinates
+// (0..w, 0..h as drawn unrotated; z up, 1 = a wall height). JSON, not code, so a
+// generated game can't break the renderer and lint can check it.
+//
+//   ['box',  x, y, w, h, z0, z1, color]   prism
+//   ['cyl',  cx, cy, r, z0, z1, color]    cylinder
+//   ['cone', cx, cy, r, z0, z1, color]    cone / spire / tree crown
+//   ['roof', x, y, w, h, z, peak, color]  hip roof from z up to peak
+//   ['flat', x, y, w, h, color]           floor patch (water, field, mat)
+//   ['sign', cx, cy, z, text]             name board on a post
+//   ['fx',   kind, cx, cy, z]             live animation (see FX_KINDS); a still in the card PNG
+//   ['npc',  kind, cx, cy]                a resident standing there (see NPC_KINDS)
+
+const PRIM_ARGS = { box: 7, cyl: 6, cone: 6, roof: 7, flat: 5, sign: 4, fx: 4, npc: 3 };
+// smoke: grey puffs · steam: white wisps · neon: pulsing pink/cyan glow · lantern: swinging red lantern
+// spark: twinkles · note: floating ♪ · train: a carriage crossing the piece's long axis · fire: flicker
+const FX_KINDS = ['smoke', 'steam', 'neon', 'lantern', 'spark', 'note', 'train', 'fire'];
+// abo 阿伯 · ama 阿嬤 · god 神明 (floats) · drunk 醉漢 · crowd 路人 · landlady 包租婆 · kid 小孩 · worker 工人
+const NPC_KINDS = ['abo', 'ama', 'god', 'drunk', 'crowd', 'landlady', 'kid', 'worker'];
+
+const WHITE = '#fbfaf6', WOOD = '#8a5a3b', LEAF = '#5c9a52';
+
+const PRESETS = {
+  temple: (w, h, c) => [
+    ['box', 0.2, 0.25, w - 0.4, h - 0.45, 0, 0.6, WHITE],
+    ['cyl', 0.3, 0.3, 0.07, 0, 0.6, c], ['cyl', w - 0.3, 0.3, 0.07, 0, 0.6, c],
+    ['roof', 0.05, 0.1, w - 0.1, h - 0.2, 0.6, 1.05, c],
+  ],
+  shrine: (w, h, c) => [
+    ['box', 0.25, 0.3, w - 0.5, h - 0.5, 0, 0.45, WHITE],
+    ['roof', 0.15, 0.2, w - 0.3, h - 0.3, 0.45, 0.75, c],
+  ],
+  stall: (w, h, c) => [
+    ['box', 0.1, 0.35, w - 0.2, h - 0.45, 0, 0.42, WHITE],
+    ['box', 0.05, 0.1, w - 0.1, h - 0.15, 0.55, 0.62, c],
+    ['cyl', 0.12, 0.15, 0.04, 0, 0.55, WOOD], ['cyl', w - 0.12, 0.15, 0.04, 0, 0.55, WOOD],
+  ],
+  shop: (w, h, c) => [
+    ['box', 0.1, 0.15, w - 0.2, h - 0.25, 0, 0.7, WHITE],
+    ['box', 0.05, 0.05, w - 0.1, 0.22, 0.48, 0.62, c],
+  ],
+  tower: (w, h, c) => [
+    ['box', 0.25, 0.25, w - 0.5, h - 0.5, 0, 2.2, c],
+    ['box', 0.32, 0.32, w - 0.64, h - 0.64, 2.2, 2.6, WHITE],
+    ['cone', w / 2, h / 2, Math.min(w, h) * 0.18, 2.6, 3.0, c],
+  ],
+  water: (w, h, c) => [['flat', 0.15, 0.15, w - 0.3, h - 0.3, c]],
+  field: (w, h, c) => {
+    const out = [['flat', 0.1, 0.1, w - 0.2, h - 0.2, '#c9b27a']];
+    for (let x = 0.4; x < w - 0.2; x += 0.5) for (let y = 0.4; y < h - 0.2; y += 0.5) out.push(['cone', x, y, 0.13, 0, 0.3, c]);
+    return out;
+  },
+  tree: (w, h, c) => [
+    ['cyl', w / 2, h / 2, 0.1, 0, 0.55, WOOD],
+    ['cone', w / 2, h / 2, Math.min(w, h) * 0.42, 0.35, 1.25, c || LEAF],
+  ],
+  booth: (w, h, c) => [
+    ['box', 0.2, 0.2, w - 0.4, h - 0.4, 0, 0.8, c],
+    ['box', 0.15, 0.15, w - 0.3, h - 0.3, 0.8, 0.88, WHITE],
+  ],
+  track: (w, h, c) => {
+    const long = w >= h, out = [];
+    const n = Math.max(2, Math.round((long ? w : h) / 1.4));
+    for (let k = 0; k < n; k++) {
+      const p = 0.4 + k * (((long ? w : h) - 0.8) / (n - 1));
+      out.push(long ? ['cyl', p, h / 2, 0.08, 0, 0.75, '#9a9a9a'] : ['cyl', w / 2, p, 0.08, 0, 0.75, '#9a9a9a']);
+    }
+    out.push(long ? ['box', 0, h * 0.25, w, h * 0.5, 0.75, 0.9, c] : ['box', w * 0.25, 0, w * 0.5, h, 0.75, 0.9, c]);
+    return out;
+  },
+  pool: (w, h, c) => [
+    ['flat', 0.1, 0.1, w - 0.2, h - 0.2, '#d9d4c7'],
+    ['flat', 0.22, 0.22, w - 0.44, h - 0.44, c],
+    ['cyl', w - 0.3, 0.3, 0.12, 0, 0.12, '#d9d4c7'],
+  ],
+  ktv: (w, h, c) => [
+    ['box', 0.15, 0.15, w - 0.3, h - 0.3, 0, 0.8, '#3b2a5e'],
+    ['box', 0.1, 0.1, w - 0.2, 0.2, 0.8, 0.95, c],
+    ['fx', 'neon', w / 2, 0.2, 1.0], ['fx', 'note', w / 2, h / 2, 0.9],
+  ],
+  nightmarket: (w, h, c) => {
+    const out = [['box', 0.1, 0.35, w - 0.2, h - 0.45, 0, 0.42, WHITE], ['box', 0.05, 0.1, w - 0.1, h - 0.15, 0.55, 0.62, c]];
+    for (let x = 0.4; x < w - 0.2; x += 0.8) out.push(['fx', 'lantern', x, 0.15, 0.95]);
+    out.push(['fx', 'steam', w / 2, h / 2, 0.5]);
+    return out;
+  },
+  incense: (w, h, c) => [
+    ['cyl', w / 2, h / 2, Math.min(w, h) * 0.28, 0, 0.5, c],
+    ['cone', w / 2, h / 2, Math.min(w, h) * 0.3, 0.5, 0.8, shadeHex(c)],
+    ['fx', 'smoke', w / 2, h / 2, 0.85],
+  ],
+  mrt: (w, h, c) => {
+    const out = PRESETS.track(w, h, c);
+    out.push(['fx', 'train', w / 2, h / 2, 0.9]);
+    return out;
+  },
+  court: (w, h, c) => [
+    ['flat', 0.1, 0.1, w - 0.2, h - 0.2, c],
+    ['cyl', 0.3, h / 2, 0.05, 0, 0.9, '#666'], ['box', 0.15, h / 2 - 0.2, 0.08, 0.4, 0.75, 1.0, WHITE],
+  ],
+};
+
+function shadeHex(c) {
+  const n = parseInt(c.slice(1).length === 3 ? [...c.slice(1)].map(x => x + x).join('') : c.slice(1), 16);
+  const ch = k => Math.round(((n >> k) & 255) * 0.7).toString(16).padStart(2, '0');
+  return '#' + ch(16) + ch(8) + ch(0);
+}
+
+// → primitive list or null. Unknown presets return null (lint reports them).
+// A preset may carry extra primitives: ['temple', '#c8342b', [['fx', 'smoke', 1, 1, 1]]].
+function expandArt(art, w, h) {
+  if (!art || !art.length) return null;
+  if (typeof art[0] === 'string' && PRESETS[art[0]]) return PRESETS[art[0]](w, h, art[1]).concat(Array.isArray(art[2]) ? art[2] : []);
+  if (Array.isArray(art[0])) return art;
+  return null;
+}
+
+// Lint helper: problems with one primitive list for a w×h piece.
+function checkArt(prims, w, h) {
+  const errs = [];
+  const hex = c => typeof c === 'string' && /^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(c);
+  for (const p of prims) {
+    const [type, ...a] = p;
+    if (!(type in PRIM_ARGS)) { errs.push(`unknown primitive ${type}`); continue; }
+    if (a.length !== PRIM_ARGS[type]) { errs.push(`${type} needs ${PRIM_ARGS[type]} args, got ${a.length}`); continue; }
+    if (type === 'fx' || type === 'npc') {
+      const list = type === 'fx' ? FX_KINDS : NPC_KINDS;
+      if (!list.includes(a[0])) { errs.push(`${type} kind ${a[0]} unknown (${list.join('/')})`); continue; }
+      const xs = a.slice(1);
+      if (xs.some(v => typeof v !== 'number' || !Number.isFinite(v))) { errs.push(`${type} has a non-number`); continue; }
+      if (xs[0] < -0.01 || xs[1] < -0.01 || xs[0] > w + 0.01 || xs[1] > h + 0.01) errs.push(`${type} outside the ${w}×${h} piece`);
+      if (type === 'fx' && (xs[2] < 0 || xs[2] > 3)) errs.push('fx z outside 0..3');
+      continue;
+    }
+    if (type === 'sign' && (typeof a[3] !== 'string' || !a[3] || [...a[3]].length > 6)) errs.push('sign text must be 1–6 chars');
+    const nums = type === 'sign' ? a.slice(0, 3) : a.slice(0, -1);
+    if (nums.some(v => typeof v !== 'number' || !Number.isFinite(v))) { errs.push(`${type} has a non-number`); continue; }
+    if (type !== 'sign' && !hex(a[a.length - 1])) errs.push(`${type} color ${a[a.length - 1]} is not #hex`);
+    const eps = 0.01;
+    const inRect = (x0, y0, x1, y1) => x0 >= -eps && y0 >= -eps && x1 <= w + eps && y1 <= h + eps;
+    if (type === 'box' || type === 'roof' || type === 'flat') { if (!inRect(a[0], a[1], a[0] + a[2], a[1] + a[3])) errs.push(`${type} leaves the ${w}×${h} piece`); }
+    else if (type === 'sign') { if (!inRect(a[0], a[1], a[0], a[1])) errs.push('sign outside the piece'); }
+    else if (!inRect(a[0] - a[2], a[1] - a[2], a[0] + a[2], a[1] + a[2])) errs.push(`${type} leaves the ${w}×${h} piece`);
+    const zs = type === 'box' || type === 'cyl' || type === 'cone' ? [a[a.length - 3], a[a.length - 2]] : type === 'roof' ? [a[4], a[5]] : type === 'sign' ? [a[2]] : [];
+    if (zs.some(z => z < 0 || z > 3)) errs.push(`${type} z outside 0..3`);
+  }
+  return errs;
+}
+
+return { PRIM_ARGS, FX_KINDS, NPC_KINDS, PRESETS, expandArt, checkArt };
+})();
+
+// src\draw.js
+const __m17 = (() => {
+const { expandArt } = __m16;
+const { PIECES } = __m12;
+// draw.js — per-piece look for grid-view. Rares rise as 3D art (spec ART) with a
+// name tag; a rare without art falls back to a sign board.
+
+
+
+
+const CORE_STYLE = {
+  ke: { fill: '#ffe3a3', pat: 'wood', mark: 'sofa' },
+  fang: { fill: '#ffcfc2', pat: 'wood', mark: 'bed' },
+  wei: { fill: '#a8dcef', pat: 'tile', mark: 'wc' },
+  men: { fill: '#e6dfcf', pat: 'tile' },
+  chu: { fill: '#ffd9a8', pat: 'tile', mark: 'stove' },
+  yang: { fill: '#cfe8b8', pat: 'stripe' },
+  ti: { fill: '#e9dcc2', pat: 'steps' },
+  cang: { fill: '#d9cdb6' },
+  shen: { fill: '#ffb9a3', mark: 'altar' },
+  lang: { fill: '#f3e6c8', pat: 'wood' },
+};
+
+const THEME_FILL = { temple: '#ff9f8a', market: '#ffd166', store: '#9fe0a8', transit: '#9cc3f5' };
+
+const STYLES = PIECES.map(p => p.rare
+  ? { fill: THEME_FILL[p.theme] || '#d9b8f0', short: p.short, sign: true, art: expandArt(p.art, p.w, p.h), npc: p.npc, glow: p.glow }
+  : { ...CORE_STYLE[p.id], short: p.short });
+
+const style = t => STYLES[t];
+
+return { style };
+})();
+
+// src\game.js
+const __m18 = (() => {
+const { W, H, PIECES, NAMES, REQUEST_TEXT, THEMES, COMBOS } = __m12;
+const { brief, makeBag, analyze, banner, info, specLine, day, eventBag } = __m13;
+const { agent, comments, stickers, was, jiao, EVENTS, COMMENT_POOL } = __m14;
+const { quirks, neighbor, RULES, FALLBACK } = __m15;
+const { style } = __m17;
+// game.js — 「格局」: assembles spec + rules + quirks + draw into the game contract.
+
+
+
+
+
+
+
+const URL_TEXT = 'tomkuo1124.github.io/shared-notes/geju';
+// Headlines that deserve the sad trombone when the card lands.
+const DISASTER = new Set(['men-alone', 'gap', 'lost-wei', 'lost', 'men0', 'wei0', 'over', 'via-wei', 'wei-window', 'weijian']);
+
+// extra (from the stage): { daily: 'YYYY-MM-DD'|null, houseNo: 1.., quirks: neighbour jokes }
+function card(f, code, extra = {}) {
+  const qs = quirks(f).concat(extra.quirks || []).sort((a, b) => b.pri - a.pri);
+  const houseNo = extra.houseNo || 1;
+  const inf = info(f, code);
+  const head = qs[0];
+  const rest = qs.slice(1).filter(q => q.key !== FALLBACK).map(q => q.text);
+  const tag = (f.theme ? `【${THEMES[f.theme.key].name}】` : f.odd ? `【${f.odd.name}】` : '')
+    + (houseNo > 1 ? `【第${houseNo}戶】` : '');
+  const spec = specLine(f);
+  const big = inf.rent.toLocaleString('en-US');
+  const cm = comments(f, code, head.key, inf.jackpot);
+  const [toss, note] = jiao(code);
+  const tier = inf.jackpot ? 'jackpot' : f.rares.length >= 2 || f.theme ? 'rare' : '';
+  return {
+    fields: {
+      badge: extra.daily ? '今日物件 ' + extra.daily.slice(5).replace('-', '/') : '新上架', name: NAMES[f.brief.name], tag, head: head.text, at: head.at, spec,
+      pre: 'NT$', big, unit: '/月', sub: inf.sub,
+      bullets: (inf.jackpot ? ['租金由房東心情決定'] : []).concat(rest).slice(0, 3),
+      stamp: { ok: f.reqOk, text: f.reqOk ? '符合需求' : '不符需求', req: REQUEST_TEXT[f.brief.req], note },
+      footer: '格局  ' + URL_TEXT,
+      tier, burst: inf.jackpot ? '房東開價' : '', was: was(inf.rent, code, inf.jackpot),
+      stickers: stickers(f, code, inf.jackpot), comments: cm, seed: code,
+      toss: { kind: 'jiao', result: toss, label: { sheng: '聖筊', xiao: '笑筊', yin: '陰筊' }[toss] },
+    },
+    share: { lines: [tag + head.text, `${spec} NT$${big}/月`],
+      optional: [`${cm[0].tag} ${cm[0].id}: ${cm[0].text}`, inf.sub, ...(houseNo > 1 ? ['整條街一起蓋，下一戶換你'] : []), extra.daily ? '#格局今日物件' : '#格局'] },
+    sfx: DISASTER.has(head.key) ? 'sad' : '',
+    keys: qs.map(q => q.key), head: head.key, rares: f.rares, rent: inf.rent, jackpot: inf.jackpot,
+    theme: f.theme && f.theme.key, odd: f.odd && f.odd.id, reqOk: f.reqOk, texts: qs.map(q => q.text),
+  };
+}
+
+const game = {
+  meta: { id: 'geju', url: URL_TEXT },
+  music: { preset: 'temple-fair' },
+  grid: { W, H },
+  pieces: PIECES,
+  names: NAMES,
+  requests: REQUEST_TEXT.map(text => ({ text })),
+  strings: {
+    title: '格局', sub: '把房間丟下去，蓋一間房子',
+    reqPrefix: t => `房客需求「${t}」`, road: '馬路',
+  },
+  ruleKeys: RULES.map(r => r.key),
+  fallbackKey: FALLBACK,
+  events: EVENTS,
+  comboTexts: COMBOS.map(c => c[2]), commentPool: COMMENT_POOL, // for sim coverage
+  brief, makeBag, analyze, banner, card, day, style, neighbor, agent, eventBag,
+};
+
+return { DISASTER, game };
+})();
+
+// src\main.js
+const __m19 = (() => {
+const { boot } = __m11;
+const { game } = __m18;
+
+
+
+boot(game);
+
+return {  };
+})();
+</script>
+</body>
+</html>
