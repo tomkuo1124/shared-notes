@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#f5f3ee">
 <title>viral-toy</title>
 <meta name="generator" content="viral-toy">
-<meta name="vt-build" content="mvm332o2-33836">
+<meta name="vt-build" content="mvm3wvi5-10636">
 <meta name="description" content="把房間丟下去，蓋一間房子">
 <meta property="og:type" content="website">
 <meta property="og:title" content="格局">
@@ -241,10 +241,12 @@ function pickEvent(events, rand) {
 
 // One run = brief + bag (+ event), each from an isolated stream of the run seed.
 // Events never reach the share code: a link replays drops, so the card must not depend on them.
-function newRun(game, seed) {
+// opts.seen: rare ids this player already found (only for fresh random runs; the daily and
+// replayed seeds pass nothing, so they stay identical everywhere).
+function newRun(game, seed, opts = {}) {
   const event = pickEvent(game.events, rng(seed + ':event'));
-  let bag = game.makeBag(rng(seed + ':bag'));
-  if (event && event.bag && game.eventBag) bag = game.eventBag(event, bag, rng(seed + ':event-bag'));
+  let bag = game.makeBag(rng(seed + ':bag'), opts);
+  if (event && event.bag && game.eventBag) bag = game.eventBag(event, bag, rng(seed + ':event-bag'), opts);
   return { seed, brief: game.brief(rng(seed + ':brief')), bag, event, drops: [], placed: [] };
 }
 
@@ -2019,7 +2021,7 @@ const ENGINE_STRINGS = {
   next: '下一個', hint: '點一下放下', hintKey: '點一下或按空白鍵放下', skip: '略過', go: '隨便蓋', zukan: '稀有空間圖鑑',
   close: '關閉', post: '分享到 X', save: '存圖', again: '再蓋一間', mine: '我也來蓋',
   watch: '住住看', hold: '長按快轉', newFind: n => '新發現：' + n, locked: '？？？',
-  daily: d => '今日物件 ' + d, nextdoor: '在隔壁蓋',
+  daily: (d, note) => '今日物件 ' + d + ' · ' + note, dailyNew: '每天同一間', dailyDone: n => '已蓋 ' + n + ' 次', nextdoor: '在隔壁蓋',
   record: (n, best) => `今日物件第${n}次 · 你的最高 ${best}`,
   soundOn: '音效 開', soundOff: '音效 關', video: '存影片', recording: '錄影中…',
 };
@@ -2093,7 +2095,14 @@ function boot(game) {
   const panels = ['title', 'zukan', 'result'];
   const mmdd = date => date.slice(5).replace('-', '/');
   // Re-read the date whenever the title shows: a tab left open past midnight must not show yesterday.
-  const dailyLabel = () => { $('daily').textContent = tr('daily', mmdd(today())); };
+  // The daily is the same house for everyone all day: say so, and once it is played make 隨便蓋 the big button.
+  const dailyCount = date => { try { return JSON.parse(localStorage.getItem(`vt.${game.meta.id}.daily.${date}`) || '{}').n || 0; } catch { return 0; } };
+  const dailyLabel = () => {
+    const d = today(), n = dailyCount(d);
+    $('daily').textContent = tr('daily', mmdd(d), n ? tr('dailyDone', n) : tr('dailyNew'));
+    $('daily').classList.toggle('primary', !n);
+    $('go').classList.toggle('primary', !!n);
+  };
   const show = id => { if (id === 'title') dailyLabel(); panels.forEach(p => { $(p).hidden = p !== id; }); };
   dailyLabel();
   document.addEventListener('visibilitychange', () => { if (!document.hidden) dailyLabel(); });
@@ -2122,7 +2131,7 @@ function boot(game) {
 
   // opts: { daily: 'YYYY-MM-DD' | null, street: [{ code, drops }] (houses to the left) }
   function startRun(seed, opts = {}) {
-    S.run = newRun(game, seed);
+    S.run = newRun(game, seed, { seen: opts.seen });
     S.an = game.analyze([], S.run.brief);
     S.theirs = false; S.res = null; S.rows = H + 3;
     S.daily = opts.daily || null;
@@ -2499,10 +2508,12 @@ function boot(game) {
   $('skip').addEventListener('click', e => { e.stopPropagation(); if (S.mode === 'reveal') finish(); });
   $('skip').addEventListener('pointerdown', e => e.stopPropagation());
   $('daily').addEventListener('click', startDaily);
-  $('go').addEventListener('click', () => startRun(randomSeed()));
-  $('again').addEventListener('click', () => startRun(randomSeed()));
-  $('mine').addEventListener('click', () => startRun(randomSeed()));
-  $('nextdoor').addEventListener('click', () => startRun(randomSeed(), { street: chain() }));
+  // Fresh random runs lean toward rares not yet in this browser's 圖鑑 (game.makeBag opts.seen).
+  const fresh = (opts = {}) => startRun(randomSeed(), { ...opts, seen: zk.list() });
+  $('go').addEventListener('click', () => fresh());
+  $('again').addEventListener('click', () => fresh());
+  $('mine').addEventListener('click', () => fresh());
+  $('nextdoor').addEventListener('click', () => fresh({ street: chain() }));
   $('watch').addEventListener('click', () => { beginReveal(false); S.tour = S.theirs; });
   // Save video: replay the rise + day while recording the canvas and the music (webm).
   const vbtn = $('r-video');
@@ -2924,7 +2935,8 @@ const { W, H, ROOMS, PIECES, TYPE, THEMES, NAMES, REQUEST_TEXT, ODD, COMBOS } = 
 
 const CORE = ['ke', 'fang', 'fang', 'wei', 'men', 'chu'];
 const FILL = [['cang', 1.8], ['yang', 1.6], ['wei', 1.5], ['fang', 1.0], ['ti', 1.0], ['lang', 0.8], ['shen', 0.7], ['men', 0.7], ['chu', 0.4], ['ke', 0.4]];
-const RARE_CHAIN = [0.54, 0.55, 0.4, 0.3]; // first link > .5: odd rounds (8%) carry no rares
+const RARE_CHAIN = [0.70, 0.55, 0.4, 0.3]; // ≥1 rare in ~65% of games (odd rounds, 8%, carry none)
+const UNSEEN = 3; // a rare not yet in the player's 圖鑑 is this many times as likely
 const RARES = PIECES.filter(p => p.rare).map(p => p.id);
 const FILLERS = new Set(['cang', 'ti', 'shen', 'lang', 'yang']);
 const MUST_KEEP = ['ke', 'men', 'wei', 'fang'];
@@ -2933,7 +2945,8 @@ function brief(rand) {
   return { name: Math.floor(rand() * NAMES.length), req: Math.floor(rand() * REQUEST_TEXT.length) };
 }
 
-function makeBag(rand) {
+// opts.seen: rare ids already found (fresh random runs only). Empty → every rare equally likely.
+function makeBag(rand, { seen = [] } = {}) {
   const oddR = rng('odd:' + Math.floor(rand() * 1e9));
   const o = oddR();
   const odd = o < 0.03 ? ODD[0] : o < 0.06 ? ODD[1] : o < 0.08 ? ODD[2] : null;
@@ -2954,13 +2967,17 @@ function makeBag(rand) {
       // A later rare is often a combo partner of one already in the bag, so combos actually happen.
       const partners = ids.flatMap(id => COMBOS.flatMap(([a, b]) => (a.includes(id) ? b : b.includes(id) ? a : [])))
         .filter(id => pool.includes(id));
-      ids[k] = partners.length && rand() < 0.45 ? pick(rand, partners) : pick(rand, pool);
+      ids[k] = partners.length && rand() < 0.45 ? pick(rand, partners) : pickRare(rand, pool, seen);
     }
   }
   return shuffle(rand, ids).map(id => {
     const p = PIECES[TYPE[id]];
     return { t: TYPE[id], rot: p.w !== p.h && rand() < 0.5 ? 1 : 0 };
   });
+}
+
+function pickRare(rand, pool, seen) {
+  return weighted(rand, pool.map(id => [id, seen.includes(id) ? 1 : UNSEEN]));
 }
 
 // Least essential slot, searching from the end: fillers, then spare core copies.
@@ -3203,12 +3220,12 @@ function day(f) {
 }
 
 // Event "神明指示": one more rare in the bag (odd rounds stay as they are, so they remain recognisable).
-function eventBag(ev, bag, rand) {
+function eventBag(ev, bag, rand, { seen = [] } = {}) {
   if (banner(bag)) return bag;
   const ids = bag.map(b => PIECES[b.t].id);
   const k = replaceable(ids);
   if (k < 0) return bag;
-  const id = pick(rand, RARES.filter(x => !ids.includes(x)));
+  const id = pickRare(rand, RARES.filter(x => !ids.includes(x)), seen);
   const p = PIECES[TYPE[id]];
   const out = bag.slice();
   out[k] = { t: TYPE[id], rot: p.w !== p.h && rand() < 0.5 ? 1 : 0 };
