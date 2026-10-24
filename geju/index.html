@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#f5f3ee">
 <title>viral-toy</title>
 <meta name="generator" content="viral-toy">
-<meta name="vt-build" content="mvlzs1nw-38872">
+<meta name="vt-build" content="mvm332o2-33836">
 <meta name="description" content="把房間丟下去，蓋一間房子">
 <meta property="og:type" content="website">
 <meta property="og:title" content="格局">
@@ -102,7 +102,6 @@ h1 { display: inline-block; transform: rotate(-3deg); color: var(--red); text-sh
   box-shadow: 0 3px 0 var(--ink); }
 .sound.pill:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--ink); }
 .sound.off { color: var(--muted) !important; background: #ecebe6 !important; }
-.box .sound.switch { align-self: center; padding: 8px 18px !important; font-size: 15px; }
 
 /* the agent talking during the build */
 #agent { position: absolute; left: 12px; top: 8px; right: 12px; display: flex; align-items: flex-end; gap: 6px; pointer-events: none; z-index: 2; }
@@ -145,7 +144,6 @@ h1 { display: inline-block; transform: rotate(-3deg); color: var(--red); text-sh
     <p class="sub" data-t="sub"></p>
     <button id="daily" type="button" class="primary big"></button>
     <button id="go" type="button" class="big" data-t="go"></button>
-    <button id="t-sound" type="button" class="sound switch" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="lbl"></span></button>
     <button id="t-zukan" type="button" class="link"><span data-t="zukan"></span> <span class="zk-count"></span></button>
   </div>
 </section>
@@ -177,7 +175,6 @@ h1 { display: inline-block; transform: rotate(-3deg); color: var(--red); text-sh
       <button id="mine" type="button" class="big" data-t="mine"></button>
       <button id="watch" type="button" data-t="watch"></button>
     </div>
-    <button id="r-sound" type="button" class="sound switch" aria-pressed="true"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/><path class="wave" d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path class="x" d="M16 9l6 6M22 9l-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span class="lbl"></span></button>
     <button id="r-zukan" type="button" class="link"><span data-t="zukan"></span> <span class="zk-count"></span></button>
   </div>
 </section>
@@ -2019,7 +2016,7 @@ const { person, LOOKS } = __m6;
 
 
 const ENGINE_STRINGS = {
-  next: '下一個', hint: '點一下放下', skip: '略過', go: '隨便蓋', zukan: '稀有空間圖鑑',
+  next: '下一個', hint: '點一下放下', hintKey: '點一下或按空白鍵放下', skip: '略過', go: '隨便蓋', zukan: '稀有空間圖鑑',
   close: '關閉', post: '分享到 X', save: '存圖', again: '再蓋一間', mine: '我也來蓋',
   watch: '住住看', hold: '長按快轉', newFind: n => '新發現：' + n, locked: '？？？',
   daily: d => '今日物件 ' + d, nextdoor: '在隔壁蓋',
@@ -2056,8 +2053,9 @@ function boot(game) {
     rev: null, steps: [], hold: false, theirs: false, rows: H + 3, dpr: 1, cw: 0, ch: 0,
     street: [], daily: null, art: null, time: 0, light: 0, zoom: 1, squash: null };
   const fx = fxLayer();
+  const FINE_POINTER = !!(window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches);
   const au = audio(game.music || {}, `vt.${game.meta.id}.mute`);
-  // Sound on/off: the corner pill + big switches on the title and result panels, one shared state.
+  // Sound on/off: one corner pill, visible on every screen (title, build, reveal, card).
   const soundBtns = [...document.querySelectorAll('.sound')];
   const showMute = () => soundBtns.forEach(b => {
     b.classList.toggle('off', au.muted);
@@ -2137,6 +2135,7 @@ function boot(game) {
     S.mode = 'build';
     au.unlock(); au.music('build'); au.intensity(0);
     show(null);
+    $('hint').textContent = (FINE_POINTER && !(game.strings && game.strings.hint && !game.strings.hintKey) ? tr('hintKey') : tr('hint')); // desktop: mention the Space key
     $('hint').hidden = false;
     $('hud').hidden = false;
     const ban = (game.banner ? game.banner(S.run.bag) : '') || (ev ? ev.banner : '');
@@ -2477,6 +2476,26 @@ function boot(game) {
     e.preventDefault();
   });
   for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) $('stage').addEventListener(ev, () => { S.hold = false; });
+  // Desktop: Space does what a tap does (drop / hold to fast-forward the reveal).
+  let spaceEaten = false;
+  const typing = e => /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || e.target.isContentEditable;
+  document.addEventListener('keydown', e => {
+    if (e.code !== 'Space' || typing(e)) return;
+    if (S.mode !== 'build' && S.mode !== 'reveal') return; // title / card: Space keeps pressing the focused button
+    e.preventDefault(); // no page scroll, no click on the button that still has focus
+    spaceEaten = true;
+    au.unlock();
+    if (e.repeat) return;
+    if (S.mode === 'build' && mech.tap()) { $('hint').hidden = true; au.sfx('drop'); }
+    if (S.mode === 'reveal') S.hold = true;
+  });
+  document.addEventListener('keyup', e => {
+    if (e.code !== 'Space') return;
+    S.hold = false;
+    if (spaceEaten) { spaceEaten = false; e.preventDefault(); } // some browsers click the focused button on keyup
+  });
+  // A key released in another window never sends keyup: never stay on fast-forward.
+  window.addEventListener('blur', () => { S.hold = false; spaceEaten = false; });
   $('skip').addEventListener('click', e => { e.stopPropagation(); if (S.mode === 'reveal') finish(); });
   $('skip').addEventListener('pointerdown', e => e.stopPropagation());
   $('daily').addEventListener('click', startDaily);
